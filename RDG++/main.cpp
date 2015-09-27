@@ -1,96 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include "SettingsParser.hpp"
+#include "pugixml.hpp"
+#include "settings.hpp"
 #include <iostream>
 #include <fstream>
-
-// store Settings in own class for easy parameter passing
-class Settings
-{
-	// make settings fields public for easier read/write
-	public:
-
-		// constants
-		const std::string APPNAME = "RDG++";
-		const std::string SETTINGS_FILE = "settings.txt";
-		const unsigned int colorDepth = 32;
-
-		// variables
-		unsigned int width;
-		unsigned int height;
-		bool fullscreen;
-
-		// write initial default settings to newly created output file
-		void writeDefaultSettings() {
-
-			std::cout << "Writing default settings." << std::endl;
-
-			// open settings file
-			std::ofstream outfile(SETTINGS_FILE);
-
-			// write video mode variables
-			outfile << "# VideoMode" << std::endl;
-			outfile << "width = " << width << std::endl;
-			outfile << "height = " << height << std::endl;
-			outfile << "fullscreen = " << ((fullscreen == true) ? "TRUE" : "FALSE") << std::endl;
-			
-			// close settings file
-			outfile.close();
-		}
-
-		// writes settings to settings file
-		void saveSettings() {
-
-			std::cout << "Writing settings to " << SETTINGS_FILE << std::endl;
-
-			settingsParser.set("width", width);
-			settingsParser.set("height", height);
-			settingsParser.set("fullscreen", fullscreen);
-
-			settingsParser.saveToFile();
-			settingsParser.print();
-		}
-
-		// loads settings from settings file
-		bool loadSettings() {
-
-			// try to create new settings file if none exists
-			if (!settingsParser.loadFromFile(SETTINGS_FILE))
-			{
-				std::cout << "Settings file not found! Trying to create new settings file..." << std::endl;
-
-				// create settings file with default settings
-				writeDefaultSettings();
-			}
-
-			// load settings file
-			if (!settingsParser.loadFromFile(SETTINGS_FILE))
-			{
-				std::cout << "Error loading settings file!" << std::endl;
-				return false;
-			}
-			else
-			{
-				std::cout << "Loading settings from " << SETTINGS_FILE << std::endl;
-				
-				settingsParser.get("width", width);
-				settingsParser.get("height", height);
-				settingsParser.get("fullscreen", fullscreen);
-
-				settingsParser.print();
-			}
-
-			return true;
-		}
-
-	private:
-		SettingsParser settingsParser;
-};
 
 int main()
 {
 
 	// game settings variables declaration
-	Settings settings{};
+	Settings settings;
 
 	// game engine variables declaration
 	SettingsParser settingsParser;

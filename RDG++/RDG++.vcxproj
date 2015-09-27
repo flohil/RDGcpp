@@ -69,9 +69,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="pugixml.cpp" />
+    <ClCompile Include="settings.cpp" />
     <ClCompile Include="SettingsParser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="pugiconfig.hpp" />
+    <ClInclude Include="pugixml.hpp" />
+    <ClInclude Include="settings.hpp" />
     <ClInclude Include="SettingsParser.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
