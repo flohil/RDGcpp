@@ -1,123 +1,159 @@
-#include <SFGUI/SFGUI.hpp>
-#include <SFGUI/Widgets.hpp>
-
 #include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
-#include <cmath>
+#include "SettingsParser.hpp"
+#include <iostream>
+#include <fstream>
 
-int main() {
-	// An sf::Window for raw OpenGL rendering.
-	sf::Window app_window(sf::VideoMode(800, 600), "SFGUI with OpenGL example", sf::Style::Titlebar | sf::Style::Close);
+// store Settings in own class for easy parameter passing
+class Settings
+{
+	// make settings fields public for easier read/write
+	public:
 
-	// Create an SFGUI. This is required before doing anything with SFGUI.
-	sfg::SFGUI sfgui;
+		// constants
+		const std::string APPNAME = "RDG++";
+		const std::string SETTINGS_FILE = "settings.txt";
+		const unsigned int colorDepth = 32;
 
-	// Set the SFML Window's context back to the active one. SFGUI creates
-	// a temporary context on creation that is set active.
-	app_window.setActive();
+		// variables
+		unsigned int width;
+		unsigned int height;
+		bool fullscreen;
 
-	// Initial OpenGL setup.
-	// We have to set up our own OpenGL viewport because we are using an sf::Window.
-	glViewport(0, 0, static_cast<int>(app_window.getSize().x), static_cast<int>(app_window.getSize().y));
+		// write initial default settings to newly created output file
+		void writeDefaultSettings() {
 
-	auto red_scale = sfg::Scale::Create(0.f, 1.f, .01f, sfg::Scale::Orientation::HORIZONTAL);
-	auto green_scale = sfg::Scale::Create(0.f, 1.f, .01f, sfg::Scale::Orientation::HORIZONTAL);
-	auto blue_scale = sfg::Scale::Create(0.f, 1.f, .01f, sfg::Scale::Orientation::HORIZONTAL);
-	auto angle_scale = sfg::Scale::Create(0.f, 360.f, 1.f, sfg::Scale::Orientation::HORIZONTAL);
-	auto auto_check = sfg::CheckButton::Create("Auto");
+			std::cout << "Writing default settings." << std::endl;
 
-	auto table = sfg::Table::Create();
-	table->SetRowSpacings(5.f);
-	table->SetColumnSpacings(5.f);
+			// open settings file
+			std::ofstream outfile(SETTINGS_FILE);
 
-	table->Attach(sfg::Label::Create("Change the color of the rect using the scales below."), sf::Rect<sf::Uint32>(0, 0, 3, 1), sfg::Table::FILL, sfg::Table::FILL);
-	table->Attach(sfg::Label::Create("Red:"), sf::Rect<sf::Uint32>(0, 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL);
-	table->Attach(red_scale, sf::Rect<sf::Uint32>(1, 1, 1, 1), sfg::Table::FILL | sfg::Table::EXPAND, sfg::Table::FILL | sfg::Table::EXPAND);
-	table->Attach(sfg::Label::Create("Green:"), sf::Rect<sf::Uint32>(0, 2, 1, 1), sfg::Table::FILL, sfg::Table::FILL);
-	table->Attach(green_scale, sf::Rect<sf::Uint32>(1, 2, 1, 1), sfg::Table::FILL | sfg::Table::EXPAND, sfg::Table::FILL | sfg::Table::EXPAND);
-	table->Attach(sfg::Label::Create("Blue:"), sf::Rect<sf::Uint32>(0, 3, 1, 1), sfg::Table::FILL, sfg::Table::FILL);
-	table->Attach(blue_scale, sf::Rect<sf::Uint32>(1, 3, 1, 1), sfg::Table::FILL | sfg::Table::EXPAND, sfg::Table::FILL | sfg::Table::EXPAND);
-	table->Attach(sfg::Label::Create("Angle:"), sf::Rect<sf::Uint32>(0, 4, 1, 1), sfg::Table::FILL, sfg::Table::FILL);
-	table->Attach(angle_scale, sf::Rect<sf::Uint32>(1, 4, 1, 1), sfg::Table::FILL | sfg::Table::EXPAND, sfg::Table::FILL | sfg::Table::EXPAND);
-	table->Attach(auto_check, sf::Rect<sf::Uint32>(2, 4, 1, 1), sfg::Table::FILL, sfg::Table::FILL);
+			// write video mode variables
+			outfile << "# VideoMode" << std::endl;
+			outfile << "width = " << width << std::endl;
+			outfile << "height = " << height << std::endl;
+			outfile << "fullscreen = " << ((fullscreen == true) ? "TRUE" : "FALSE") << std::endl;
+			
+			// close settings file
+			outfile.close();
+		}
 
-	auto window = sfg::Window::Create();
-	window->SetTitle("SFGUI with OpenGL");
-	window->Add(table);
+		// writes settings to settings file
+		void saveSettings() {
 
-	sfg::Desktop desktop;
-	desktop.Add(window);
+			std::cout << "Writing settings to " << SETTINGS_FILE << std::endl;
 
-	red_scale->SetValue(.2f);
-	green_scale->SetValue(.5f);
-	blue_scale->SetValue(.8f);
+			settingsParser.set("width", width);
+			settingsParser.set("height", height);
+			settingsParser.set("fullscreen", fullscreen);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+			settingsParser.saveToFile();
+			settingsParser.print();
+		}
 
-	static const auto pi = 3.1415926535897932384626433832795f;
-	static const auto fov = 90.f;
-	static const auto near_distance = .1f;
-	static const auto far_distance = 100.f;
-	static const auto aspect = 800.f / 600.f;
+		// loads settings from settings file
+		bool loadSettings() {
 
-	auto frustum_height = std::tan(fov / 360 * pi) * near_distance;
-	auto frustum_width = frustum_height * aspect;
+			// try to create new settings file if none exists
+			if (!settingsParser.loadFromFile(SETTINGS_FILE))
+			{
+				std::cout << "Settings file not found! Trying to create new settings file..." << std::endl;
 
-	glFrustum(-frustum_width, frustum_width, -frustum_height, frustum_height, near_distance, far_distance);
+				// create settings file with default settings
+				writeDefaultSettings();
+			}
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+			// load settings file
+			if (!settingsParser.loadFromFile(SETTINGS_FILE))
+			{
+				std::cout << "Error loading settings file!" << std::endl;
+				return false;
+			}
+			else
+			{
+				std::cout << "Loading settings from " << SETTINGS_FILE << std::endl;
+				
+				settingsParser.get("width", width);
+				settingsParser.get("height", height);
+				settingsParser.get("fullscreen", fullscreen);
 
-	sf::Event event;
+				settingsParser.print();
+			}
 
-	sf::Clock clock;
+			return true;
+		}
 
-	while (app_window.isOpen()) {
-		auto delta = clock.restart().asSeconds();
+	private:
+		SettingsParser settingsParser;
+};
 
-		while (app_window.pollEvent(event)) {
+int main()
+{
+
+	// game settings variables declaration
+	Settings settings{};
+
+	// game engine variables declaration
+	SettingsParser settingsParser;
+	sf::VideoMode desktopVmode;
+	sf::VideoMode vmode;
+	sf::RenderWindow window;
+
+	// retrieve desktop Vmode
+	desktopVmode = sf::VideoMode::getDesktopMode();
+
+	// set default game settings variables
+	settings.fullscreen = true;
+	settings.width = desktopVmode.width;
+	settings.height = desktopVmode.height;
+
+	// load settings from settings file
+	if (!settings.loadSettings())
+	{
+		return -1;
+	}
+
+	// create video mode and window
+	vmode = sf::VideoMode(settings.width, settings.height, settings.colorDepth);
+	window.create(sf::VideoMode(settings.width, settings.height, settings.colorDepth), settings.APPNAME, (settings.fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+	
+	window.setFramerateLimit(60); //limit fps to 60 
+
+	// retrieve a list of all possible fullscreen video modes
+	std::vector<sf::VideoMode> vmodes = sf::VideoMode::getFullscreenModes();
+
+	// output possible resolutions
+	for (unsigned i = 0; i < vmodes.size(); i++) 
+	{
+		std::cout << vmodes[i].width << " x " << vmodes[i].height << "\n";
+	}
+		
+	// run the program as long as the window is open
+	while (window.isOpen())
+	{
+
+		// check all the window's events that were triggered since the last iteration of the loop
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			// "close requested" event: we close the window
 			if (event.type == sf::Event::Closed) {
-				app_window.close();
+
+				window.close();
 			}
-			else {
-				desktop.HandleEvent(event);
+			else if (event.type == sf::Event::KeyPressed) {
+				settings.fullscreen = !settings.fullscreen;
+				window.create(sf::VideoMode(settings.width, settings.height, settings.colorDepth), settings.APPNAME, (settings.fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+				std::cout << "fullscreen? " << settings.fullscreen << " - size: " << window.getSize().x << " x " << window.getSize().y << std::endl;
+			
+				settings.saveSettings();
 			}
+
+			// Clear the whole window before rendering a new frame
+			window.clear(sf::Color::Red);
+
+			// End the current frame and display its contents on screen
+			window.display();
 		}
-
-		if (auto_check->IsActive()) {
-			float angle(angle_scale->GetValue());
-			angle += delta * 90.f;
-
-			while (angle >= 360.f) {
-				angle -= 360.f;
-			}
-
-			angle_scale->SetValue(angle);
-		}
-
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		glMatrixMode(GL_MODELVIEW);
-
-		glLoadIdentity();
-		glRotatef(angle_scale->GetValue(), 0.f, 0.f, 1.f);
-		glTranslatef(-.5f, -.5f, -5.f);
-
-		glBegin(GL_QUADS);
-		glColor3f(red_scale->GetValue(), green_scale->GetValue(), blue_scale->GetValue());
-		glVertex3f(0.f, 1.f, 0.f);
-		glVertex3f(0.f, 0.f, 0.f);
-		glVertex3f(1.f, 0.f, 0.f);
-		glVertex3f(1.f, 1.f, 0.f);
-		glEnd();
-
-		desktop.Update(delta);
-
-		// SFGUI rendering.
-		sfgui.Display(app_window);
-
-		app_window.display();
 	}
 
 	return 0;
