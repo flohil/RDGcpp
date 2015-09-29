@@ -12,6 +12,7 @@ public:
 	// constants
 	const std::string APPNAME;
 	const std::string SETTINGS_FILE_PATH;
+	const std::string CONFIG_PATH;
 	const unsigned int COLOR_DEPTH;
 
 	// variables

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Potions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Potion>
+		<Name>Instant Cure</Name>
+		<Item_Class>weak</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>fills x HP immediatly</Description>
+		<Target>self</Target>
+		<Effect>hp</Effect>
+		<Mode>+</Mode>
+		<x>50</x>
+		<n>1</n>
+		<Image>potions/instant_cure.png</Image>
+	</Potion>
+	<Potion>
+		<Name>Regeneration</Name>
+		<Item_Class>weak</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>regenerates x HP over n rounds</Description>
+		<Target>self</Target>
+		<Effect>hp</Effect>
+		<Mode>+</Mode>
+		<x>10</x>
+		<n>5</n>
+		<Image>potions/regeneration.png</Image>
+	</Potion>
+	<Potion>
+		<Name>Antidote</Name>
+		<Item_Class>strong</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>reverses poison effect</Description>
+		<Target>self</Target>
+		<Effect>hp</Effect>
+		<Mode>x</Mode>
+		<x>1</x>
+		<n>1</n>
+		<Image>potions/antidote.png</Image>
+	</Potion>
+	<Potion>
+		<Name>Strength</Name>
+		<Item_Class>medium</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>increases strength by x for n rounds</Description>
+		<Target>self</Target>
+		<Effect>strength</Effect>
+		<Mode>&gt;</Mode>
+		<x>10</x>
+		<n>5</n>
+		<Image>potions/strength.png</Image>
+	</Potion>
+	<Potion>
+		<Name>Speed</Name>
+		<Item_Class>medium</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>increases speed by x for n rounds</Description>
+		<Target>self</Target>
+		<Effect>speed</Effect>
+		<Mode>&gt;</Mode>
+		<x>10</x>
+		<n>5</n>
+		<Image>potions/speed.png</Image>
+	</Potion>
+	<Potion>
+		<Name>Accuracy</Name>
+		<Item_Class>medium</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>increases accuracy by x for n rounds</Description>
+		<Target>self</Target>
+		<Effect>accuracy</Effect>
+		<Mode>&gt;</Mode>
+		<x>10</x>
+		<n>5</n>
+		<Image>potions/accuracy.png</Image>
+	</Potion>
+	<Potion>
+		<Name>Blindness </Name>
+		<Item_Class>medium</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>decreases accuracy by x for n rounds</Description>
+		<Target>opponent</Target>
+		<Effect>accuracy</Effect>
+		<Mode>&lt;</Mode>
+		<x>10</x>
+		<n>5</n>
+		<Image>potions/blindness.png</Image>
+	</Potion>
+	<Potion>
+		<Name>Slowness</Name>
+		<Item_Class>medium</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>descreases speed by x for n rounds</Description>
+		<Target>opponent</Target>
+		<Effect>speed</Effect>
+		<Mode>&lt;</Mode>
+		<x>10</x>
+		<n>5</n>
+		<Image>potions/slowness.png</Image>
+	</Potion>
+	<Potion>
+		<Name>Poison</Name>
+		<Item_Class>strong</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>deals x damage for n rounds</Description>
+		<Target>opponent</Target>
+		<Effect>hp</Effect>
+		<Mode>-</Mode>
+		<x>10</x>
+		<n>5</n>
+		<Image>potions/poison.png</Image>
+	</Potion>
+	<Potion>
+		<Name>Weakness</Name>
+		<Item_Class>medium</Item_Class>
+		<Class_Multiplier>1</Class_Multiplier>
+		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
+		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
+		<Description>decreases strength by x for n rounds</Description>
+		<Target>opponent</Target>
+		<Effect>strength</Effect>
+		<Mode>&lt;</Mode>
+		<x>10</x>
+		<n>5</n>
+		<Image>potions/weakness.png</Image>
+	</Potion>
+</Potions>

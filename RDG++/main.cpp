@@ -1,6 +1,5 @@
 #include <SFML/Graphics.hpp>
 #include "SettingsParser.hpp"
-#include "pugixml.hpp"
 #include "settings.hpp"
 #include "exceptions.hpp"
 #include "prototypes.hpp"
@@ -20,20 +19,19 @@ int main()
 	// obtain desktop vMode for default settings
 	desktopVmode = sf::VideoMode::getDesktopMode();
 
-	// game settings variables declaration
+	// game settings and prototype initialization
 	std::unique_ptr<Settings> settings;
+	std::unique_ptr<PrototypeStorage> prototypeStorage;
 	try
 	{
 		settings.reset(new Settings(desktopVmode.width, desktopVmode.height));
+		prototypeStorage.reset(new PrototypeStorage(settings->CONFIG_PATH));
 	}
-	catch (LocationException& e)
+	catch (std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
 		return -1;
 	}
-
-	// prototype initialization
-	PrototypeStorage storage;
 
 	// create video mode and window
 	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);
