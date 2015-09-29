@@ -5,6 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
+*.vcxproj
 
 # Build results
 [Dd]ebug/
@@ -187,3 +188,4 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+/RDG++/settings.txt
