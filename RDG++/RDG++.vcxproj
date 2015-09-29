@@ -68,12 +68,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="exceptions.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="prototypes.cpp" />
     <ClCompile Include="pugixml.cpp" />
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="SettingsParser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="exceptions.hpp" />
+    <ClInclude Include="prototypes.hpp" />
     <ClInclude Include="pugiconfig.hpp" />
     <ClInclude Include="pugixml.hpp" />
     <ClInclude Include="settings.hpp" />

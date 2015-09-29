@@ -2,14 +2,14 @@
 #include "SettingsParser.hpp"
 #include "pugixml.hpp"
 #include "settings.hpp"
+#include "exceptions.hpp"
+#include "prototypes.hpp"
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 int main()
 {
-
-	// game settings variables declaration
-	Settings settings;
 
 	// game engine variables declaration
 	SettingsParser settingsParser;
@@ -17,23 +17,27 @@ int main()
 	sf::VideoMode vmode;
 	sf::RenderWindow window;
 
-	// retrieve desktop Vmode
+	// obtain desktop vMode for default settings
 	desktopVmode = sf::VideoMode::getDesktopMode();
 
-	// set default game settings variables
-	settings.fullscreen = true;
-	settings.width = desktopVmode.width;
-	settings.height = desktopVmode.height;
-
-	// load settings from settings file
-	if (!settings.loadSettings())
+	// game settings variables declaration
+	std::unique_ptr<Settings> settings;
+	try
 	{
+		settings.reset(new Settings(desktopVmode.width, desktopVmode.height));
+	}
+	catch (LocationException& e)
+	{
+		std::cerr << e.what() << std::endl;
 		return -1;
 	}
 
+	// prototype initialization
+	PrototypeStorage storage;
+
 	// create video mode and window
-	vmode = sf::VideoMode(settings.width, settings.height, settings.colorDepth);
-	window.create(sf::VideoMode(settings.width, settings.height, settings.colorDepth), settings.APPNAME, (settings.fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);
+	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
 	
 	window.setFramerateLimit(60); //limit fps to 60 
 
@@ -45,7 +49,7 @@ int main()
 	{
 		std::cout << vmodes[i].width << " x " << vmodes[i].height << "\n";
 	}
-		
+
 	// run the program as long as the window is open
 	while (window.isOpen())
 	{
@@ -60,11 +64,11 @@ int main()
 				window.close();
 			}
 			else if (event.type == sf::Event::KeyPressed) {
-				settings.fullscreen = !settings.fullscreen;
-				window.create(sf::VideoMode(settings.width, settings.height, settings.colorDepth), settings.APPNAME, (settings.fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
-				std::cout << "fullscreen? " << settings.fullscreen << " - size: " << window.getSize().x << " x " << window.getSize().y << std::endl;
+				settings->fullscreen = !settings->fullscreen;
+				window.create(sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH), settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+				std::cout << "fullscreen? " << settings->fullscreen << " - size: " << window.getSize().x << " x " << window.getSize().y << std::endl;
 			
-				settings.saveSettings();
+				settings->saveSettings();
 			}
 
 			// Clear the whole window before rendering a new frame
