@@ -5,168 +5,6 @@
 #include <iostream>
 #include <memory>
 
-DoorPositions EnumMapper::mapDoorPositions(std::string input)
-{
-	if (input == "N")
-	{
-		return DoorPositions::North;
-	}
-	else if (input == "E")
-	{
-		return DoorPositions::East;
-	}
-	else if (input == "S")
-	{
-		return DoorPositions::South;
-	}
-	else if (input == "W")
-	{
-		return DoorPositions::West;
-	}
-	else
-	{
-		throw EnumMappingException(input, "DoorPositions");
-	}
-}
-
-MonsterProbabilities EnumMapper::mapMonsterProbabilities(std::string input)
-{
-	if (input == "no")
-	{
-		return MonsterProbabilities::No;
-	}
-	else if (input == "easy")
-	{
-		return MonsterProbabilities::Easy;
-	}
-	else if (input == "normal")
-	{
-		return MonsterProbabilities::Normal;
-	}
-	else if (input == "hard")
-	{
-		return MonsterProbabilities::Hard;
-	}
-	else
-	{
-		throw EnumMappingException(input, "MonsterProbabilities");
-	}
-}
-
-DifficultyLevel::Level EnumMapper::mapLevel(std::string input)
-{
-	if (input == "easy")
-	{
-		return DifficultyLevel::Level::Easy;
-	}
-	else if (input == "normal")
-	{
-		return DifficultyLevel::Level::Normal;
-	}
-	else if (input == "hard")
-	{
-		return DifficultyLevel::Level::Hard;
-	}
-	else
-	{
-		throw EnumMappingException(input, "Level");
-	}
-}
-
-Classes EnumMapper::mapClasses(std::string input)
-{
-	if (input == "-" || input == "none")
-	{
-		return Classes::None;
-	}
-	else if (input == "weak")
-	{
-		return Classes::Weak;
-	}
-	else if (input == "medium")
-	{
-		return Classes::Medium;
-	}
-	else if (input == "strong")
-	{
-		return Classes::Strong;
-	}
-	else
-	{
-		throw EnumMappingException(input, "ItemClass");
-	}
-}
-
-Target EnumMapper::mapTarget(std::string input)
-{
-	if (input == "self")
-	{
-		return Target::Self;
-	}
-	else if (input == "opponent")
-	{
-		return Target::Opponent;
-	}
-	else
-	{
-		throw EnumMappingException(input, "Target");
-	}
-}
-
-Attribute EnumMapper::mapAttribute(std::string input)
-{
-	if (input == "hp")
-	{
-		return Attribute::Hp;
-	}
-	else if (input == "speed")
-	{
-		return Attribute::Speed;
-	}
-	else if (input == "accuracy")
-	{
-		return Attribute::Accuracy;
-	}
-	else if (input == "strength")
-	{
-		return Attribute::Strength;
-	}
-	else
-	{
-		throw EnumMappingException(input, "Effect");
-	}
-}
-
-Mode EnumMapper::mapMode(std::string input)
-{
-	if (input == "x")
-	{
-		return Mode::Cure;
-	}
-	else if (input == "<")
-	{
-		return Mode::TemporaryDecrease;
-	}
-	else if (input == "-")
-	{
-		return Mode::IncrementalDecrease;
-	}
-	else if (input == ">")
-	{
-		return Mode::TemporaryIncrease;
-	}
-	else if (input == "+")
-	{
-		return Mode::IncrementalIncrease;
-	}
-	else
-	{
-		throw EnumMappingException(input, "Mode");
-	}
-}
-
-
-
 PrototypeStorage::PrototypeStorage(std::string templatePath)
 {
 	try {
@@ -213,28 +51,39 @@ void PrototypeStorage::initializeTemplates(std::string templatePath)
 	}
 }
 
-Item::Item(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_) :
-	name(name_), image(image_), itemClass(itemClass_), classMultiplier(classMultiplier_), statsLowMultiplier(statsLowMultiplier_), statsHighMultiplier(statsHighMultiplier_) {
+VariableTemplate::VariableTemplate(const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_) :
+	classMultiplier(classMultiplier_), statsLowMultiplier(statsLowMultiplier_), statsHighMultiplier(statsHighMultiplier_)
+{
 
 };
 
-Item::~Item()
+float VariableTemplate::getClassMultiplier() const
 {
-
+	return classMultiplier;
 }
 
-Armament::Armament(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
+float VariableTemplate::getStatsLowMultiplier() const
+{
+	return statsLowMultiplier;
+}
+
+float VariableTemplate::getStatsHighMultiplier() const
+{
+	return statsHighMultiplier;
+}
+
+ArmamentTemplate::ArmamentTemplate(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
 	const std::string type_, const float armor_, const float speed_, const float bonus_) :
-	type(type_), armor(armor_), speed(speed_), bonus(bonus_), Item(name_, image_, itemClass_, classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)  
+	Armament(name_, image_, itemClass_, type_, armor_, speed_, bonus_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
 {
 
 }
 
-Armament* Armament::clone()
+ArmamentTemplate* ArmamentTemplate::clone()
 {
 	std::cout << "cloning Armament..." << std::endl;
-
-	return new Armament(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus);
+	return NULL;
+	//return new ArmamentTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus);
 }
 
 void ArmamentFactory::importConfig(std::string path)
@@ -266,10 +115,10 @@ void ArmamentFactory::importConfig(std::string path)
 			const float speed = armamentNode.child("Speed").text().as_float();
 			const float bonus = armamentNode.child("Bonus").text().as_float();
 
-			std::shared_ptr<Armament> armament(new Armament(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
+			std::shared_ptr<ArmamentTemplate> armament(new ArmamentTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
 				type, armor, speed, bonus));
 
-			objects[armament->name] = armament;
+			objects[armament->getName()] = armament;
 		}
 	}
 
@@ -277,14 +126,13 @@ void ArmamentFactory::importConfig(std::string path)
 	std::cout << "ArmamentTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Monster::Monster(const std::string name_, const std::string image_, const DifficultyLevel::Level level_, const Attribute killBonusType_,
-	const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const float killBonusLow_, const float killBonusHigh_) :
-	name(name_), image(image_), level(level_), killBonusType(killBonusType_), classMultiplier(classMultiplier_), 
-	statsLowMultiplier(statsLowMultiplier_), statsHighMultiplier(statsHighMultiplier_), killBonusLow(killBonusLow_), killBonusHigh(killBonusHigh_) {
+MonsterTemplate::MonsterTemplate(const std::string name_, const std::string image_, const DifficultyLevel::Level level_, const Attribute killBonusType_,
+	const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const float killBonusLow_, const float killBonusHigh_, float hp_, float strength_, float speed_, float accuracy_) :
+	Monster(name_, image_, level_, killBonusType_, killBonusLow_, killBonusHigh_, hp_, strength_, speed_, accuracy_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {
 
 }
 
-Monster* Monster::clone()
+MonsterTemplate* MonsterTemplate::clone()
 {
 	std::cout << "cloning Monster..." << std::endl;
 
@@ -318,15 +166,14 @@ void MonsterFactory::importConfig(std::string path)
 			const float statsHighMultiplier = monsterNode.child("Stats_High_Multiplier").text().as_float();
 			const float killBonusLow = monsterNode.child("Kill_Bonus_Low").text().as_float();
 			const float killBonusHigh = monsterNode.child("Kill_Bonus_High").text().as_float();
+			float hp = monsterNode.child("HP").text().as_float();
+			float strength = monsterNode.child("Strength").text().as_float();
+			float speed = monsterNode.child("Speed").text().as_float();
+			float accuracy = monsterNode.child("Accuracy").text().as_float();
 
-			std::shared_ptr<Monster> monster(new Monster(name, image, level, killBonusType, classMultiplier, statsLowMultiplier, statsHighMultiplier, killBonusLow, killBonusHigh));
+			std::shared_ptr<MonsterTemplate> monster(new MonsterTemplate(name, image, level, killBonusType, classMultiplier, statsLowMultiplier, statsHighMultiplier, killBonusLow, killBonusHigh, hp, strength, speed, accuracy));
 
-			monster->hp = monsterNode.child("HP").text().as_float();
-			monster->strength = monsterNode.child("Strength").text().as_float();
-			monster->speed = monsterNode.child("Speed").text().as_float();
-			monster->accuracy = monsterNode.child("Accuracy").text().as_float();
-
-			objects[monster->name] = monster;
+			objects[monster->getName()] = monster;
 		}
 	}
 
@@ -334,14 +181,14 @@ void MonsterFactory::importConfig(std::string path)
 	std::cout << "MonsterTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Potion::Potion(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
+PotionTemplate::PotionTemplate(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
 	const std::string description_, const Target target_, const Attribute effect_, const Mode mode_, const float strength_, const unsigned int duration_) : 
-	description(description_), target(target_), effect(effect_), mode(mode_), strength(strength_), duration(duration_), Item(name_, image_, itemClass_, classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
+	Potion(name_, image_, itemClass_, description_, target_, effect_, mode_, strength_, duration_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
 {
 
 };
 
-Potion* Potion::clone()
+PotionTemplate* PotionTemplate::clone()
 {
 	std::cout << "cloning Potion..." << std::endl;
 
@@ -378,10 +225,10 @@ void PotionFactory::importConfig(std::string path)
 			const float strength = potionNode.child("Strength").text().as_float();
 			const unsigned int duration = potionNode.child("Duration").text().as_uint();
 			
-			std::shared_ptr<Potion> potion(new Potion(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
+			std::shared_ptr<PotionTemplate> potion(new PotionTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
 				description, target, effect, mode, strength, duration));
 
-			objects[potion->name] = potion;
+			objects[potion->getName()] = potion;
 		}
 	}
 
@@ -389,16 +236,16 @@ void PotionFactory::importConfig(std::string path)
 	std::cout << "PotionTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Weapon* Weapon::clone()
+WeaponTemplate* WeaponTemplate::clone()
 {
 	std::cout << "cloning Weapon..." << std::endl;
 
 	return NULL;
 }
 
-Weapon::Weapon(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
+WeaponTemplate::WeaponTemplate(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
 	const std::string type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
-	type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), max(max_), Item(name_, image_, itemClass_, classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
+	Weapon(name_, image_, itemClass_, type_, attack_, speed_, accuracy_, defence_, slots_, max_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
 {
 
 }
@@ -435,10 +282,10 @@ void WeaponFactory::importConfig(std::string path)
 			const unsigned int slots = weaponNode.child("Slots").text().as_uint();
 			const unsigned int max = weaponNode.child("Max").text().as_uint();
 
-			std::shared_ptr<Weapon> weapon(new Weapon(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
+			std::shared_ptr<WeaponTemplate> weapon(new WeaponTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
 				type, attack, speed, accuracy, defence, slots, max));
 
-			objects[weapon->name] = weapon;
+			objects[weapon->getName()] = weapon;
 		}
 	}
 
@@ -446,15 +293,14 @@ void WeaponFactory::importConfig(std::string path)
 	std::cout << "WeaponTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Attack::Attack(const std::string name_, const Attribute effect_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
+AttackTemplate::AttackTemplate(const std::string name_, const Attribute effect_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
 	const float hpDamage_, const float hitProbability_, const float x_) :
-	name(name_), effect(effect_), classMultiplier(classMultiplier_), statsLowMultiplier(statsLowMultiplier_), statsHighMultiplier(statsHighMultiplier_),
-	hpDamage(hpDamage_), hitProbability(hitProbability_), x(x_)
+	Attack(name_, effect_, hpDamage_, hitProbability_, x_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
 {
 
 }
 
-Attack* Attack::clone()
+AttackTemplate* AttackTemplate::clone()
 {
 	std::cout << "cloning Attack..." << std::endl;
 
@@ -488,9 +334,9 @@ void AttackFactory::importConfig(std::string path)
 			const float hitProbability = attackNode.child("Hit_Probability").text().as_float();
 			const float x = attackNode.child("x").text().as_float();
 
-			std::shared_ptr<Attack> attack(new Attack(name, effect, classMultiplier, statsLowMultiplier, statsHighMultiplier, hpDamage, hitProbability, x));
+			std::shared_ptr<AttackTemplate> attack(new AttackTemplate(name, effect, classMultiplier, statsLowMultiplier, statsHighMultiplier, hpDamage, hitProbability, x));
 
-			objects[attack->name] = attack;
+			objects[attack->getName()] = attack;
 		}
 	}
 
@@ -498,19 +344,18 @@ void AttackFactory::importConfig(std::string path)
 	std::cout << "AttackTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Room::Room(const std::string name_, const std::string description_, const std::string image_,
+RoomTemplate::RoomTemplate(const std::string name_, const std::string description_, const std::string image_,
 	const std::map<DoorPositions, const bool> doorPositions_,
 	const std::map<MonsterProbabilities, const float> monsterProbabilities_,
 	const std::map<Classes, const float> findProbabilities_,
 	const unsigned int monsterCount_, const unsigned int itemCount_,
-	const float itemMultiplier_) : 
-	name(name_), description(description_), image(image_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_),
-	findProbabilities(findProbabilities_), monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_)
+	const float itemMultiplier_) :
+	Room(name_, description_, image_, doorPositions_, monsterProbabilities_, findProbabilities_, monsterCount_, itemCount_, itemMultiplier_)
 {
 
 }
 
-Room* Room::clone()
+RoomTemplate* RoomTemplate::clone()
 {
 	std::cout << "cloning Room..." << std::endl;
 
@@ -566,9 +411,9 @@ void RoomFactory::importConfig(std::string path)
 
 			// std::shared_ptr<Room> room(new Room())
 
-			std::shared_ptr<Room> room(new Room(name, description, image, constDoorPositions, constMonsterProbabilities, constFindProbabilities, monsterCount, itemCount, itemMultiplier));
+			std::shared_ptr<RoomTemplate> room(new RoomTemplate(name, description, image, constDoorPositions, constMonsterProbabilities, constFindProbabilities, monsterCount, itemCount, itemMultiplier));
 
-			objects[room->name] = room;
+			objects[room->getName()] = room;
 		}
 	}
 

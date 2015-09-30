@@ -3,6 +3,8 @@
 #include "settings.hpp"
 #include "exceptions.hpp"
 #include "prototypes.hpp"
+#include "enums.hpp"
+#include "gameObjects.hpp"
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -33,7 +35,7 @@ int main()
 		return -1;
 	}
 
-	Armament* testArm = prototypeStorage->armamentFactory->create("Leather Helmet");
+	ArmamentTemplate* testArm = prototypeStorage->armamentFactory->create("Leather Helmet");
 
 	// create video mode and window
 	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);

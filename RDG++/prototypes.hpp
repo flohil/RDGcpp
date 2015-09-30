@@ -1,19 +1,15 @@
+#ifndef PROTOTYPES_INCLUDE
+#define PROTOTYPES_INCLUDE
+
 #include <map>
 #include <set>
 #include <memory>
-
-enum DoorPositions { North, East, South, West };
-enum MonsterProbabilities { No, Easy, Normal, Hard };
-namespace DifficultyLevel
-{
-	enum Level { Easy, Normal, Hard };
-}
-enum Classes { None, Weak, Medium, Strong };
-enum Target { Self, Opponent };
-enum Attribute { Hp, Speed, Accuracy, Strength };
-enum Mode { Cure, TemporaryDecrease, IncrementalDecrease, TemporaryIncrease, IncrementalIncrease };
+#include "enums.hpp"
+#include "gameObjects.hpp"
 
 // templates are defined in header to avoid linker errors
+
+// prototypes for actual game objects
 
 // template/interface for all prototype templates
 template <class T>
@@ -45,163 +41,119 @@ private:
 	virtual void importConfig(std::string path) = 0;
 };
 
-// maps strings to enums
-class EnumMapper
-{
-public:
-
-	static DoorPositions mapDoorPositions(std::string input);
-	static MonsterProbabilities mapMonsterProbabilities(std::string input);
-	static DifficultyLevel::Level mapLevel(std::string input);
-	static Classes mapClasses(std::string input);
-	static Target mapTarget(std::string input);
-	static Attribute mapAttribute(std::string input);
-	static Mode mapMode(std::string input);
-};
-
-
 // prototype template classes
-class Item
+class VariableTemplate
 {
 public:
 
-	Item(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier);
+	VariableTemplate(const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier);
 
-	const std::string name, image;
-	const Classes itemClass;
+	float getClassMultiplier() const;
+	float getStatsLowMultiplier() const;
+	float getStatsHighMultiplier() const;
+
+private:
+
 	const float classMultiplier, statsLowMultiplier, statsHighMultiplier;
-
-	virtual Item::~Item() = 0;
 };
 
-class Armament : public Item, public PrototypeTemplate<Armament>
+class ArmamentTemplate : public Armament, public VariableTemplate, public PrototypeTemplate<ArmamentTemplate>
 {
 public:
 
-	Armament(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
+	ArmamentTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
 		const std::string type, const float armor, const float speed, const float bonus);
 
-	const std::string type;
-	const float armor, speed, bonus;
-
-	virtual Armament* clone();
+	virtual ArmamentTemplate* clone();
 };
 
-class Monster : public PrototypeTemplate<Monster>
+class MonsterTemplate : public Monster, public VariableTemplate, public PrototypeTemplate<MonsterTemplate>
 {
 public:
 
-	Monster(const std::string name, const std::string image, const DifficultyLevel::Level level, const Attribute killBonusType,
-		const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, const float killBonusLow, const float killBonusHigh);
+	MonsterTemplate(const std::string name, const std::string image, const DifficultyLevel::Level level, const Attribute killBonusType,
+		const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, const float killBonusLow, const float killBonusHigh, float hp, float strength, float speed, float accuracy);
 
-	const std::string name, image;
-	const DifficultyLevel::Level level;
-	const Attribute killBonusType;
-	const float classMultiplier, statsLowMultiplier, statsHighMultiplier, killBonusLow, killBonusHigh;
-	float hp, strength, speed, accuracy;
-
-	virtual Monster* clone();
+	virtual MonsterTemplate* clone();
 };
 
-class Potion : public Item, public PrototypeTemplate<Potion>
+class PotionTemplate : public Potion, public VariableTemplate, public PrototypeTemplate<PotionTemplate>
 {
 public:
 
-	Potion(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
+	PotionTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
 		const std::string description, const Target target, const Attribute effect, const Mode mode, const float strength, const unsigned int duration);
 
-	const std::string description;
-	const Target target;
-	const Attribute effect;
-	const Mode mode;
-	const float strength;
-	const unsigned int duration;
-
-	virtual Potion* clone();
+	virtual PotionTemplate* clone();
 };
 
-class Weapon : public Item, public PrototypeTemplate<Weapon>
+class WeaponTemplate : public Weapon, public VariableTemplate, public PrototypeTemplate<WeaponTemplate>
 {
 public:
 
-	Weapon(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
+	WeaponTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
 		const std::string type, const float attack, const float speed, const float accuracy, const float defence, const unsigned int slots, const unsigned int max);
 
-	const std::string type;
-	const float attack, speed, accuracy, defence;
-	const unsigned int slots, max;
-
-	virtual Weapon* clone();
+	virtual WeaponTemplate* clone();
 };
 
-class Attack : public PrototypeTemplate<Attack>
+class AttackTemplate : public Attack, public VariableTemplate, public PrototypeTemplate<AttackTemplate>
 {
 public:
 
-	Attack(const std::string name, const Attribute effect, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier,
+	AttackTemplate(const std::string name, const Attribute effect, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier,
 		const float hpDamage, const float hitProbability, const float x);
 
-	const std::string name;
-	const Attribute effect;
-	const float classMultiplier, statsLowMultiplier, statsHighMultiplier, hpDamage, hitProbability, x;
-
-	virtual Attack* clone();
+	virtual AttackTemplate* clone();
 };
 
-class Room : public PrototypeTemplate<Room>
+class RoomTemplate : public Room, public PrototypeTemplate<RoomTemplate>
 {
 public:
 
-	Room(const std::string name, const std::string description, const std::string image,
+	RoomTemplate(const std::string name, const std::string description, const std::string image,
 		const std::map<DoorPositions, const bool> doorPositions,
 		const std::map<MonsterProbabilities, const float> monsterProbabilities,
 		const std::map<Classes, const float> findProbabilities,
 		const unsigned int monsterCount, const unsigned int itemCount,
 		const float itemMultiplier);
 
-	const std::string name, description, image;
-	const std::map<DoorPositions, const bool> doorPositions;
-	const std::map<MonsterProbabilities, const float> monsterProbabilities;
-	const std::map<Classes, const float> findProbabilities;
-	const unsigned int monsterCount, itemCount;
-	const float itemMultiplier;
-
-	virtual Room* clone();
+	virtual RoomTemplate* clone();
 };
 
 
 // prototype template storage classes
-class ArmamentFactory : public PrototypeTemplateFactory<Armament>
+class ArmamentFactory : public PrototypeTemplateFactory<ArmamentTemplate>
 {
 public:
 	virtual void importConfig(std::string path);
 };
 
-class MonsterFactory : public PrototypeTemplateFactory<Monster>
+class MonsterFactory : public PrototypeTemplateFactory<MonsterTemplate>
 {
 public:
 	virtual void importConfig(std::string path);
 };
 
-class PotionFactory : public PrototypeTemplateFactory<Potion>
+class PotionFactory : public PrototypeTemplateFactory<PotionTemplate>
 {
 public:
 	virtual void importConfig(std::string path);
 };
 
-class WeaponFactory : public PrototypeTemplateFactory<Weapon>
+class WeaponFactory : public PrototypeTemplateFactory<WeaponTemplate>
 {
 public:
 	virtual void importConfig(std::string path);
 };
 
-class AttackFactory : public PrototypeTemplateFactory<Attack>
+class AttackFactory : public PrototypeTemplateFactory<AttackTemplate>
 {
 public:
 	virtual void importConfig(std::string path);
 };
 
-class RoomFactory : public PrototypeTemplateFactory<Room>
+class RoomFactory : public PrototypeTemplateFactory<RoomTemplate>
 {
 public:
 	virtual void importConfig(std::string path);
@@ -274,3 +226,5 @@ PrototypeTemplateFactory<T>::~PrototypeTemplateFactory() {
 
 	objects.clear();
 }
+
+#endif // PROTOTYPES_INCLUDE
