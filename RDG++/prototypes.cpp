@@ -3,41 +3,7 @@
 #include "settings.hpp"
 #include "exceptions.hpp"
 #include <iostream>
-
-template <class T>
-std::set<std::string> PrototypeTemplate<T>::getObjectNames() 
-{
-
-	std::set<std::string> objectNames;
-
-	for (std::map<std::string, std::shared_ptr<T>>::iterator i = objects.begin(); i != objects.end(); ++i)
-	{
-		std::string objectName = i->first;
-		objectNames.insert(objectName);
-	}
-
-	std::cout << "Set contains " << objectNames.size() << " names." << std::endl;
-
-	return objectNames;
-}
-
-template <class T>
-PrototypeTemplate<T>* PrototypeStorage::getPrototypeTemplate()
-{
-	return new T();
-}
-
-template <class T>
-PrototypeTemplate<T>::~PrototypeTemplate() {
-
-	for (std::string object : getObjectNames())
-	{
-		// deallocate PrototypeTemplates in objects map (if no other reference exists) -> shared pointers
-		objects.erase(object);
-	}
-
-	objects.clear();
-}
+#include <memory>
 
 DoorPositions EnumMapper::mapDoorPositions(std::string input)
 {
@@ -214,53 +180,64 @@ PrototypeStorage::PrototypeStorage(std::string templatePath)
 
 PrototypeStorage::~PrototypeStorage()
 {
-	delete armamentTemplate;
-	delete monsterTemplate;
-	delete potionTemplate;
-	delete weaponTemplate;
-	delete attackTemplate;
-	delete roomTemplate;
+	delete armamentFactory;
+	delete monsterFactory;
+	delete potionFactory;
+	delete weaponFactory;
+	delete attackFactory;
+	delete roomFactory;
 }
 
 void PrototypeStorage::initializeTemplates(std::string templatePath)
 {
 	std::cout << "initializing templates..." << std::endl;
 
-	armamentTemplate = new Armament();
-	monsterTemplate = new Monster();
-	potionTemplate = new Potion();
-	weaponTemplate = new Weapon();
-	attackTemplate = new Attack();
-	roomTemplate = new Room();
+	armamentFactory = new ArmamentFactory();
+	monsterFactory = new MonsterFactory();
+	potionFactory = new PotionFactory();
+	weaponFactory = new WeaponFactory();
+	attackFactory = new AttackFactory();
+	roomFactory = new RoomFactory();
 
 	try {
-		armamentTemplate->importConfig(templatePath + "Armaments.xml");
-		monsterTemplate->importConfig(templatePath + "Monsters.xml");
-		potionTemplate->importConfig(templatePath + "Potions.xml");
-		weaponTemplate->importConfig(templatePath + "Weapons.xml");
-		attackTemplate->importConfig(templatePath + "Attacks.xml");
-		roomTemplate->importConfig(templatePath + "Rooms.xml");
+		armamentFactory->importConfig(templatePath + "Armaments.xml");
+		monsterFactory->importConfig(templatePath + "Monsters.xml");
+		potionFactory->importConfig(templatePath + "Potions.xml");
+		weaponFactory->importConfig(templatePath + "Weapons.xml");
+		attackFactory->importConfig(templatePath + "Attacks.xml");
+		roomFactory->importConfig(templatePath + "Rooms.xml");
 	}
 	catch (ConfigParseException& e)
 	{
 		throw e;
 	}
-	
 }
+
+Item::Item(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_) :
+	name(name_), image(image_), itemClass(itemClass_), classMultiplier(classMultiplier_), statsLowMultiplier(statsLowMultiplier_), statsHighMultiplier(statsHighMultiplier_) {
+
+};
 
 Item::~Item()
 {
 
 }
 
-Armament* Armament::clone(std::string objectName)
+Armament::Armament(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
+	const std::string type_, const float armor_, const float speed_, const float bonus_) :
+	type(type_), armor(armor_), speed(speed_), bonus(bonus_), Item(name_, image_, itemClass_, classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)  
+{
+
+}
+
+Armament* Armament::clone()
 {
 	std::cout << "cloning Armament..." << std::endl;
 
-	return NULL;
+	return new Armament(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus);
 }
 
-void Armament::importConfig(std::string path)
+void ArmamentFactory::importConfig(std::string path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
@@ -278,18 +255,19 @@ void Armament::importConfig(std::string path)
 		for (pugi::xml_node armamentNode = armamentsNode.first_child(); armamentNode; armamentNode = armamentNode.next_sibling())
 		{
 
-			std::shared_ptr<Armament> armament(new Armament());
+			const std::string name = armamentNode.child("Name").text().as_string();
+			const std::string image = armamentNode.child("Image").text().as_string();
+			const Classes itemClass = EnumMapper::mapClasses(armamentNode.child("Item_Class").text().as_string());
+			const float classMultiplier = armamentNode.child("Class_Multiplier").text().as_float();
+			const float statsLowMultiplier = armamentNode.child("Stats_Low_Multiplier").text().as_float();
+			const float statsHighMultiplier = armamentNode.child("Stats_High_Multiplier").text().as_float();
+			const std::string type = armamentNode.child("Type").text().as_string();
+			const float armor = armamentNode.child("Armor").text().as_float();
+			const float speed = armamentNode.child("Speed").text().as_float();
+			const float bonus = armamentNode.child("Bonus").text().as_float();
 
-			armament->name = armamentNode.child("Name").text().as_string();
-			armament->itemClass = EnumMapper::mapClasses(armamentNode.child("Item_Class").text().as_string());
-			armament->classMultiplier = armamentNode.child("Class_Multiplier").text().as_float();
-			armament->statsLowMultiplier = armamentNode.child("Stats_Low_Multiplier").text().as_float();
-			armament->statsHighMultiplier = armamentNode.child("Stats_High_Multiplier").text().as_float();
-			armament->armor = armamentNode.child("Armor").text().as_float();
-			armament->speed = armamentNode.child("Speed").text().as_float();
-			armament->type = armamentNode.child("Type").text().as_string();
-			armament->bonus = armamentNode.child("Bonus").text().as_float();
-			armament->image = armamentNode.child("Image").text().as_string();
+			std::shared_ptr<Armament> armament(new Armament(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
+				type, armor, speed, bonus));
 
 			objects[armament->name] = armament;
 		}
@@ -299,14 +277,21 @@ void Armament::importConfig(std::string path)
 	std::cout << "ArmamentTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Monster* Monster::clone(std::string objectName)
+Monster::Monster(const std::string name_, const std::string image_, const DifficultyLevel::Level level_, const Attribute killBonusType_,
+	const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const float killBonusLow_, const float killBonusHigh_) :
+	name(name_), image(image_), level(level_), killBonusType(killBonusType_), classMultiplier(classMultiplier_), 
+	statsLowMultiplier(statsLowMultiplier_), statsHighMultiplier(statsHighMultiplier_), killBonusLow(killBonusLow_), killBonusHigh(killBonusHigh_) {
+
+}
+
+Monster* Monster::clone()
 {
 	std::cout << "cloning Monster..." << std::endl;
 
 	return NULL;
 }
 
-void Monster::importConfig(std::string path)
+void MonsterFactory::importConfig(std::string path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
@@ -324,21 +309,22 @@ void Monster::importConfig(std::string path)
 		for (pugi::xml_node monsterNode = monstersNode.first_child(); monsterNode; monsterNode = monsterNode.next_sibling())
 		{
 
-			std::shared_ptr<Monster> monster(new Monster());
+			const std::string name = monsterNode.child("Name").text().as_string();
+			const std::string image = monsterNode.child("Image").text().as_string();
+			const DifficultyLevel::Level level = EnumMapper::mapLevel(monsterNode.child("Level").text().as_string());
+			const Attribute killBonusType = EnumMapper::mapAttribute(monsterNode.child("Kill_Bonus_Type").text().as_string());
+			const float classMultiplier = monsterNode.child("Class_Multiplier").text().as_float();
+			const float statsLowMultiplier = monsterNode.child("Stats_Low_Multiplier").text().as_float();
+			const float statsHighMultiplier = monsterNode.child("Stats_High_Multiplier").text().as_float();
+			const float killBonusLow = monsterNode.child("Kill_Bonus_Low").text().as_float();
+			const float killBonusHigh = monsterNode.child("Kill_Bonus_High").text().as_float();
 
-			monster->name = monsterNode.child("Name").text().as_string();
-			monster->level = EnumMapper::mapLevel(monsterNode.child("Level").text().as_string());
-			monster->classMultiplier = monsterNode.child("Class_Multiplier").text().as_float();
-			monster->statsLowMultiplier = monsterNode.child("Stats_Low_Multiplier").text().as_float();
-			monster->statsHighMultiplier = monsterNode.child("Stats_High_Multiplier").text().as_float();
+			std::shared_ptr<Monster> monster(new Monster(name, image, level, killBonusType, classMultiplier, statsLowMultiplier, statsHighMultiplier, killBonusLow, killBonusHigh));
+
 			monster->hp = monsterNode.child("HP").text().as_float();
 			monster->strength = monsterNode.child("Strength").text().as_float();
 			monster->speed = monsterNode.child("Speed").text().as_float();
 			monster->accuracy = monsterNode.child("Accuracy").text().as_float();
-			monster->killBonusType = EnumMapper::mapAttribute(monsterNode.child("Kill_Bonus_Type").text().as_string());
-			monster->killBonusLow = monsterNode.child("Kill_Bonus_Low").text().as_float();
-			monster->killBonusHigh = monsterNode.child("Kill_Bonus_High").text().as_float();
-			monster->image = monsterNode.child("Image").text().as_string();
 
 			objects[monster->name] = monster;
 		}
@@ -348,14 +334,21 @@ void Monster::importConfig(std::string path)
 	std::cout << "MonsterTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Potion* Potion::clone(std::string objectName)
+Potion::Potion(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
+	const std::string description_, const Target target_, const Attribute effect_, const Mode mode_, const float strength_, const unsigned int duration_) : 
+	description(description_), target(target_), effect(effect_), mode(mode_), strength(strength_), duration(duration_), Item(name_, image_, itemClass_, classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
+{
+
+};
+
+Potion* Potion::clone()
 {
 	std::cout << "cloning Potion..." << std::endl;
 
 	return NULL;
 }
 
-void Potion::importConfig(std::string path)
+void PotionFactory::importConfig(std::string path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
@@ -372,21 +365,21 @@ void Potion::importConfig(std::string path)
 
 		for (pugi::xml_node potionNode = potionsNode.first_child(); potionNode; potionNode = potionNode.next_sibling())
 		{
-
-			std::shared_ptr<Potion> potion(new Potion());
-
-			potion->name = potionNode.child("Name").text().as_string();
-			potion->itemClass = EnumMapper::mapClasses(potionNode.child("Item_Class").text().as_string());
-			potion->classMultiplier = potionNode.child("Class_Multiplier").text().as_float();
-			potion->statsLowMultiplier = potionNode.child("Stats_Low_Multiplier").text().as_float();
-			potion->statsHighMultiplier = potionNode.child("Stats_High_Multiplier").text().as_float();
-			potion->description = potionNode.child("Description").text().as_string();
-			potion->target = EnumMapper::mapTarget(potionNode.child("Target").text().as_string());
-			potion->effect = EnumMapper::mapAttribute(potionNode.child("Effect").text().as_string());
-			potion->mode = EnumMapper::mapMode(potionNode.child("Mode").text().as_string());
-			potion->strength = potionNode.child("Strength").text().as_float();
-			potion->duration = potionNode.child("Duration").text().as_uint();
-			potion->image = potionNode.child("Image").text().as_string();
+			const std::string name = potionNode.child("Name").text().as_string();
+			const std::string image = potionNode.child("Image").text().as_string();
+			const Classes itemClass = EnumMapper::mapClasses(potionNode.child("Item_Class").text().as_string());
+			const float classMultiplier = potionNode.child("Class_Multiplier").text().as_float();
+			const float statsLowMultiplier = potionNode.child("Stats_Low_Multiplier").text().as_float();
+			const float statsHighMultiplier = potionNode.child("Stats_High_Multiplier").text().as_float();
+			const std::string description = potionNode.child("Description").text().as_string();
+			const Target target = EnumMapper::mapTarget(potionNode.child("Target").text().as_string());
+			const Attribute effect = EnumMapper::mapAttribute(potionNode.child("Effect").text().as_string());
+			const Mode mode = EnumMapper::mapMode(potionNode.child("Mode").text().as_string());
+			const float strength = potionNode.child("Strength").text().as_float();
+			const unsigned int duration = potionNode.child("Duration").text().as_uint();
+			
+			std::shared_ptr<Potion> potion(new Potion(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
+				description, target, effect, mode, strength, duration));
 
 			objects[potion->name] = potion;
 		}
@@ -396,14 +389,21 @@ void Potion::importConfig(std::string path)
 	std::cout << "PotionTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Weapon* Weapon::clone(std::string objectName)
+Weapon* Weapon::clone()
 {
 	std::cout << "cloning Weapon..." << std::endl;
 
 	return NULL;
 }
 
-void Weapon::importConfig(std::string path)
+Weapon::Weapon(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
+	const std::string type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
+	type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), max(max_), Item(name_, image_, itemClass_, classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
+{
+
+}
+
+void WeaponFactory::importConfig(std::string path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*) path.c_str());
@@ -421,21 +421,22 @@ void Weapon::importConfig(std::string path)
 		for (pugi::xml_node weaponNode = weaponsNode.first_child(); weaponNode; weaponNode = weaponNode.next_sibling())
 		{
 
-			std::shared_ptr<Weapon> weapon(new Weapon());
+			const std::string name = weaponNode.child("Name").text().as_string();
+			const std::string image = weaponNode.child("Image").text().as_string();
+			const Classes itemClass = EnumMapper::mapClasses(weaponNode.child("Item_Class").text().as_string());
+			const float classMultiplier = weaponNode.child("Class_Multiplier").text().as_float();
+			const float statsLowMultiplier = weaponNode.child("Stats_Low_Multiplier").text().as_float();
+			const float statsHighMultiplier = weaponNode.child("Stats_High_Multiplier").text().as_float();
+			const std::string type = weaponNode.child("Type").text().as_string();
+			const float attack = weaponNode.child("Attack").text().as_float();
+			const float speed = weaponNode.child("Speed").text().as_float();
+			const float accuracy = weaponNode.child("Accuracy").text().as_float();
+			const float defence = weaponNode.child("Defence").text().as_float();
+			const unsigned int slots = weaponNode.child("Slots").text().as_uint();
+			const unsigned int max = weaponNode.child("Max").text().as_uint();
 
-			weapon->name = weaponNode.child("Name").text().as_string();
-			weapon->itemClass = EnumMapper::mapClasses(weaponNode.child("Item_Class").text().as_string());
-			weapon->classMultiplier = weaponNode.child("Class_Multiplier").text().as_float();
-			weapon->statsLowMultiplier = weaponNode.child("Stats_Low_Multiplier").text().as_float();
-			weapon->statsHighMultiplier = weaponNode.child("Stats_High_Multiplier").text().as_float();
-			weapon->attack = weaponNode.child("Attack").text().as_float();
-			weapon->speed = weaponNode.child("Speed").text().as_float();
-			weapon->accuracy = weaponNode.child("Accuracy").text().as_float();
-			weapon->defence = weaponNode.child("Defence").text().as_float();
-			weapon->slots = weaponNode.child("Slots").text().as_uint();
-			weapon->max = weaponNode.child("Max").text().as_uint();
-			weapon->type = weaponNode.child("Type").text().as_string();
-			weapon->image = weaponNode.child("Image").text().as_string();
+			std::shared_ptr<Weapon> weapon(new Weapon(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
+				type, attack, speed, accuracy, defence, slots, max));
 
 			objects[weapon->name] = weapon;
 		}
@@ -445,14 +446,22 @@ void Weapon::importConfig(std::string path)
 	std::cout << "WeaponTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Attack* Attack::clone(std::string objectName)
+Attack::Attack(const std::string name_, const Attribute effect_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
+	const float hpDamage_, const float hitProbability_, const float x_) :
+	name(name_), effect(effect_), classMultiplier(classMultiplier_), statsLowMultiplier(statsLowMultiplier_), statsHighMultiplier(statsHighMultiplier_),
+	hpDamage(hpDamage_), hitProbability(hitProbability_), x(x_)
+{
+
+}
+
+Attack* Attack::clone()
 {
 	std::cout << "cloning Attack..." << std::endl;
 
 	return NULL;
 }
 
-void Attack::importConfig(std::string path)
+void AttackFactory::importConfig(std::string path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*) path.c_str());
@@ -470,16 +479,16 @@ void Attack::importConfig(std::string path)
 		for (pugi::xml_node attackNode = attacksNode.first_child(); attackNode; attackNode = attackNode.next_sibling())
 		{
 
-			std::shared_ptr<Attack> attack(new Attack());
+			const std::string name = attackNode.child("Name").text().as_string();
+			const Attribute effect = EnumMapper::mapAttribute(attackNode.child("Effect").text().as_string());
+			const float classMultiplier = attackNode.child("Class_Multiplier").text().as_float();
+			const float statsLowMultiplier = attackNode.child("Stats_Low_Multiplier").text().as_float();
+			const float statsHighMultiplier = attackNode.child("Stats_High_Multiplier").text().as_float();
+			const float hpDamage = attackNode.child("HP_Damage").text().as_float();
+			const float hitProbability = attackNode.child("Hit_Probability").text().as_float();
+			const float x = attackNode.child("x").text().as_float();
 
-			attack->name = attackNode.child("Name").text().as_string();
-			attack->classMultiplier = attackNode.child("Class_Multiplier").text().as_float();
-			attack->statsLowMultiplier = attackNode.child("Stats_Low_Multiplier").text().as_float();
-			attack->statsHighMultiplier = attackNode.child("Stats_High_Multiplier").text().as_float();
-			attack->hpDamage = attackNode.child("HP_Damage").text().as_float();
-			attack->hitProbability = attackNode.child("Hit_Probability").text().as_float();
-			attack->effect = EnumMapper::mapAttribute(attackNode.child("Effect").text().as_string());
-			attack->x = attackNode.child("x").text().as_float();
+			std::shared_ptr<Attack> attack(new Attack(name, effect, classMultiplier, statsLowMultiplier, statsHighMultiplier, hpDamage, hitProbability, x));
 
 			objects[attack->name] = attack;
 		}
@@ -489,14 +498,26 @@ void Attack::importConfig(std::string path)
 	std::cout << "AttackTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Room* Room::clone(std::string objectName)
+Room::Room(const std::string name_, const std::string description_, const std::string image_,
+	const std::map<DoorPositions, const bool> doorPositions_,
+	const std::map<MonsterProbabilities, const float> monsterProbabilities_,
+	const std::map<Classes, const float> findProbabilities_,
+	const unsigned int monsterCount_, const unsigned int itemCount_,
+	const float itemMultiplier_) : 
+	name(name_), description(description_), image(image_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_),
+	findProbabilities(findProbabilities_), monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_)
+{
+
+}
+
+Room* Room::clone()
 {
 	std::cout << "cloning Room..." << std::endl;
 
 	return NULL;
 }
 
-void Room::importConfig(std::string path)
+void RoomFactory::importConfig(std::string path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
@@ -513,32 +534,39 @@ void Room::importConfig(std::string path)
 
 		for (pugi::xml_node roomNode = roomsNode.first_child(); roomNode; roomNode = roomNode.next_sibling())
 		{
+			const std::string name = roomNode.child("Name").text().as_string();
+			const std::string image = roomNode.child("Image").text().as_string();
+			const std::string description = roomNode.child("Description").text().as_string();
 
-			std::shared_ptr<Room> room(new Room());
-
-			room->name = roomNode.child("Name").text().as_string();
-			room->description = roomNode.child("Description").text().as_string();
-
+			std::map<DoorPositions, const bool> doorPositions;
 			for (pugi::xml_node doorPosNode = roomNode.child("Door_Positions").first_child(); doorPosNode; doorPosNode = doorPosNode.next_sibling())
 			{
-				room->doorPositions[EnumMapper::mapDoorPositions(doorPosNode.name())] = doorPosNode.text().as_bool();
+				doorPositions.insert(std::pair<DoorPositions, const bool>(EnumMapper::mapDoorPositions(doorPosNode.name()), doorPosNode.text().as_bool()));
 			}
+			const std::map<DoorPositions, const bool> constDoorPositions = doorPositions;
 
+			std::map<MonsterProbabilities, const float> monsterProbabilities;
 			for (pugi::xml_node monsterNode = roomNode.child("Monster").first_child(); monsterNode; monsterNode = monsterNode.next_sibling())
 			{
-				room->monsterProbabilities[EnumMapper::mapMonsterProbabilities(monsterNode.name())] = monsterNode.text().as_float();
+				monsterProbabilities.insert(std::pair<MonsterProbabilities, const float>(EnumMapper::mapMonsterProbabilities(monsterNode.name()), monsterNode.text().as_float()));
 			}
+			const std::map<MonsterProbabilities, const float> constMonsterProbabilities = monsterProbabilities;
 
-			room->monsterCount = roomNode.child("Monster_Count").text().as_uint();
-			room->itemMultiplier = roomNode.child("Item_Multiplier").text().as_float();
+			const unsigned int monsterCount = roomNode.child("Monster_Count").text().as_uint();
+			const float itemMultiplier = roomNode.child("Item_Multiplier").text().as_float();
 			
+			std::map<Classes, const float> findProbabilities;
 			for (pugi::xml_node findNode = roomNode.child("Find_Probabilities").first_child(); findNode; findNode = findNode.next_sibling())
 			{
-				room->findProbabilities[EnumMapper::mapClasses(findNode.name())] = findNode.text().as_float();
+				findProbabilities.insert(std::pair<Classes, const float>(EnumMapper::mapClasses(findNode.name()), findNode.text().as_float()));
 			}
+			const std::map<Classes, const float> constFindProbabilities;
 			
-			room->itemCount = roomNode.child("Item_Count").text().as_uint();
-			room->image = roomNode.child("Image").text().as_string();
+			const unsigned int itemCount = roomNode.child("Item_Count").text().as_uint();
+
+			// std::shared_ptr<Room> room(new Room())
+
+			std::shared_ptr<Room> room(new Room(name, description, image, constDoorPositions, constMonsterProbabilities, constFindProbabilities, monsterCount, itemCount, itemMultiplier));
 
 			objects[room->name] = room;
 		}
@@ -547,6 +575,3 @@ void Room::importConfig(std::string path)
 	std::cout << "Load result: " << result.description() << std::endl;
 	std::cout << "RoomTemplate now contains " << objects.size() << " objects." << std::endl;
 }
-
-
-

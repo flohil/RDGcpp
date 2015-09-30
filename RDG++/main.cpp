@@ -33,6 +33,8 @@ int main()
 		return -1;
 	}
 
+	Armament* testArm = prototypeStorage->armamentFactory->create("Leather Helmet");
+
 	// create video mode and window
 	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);
 	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
