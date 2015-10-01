@@ -35,7 +35,7 @@ int main()
 		return -1;
 	}
 
-	Armament* testArm = prototypeStorage->armamentFactory->create("Leather Helmet");
+	Armament* testArm = prototypeStorage->armamentFactory->create("Leather Helmet", 1);
 
 	// create video mode and window
 	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);

@@ -79,7 +79,7 @@ ArmamentTemplate::ArmamentTemplate(const std::string name_, const std::string im
 
 }
 
-Armament* ArmamentTemplate::clone()
+Armament* ArmamentTemplate::clone(float externMultiplier = 1)
 {
 	std::cout << "cloning Armament..." << std::endl;
 
@@ -146,7 +146,7 @@ MonsterTemplate::MonsterTemplate(const std::string name_, const std::string imag
 
 }
 
-Monster* MonsterTemplate::clone()
+Monster* MonsterTemplate::clone(float externMultiplier = 1)
 {
 	std::cout << "cloning Monster..." << std::endl;
 
@@ -202,7 +202,7 @@ PotionTemplate::PotionTemplate(const std::string name_, const std::string image_
 
 };
 
-Potion* PotionTemplate::clone()
+Potion* PotionTemplate::clone(float externMultiplier = 1)
 {
 	std::cout << "cloning Potion..." << std::endl;
 
@@ -250,7 +250,7 @@ void PotionFactory::importConfig(std::string path)
 	std::cout << "PotionTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Weapon* WeaponTemplate::clone()
+Weapon* WeaponTemplate::clone(float externMultiplier = 1)
 {
 	std::cout << "cloning Weapon..." << std::endl;
 
@@ -314,7 +314,7 @@ AttackTemplate::AttackTemplate(const std::string name_, const Attribute effect_,
 
 }
 
-Attack* AttackTemplate::clone()
+Attack* AttackTemplate::clone(float externMultiplier = 1)
 {
 	std::cout << "cloning Attack..." << std::endl;
 
@@ -369,7 +369,7 @@ RoomTemplate::RoomTemplate(const std::string name_, const std::string descriptio
 
 }
 
-Room* RoomTemplate::clone()
+Room* RoomTemplate::clone(float externMultiplier = 1)
 {
 	std::cout << "cloning Room..." << std::endl;
 

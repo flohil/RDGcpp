@@ -18,7 +18,7 @@ class PrototypeTemplate
 public:
 
 	PrototypeTemplate::~PrototypeTemplate();
-	virtual T* clone() = 0;
+	virtual T* clone(float externMultiplier) = 0;
 };
 
 // handles the different prototype templates for one object class 
@@ -29,7 +29,7 @@ class PrototypeTemplateFactory
 public:
 
 	PrototypeTemplateFactory::~PrototypeTemplateFactory();
-	T2* PrototypeTemplateFactory<T, T2>::create(std::string objectName);
+	T2* PrototypeTemplateFactory<T, T2>::create(std::string objectName, float externMultiplier);
 	std::set<std::string> getObjectNames();
 
 protected:
@@ -64,7 +64,7 @@ public:
 	ArmamentTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
 		const std::string type, const float armor, const float speed, const float bonus);
 
-	virtual Armament* clone();
+	virtual Armament* clone(float externMultiplier);
 };
 
 class MonsterTemplate : public Monster, public VariableTemplate, public PrototypeTemplate<Monster>
@@ -74,7 +74,7 @@ public:
 	MonsterTemplate(const std::string name, const std::string image, const DifficultyLevel::Level level, const Attribute killBonusType,
 		const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, const float killBonusLow, const float killBonusHigh, float hp, float strength, float speed, float accuracy);
 
-	virtual Monster* clone();
+	virtual Monster* clone(float externMultiplier);
 };
 
 class PotionTemplate : public Potion, public VariableTemplate, public PrototypeTemplate<Potion>
@@ -84,7 +84,7 @@ public:
 	PotionTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
 		const std::string description, const Target target, const Attribute effect, const Mode mode, const float strength, const unsigned int duration);
 
-	virtual Potion* clone();
+	virtual Potion* clone(float externMultiplier);
 };
 
 class WeaponTemplate : public Weapon, public VariableTemplate, public PrototypeTemplate<Weapon>
@@ -94,7 +94,7 @@ public:
 	WeaponTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
 		const std::string type, const float attack, const float speed, const float accuracy, const float defence, const unsigned int slots, const unsigned int max);
 
-	virtual Weapon* clone();
+	virtual Weapon* clone(float externMultiplier);
 };
 
 class AttackTemplate : public Attack, public VariableTemplate, public PrototypeTemplate<Attack>
@@ -104,7 +104,7 @@ public:
 	AttackTemplate(const std::string name, const Attribute effect, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier,
 		const float hpDamage, const float hitProbability, const float x);
 
-	virtual Attack* clone();
+	virtual Attack* clone(float externMultiplier);
 };
 
 class RoomTemplate : public Room, public PrototypeTemplate<Room>
@@ -118,7 +118,7 @@ public:
 		const unsigned int monsterCount, const unsigned int itemCount,
 		const float itemMultiplier);
 
-	virtual Room* clone();
+	virtual Room* clone(float externMultiplier);
 };
 
 
@@ -209,9 +209,9 @@ std::set<std::string> PrototypeTemplateFactory<T, T2>::getObjectNames()
 }
 
 template <class T, class T2>
-T2* PrototypeTemplateFactory<T, T2>::create(std::string objectName)
+T2* PrototypeTemplateFactory<T, T2>::create(std::string objectName, float externMultiplier = 1)
 {
-	return objects[objectName]->clone();
+	return objects[objectName]->clone(externMultiplier);
 }
 
 template <class T, class T2>
