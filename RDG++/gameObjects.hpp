@@ -13,7 +13,7 @@ public:
 
 	std::string getName() const;
 
-private:
+protected:
 
 	const std::string name;
 };
@@ -28,7 +28,7 @@ public:
 	bool isVisible() const;
 	void setVisible(bool visible_);
 
-private:
+protected:
 
 	const std::string image;
 	bool visible;
@@ -46,7 +46,7 @@ protected:
 
 	virtual Item::~Item() = 0;
 
-private:
+protected:
 
 	const Classes itemClass;
 };
@@ -62,7 +62,7 @@ public:
 	float getSpeed() const;
 	float getAccuracy() const;
 
-private:
+protected:
 
 	float hp, strength, speed, accuracy;
 };
@@ -78,7 +78,7 @@ public:
 	float getSpeed() const;
 	float getBonus() const;
 
-private:
+protected:
 
 	const std::string type;
 	const float armor, speed, bonus;
@@ -96,7 +96,7 @@ public:
 	float getKillBonusLow() const;
 	float getKillBonusHigh() const;
 
-private:
+protected:
 
 	const DifficultyLevel::Level level;
 	const Attribute killBonusType;
@@ -117,7 +117,7 @@ public:
 	float getStrength() const;
 	unsigned int getDuration() const;
 
-private:
+protected:
 
 	const std::string description;
 	const Target target;
@@ -142,7 +142,7 @@ public:
 	unsigned int getSlots() const;
 	unsigned int getMax() const;
 
-private:
+protected:
 
 	const std::string type;
 	const float attack, speed, accuracy, defence;
@@ -160,7 +160,7 @@ public:
 	float getHitProbability() const;
 	float getX() const;
 
-private:
+protected:
 
 	const Attribute effect;
 	const float hpDamage, hitProbability, x;
@@ -185,7 +185,7 @@ public:
 	unsigned int getItemCount() const;
 	float getItemMultiplier() const;
 
-private:
+protected:
 
 	const std::string description;
 	const std::map<DoorPositions, const bool> doorPositions;

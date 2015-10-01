@@ -79,11 +79,25 @@ ArmamentTemplate::ArmamentTemplate(const std::string name_, const std::string im
 
 }
 
-ArmamentTemplate* ArmamentTemplate::clone()
+Armament* ArmamentTemplate::clone()
 {
 	std::cout << "cloning Armament..." << std::endl;
-	return NULL;
-	//return new ArmamentTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus);
+
+	/*float armor = tempTemplate.getArmor() * itemMultiplier * tempTemplate.getClass_multiplier() *
+		Chances.randomFloat(tempTemplate.getStats_low_multiplier(), tempTemplate.getStats_high_multiplier());
+	float speed = tempTemplate.getSpeed() * itemMultiplier * tempTemplate.getClass_multiplier() *
+		Chances.randomFloat(tempTemplate.getStats_low_multiplier(), tempTemplate.getStats_high_multiplier());
+	float bonus = tempTemplate.getBonus();
+*/
+	return new Armament(
+		name, 
+		image, 
+		itemClass, 
+		type, 
+		armor, 
+		speed, 
+		bonus
+	);
 }
 
 void ArmamentFactory::importConfig(std::string path)
@@ -132,7 +146,7 @@ MonsterTemplate::MonsterTemplate(const std::string name_, const std::string imag
 
 }
 
-MonsterTemplate* MonsterTemplate::clone()
+Monster* MonsterTemplate::clone()
 {
 	std::cout << "cloning Monster..." << std::endl;
 
@@ -188,7 +202,7 @@ PotionTemplate::PotionTemplate(const std::string name_, const std::string image_
 
 };
 
-PotionTemplate* PotionTemplate::clone()
+Potion* PotionTemplate::clone()
 {
 	std::cout << "cloning Potion..." << std::endl;
 
@@ -236,7 +250,7 @@ void PotionFactory::importConfig(std::string path)
 	std::cout << "PotionTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-WeaponTemplate* WeaponTemplate::clone()
+Weapon* WeaponTemplate::clone()
 {
 	std::cout << "cloning Weapon..." << std::endl;
 
@@ -300,7 +314,7 @@ AttackTemplate::AttackTemplate(const std::string name_, const Attribute effect_,
 
 }
 
-AttackTemplate* AttackTemplate::clone()
+Attack* AttackTemplate::clone()
 {
 	std::cout << "cloning Attack..." << std::endl;
 
@@ -355,7 +369,7 @@ RoomTemplate::RoomTemplate(const std::string name_, const std::string descriptio
 
 }
 
-RoomTemplate* RoomTemplate::clone()
+Room* RoomTemplate::clone()
 {
 	std::cout << "cloning Room..." << std::endl;
 
