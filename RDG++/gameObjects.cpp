@@ -79,10 +79,8 @@ type(type_), armor(armor_), speed(speed_), bonus(bonus_), NamedObject(name_), Vi
 
 }
 
-Monster::Monster(const std::string name_, const std::string image_, const DifficultyLevel::Level level_, const Attribute killBonusType_,
-	const float killBonusLow_, const float killBonusHigh_, float hp_, float strength_, float speed_, float accuracy_) :
-	level(level_), killBonusType(killBonusType_), killBonusLow(killBonusLow_), killBonusHigh(killBonusHigh_),
-	NamedObject(name_), VisibleObject(image_), FightableCreature(hp_, strength_, speed_, accuracy_)
+Monster::Monster(const std::string name_, const std::string image_, const DifficultyLevel::Level level_, const Attribute killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
+	level(level_), killBonusType(killBonusType_), killBonus(killBonus_), NamedObject(name_), VisibleObject(image_), FightableCreature(hp_, strength_, speed_, accuracy_)
 {
 
 }
@@ -97,14 +95,9 @@ Attribute Monster::getKillBonusType() const
 	return killBonusType;
 }
 
-float Monster::getKillBonusLow() const
+float Monster::getKillBonus() const
 {
-	return killBonusLow;
-}
-
-float Monster::getKillBonusHigh() const
-{
-	return killBonusHigh;
+	return killBonus;
 }
 
 Potion::Potion(const std::string name_, const std::string image_, const Classes itemClass_, const std::string description_, const Target target_,
@@ -186,8 +179,9 @@ unsigned int Weapon::getMax() const
 	return max;
 }
 
-Attack::Attack(const std::string name_, const Attribute effect_, const float hpDamage_, const float hitProbability_, const float x_) :
-effect(effect_), hpDamage(hpDamage_), hitProbability(hitProbability_), x(x_), NamedObject(name_)
+Attack::Attack(const std::string name_, const Attribute effect_, const float hpDamageMultiplier_, const float hitProbability_, 
+	const float attributeDamageMultiplier_, const float attackStatsLowMultiplier_, const float attackStatsHighMultiplier_) :
+effect(effect_), hpDamageMultiplier(hpDamageMultiplier_), hitProbability(hitProbability_), attributeDamageMultiplier(attributeDamageMultiplier_), attackStatsHighMultiplier(attackStatsHighMultiplier_), attackStatsLowMultiplier(attackStatsLowMultiplier_), NamedObject(name_)
 {
 
 }
@@ -197,9 +191,9 @@ Attribute Attack::getEffect() const
 	return effect;
 }
 
-float Attack::getHpDamage() const
+float Attack::getHpDamageMultiplier() const
 {
-	return hpDamage;
+	return hpDamageMultiplier;
 }
 
 float Attack::getHitProbability() const
@@ -207,9 +201,19 @@ float Attack::getHitProbability() const
 	return hitProbability;
 }
 
-float Attack::getX() const
+float Attack::getAttributeDamageMultiplier() const
 {
-	return x;
+	return attributeDamageMultiplier;
+}
+
+float Attack::getStatsLowMultiplier() const
+{
+	return attackStatsLowMultiplier;
+}
+
+float Attack::getStatsHighMultiplier() const
+{
+	return attackStatsHighMultiplier;
 }
 
 Room::Room(const std::string name_, const std::string description_, const std::string image_,

@@ -88,19 +88,17 @@ class Monster : public NamedObject, public VisibleObject, public FightableCreatu
 {
 public:
 
-	Monster(const std::string name, const std::string image, const DifficultyLevel::Level level, const Attribute killBonusType, const float killBonusLow, const float killBonusHigh,
-		float hp, float strength, float speed, float accuracy);
+	Monster(const std::string name, const std::string image, const DifficultyLevel::Level level, const Attribute killBonusType, float killBonus, float hp, float strength, float speed, float accuracy);
 
 	DifficultyLevel::Level getLevel() const;
 	Attribute getKillBonusType() const;
-	float getKillBonusLow() const;
-	float getKillBonusHigh() const;
+	float getKillBonus() const;
 
 protected:
 
 	const DifficultyLevel::Level level;
 	const Attribute killBonusType;
-	const float killBonusLow, killBonusHigh;
+	const float killBonus;
 };
 
 class Potion : public Item, public NamedObject, public VisibleObject
@@ -153,17 +151,24 @@ class Attack : public NamedObject
 {
 public:
 
-	Attack(const std::string name, const Attribute effect, const float hpDamage, const float hitProbability, const float x);
+	Attack(const std::string name, const Attribute effect, const float hpDamageMultiplier, const float hitProbability, 
+		const float attributeDamageMultiplier, const float attackStatsLowMultiplier, const float attackStatsHighMultiplier);
 
 	Attribute getEffect() const;
-	float getHpDamage() const;
+	float getHpDamageMultiplier() const;
 	float getHitProbability() const;
-	float getX() const;
+	float getAttributeDamageMultiplier() const;
+	float getStatsLowMultiplier() const;
+	float getStatsHighMultiplier() const;
 
 protected:
 
 	const Attribute effect;
-	const float hpDamage, hitProbability, x;
+	const float hpDamageMultiplier, hitProbability, attributeDamageMultiplier;
+		
+private:
+	
+	const float attackStatsLowMultiplier, attackStatsHighMultiplier;
 };
 
 class Room : public NamedObject, public VisibleObject

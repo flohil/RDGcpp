@@ -13,6 +13,7 @@ enum Classes { None, Weak, Medium, Strong };
 enum Target { Self, Opponent };
 enum Attribute { Hp, Speed, Accuracy, Strength };
 enum Mode { Cure, TemporaryDecrease, IncrementalDecrease, TemporaryIncrease, IncrementalIncrease };
+enum RoomTypes { Deadend, Hallway, Turn, Tjunction, Junction, Treasurechamber };
 
 // maps strings to enums
 class EnumMapper

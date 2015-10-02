@@ -2,6 +2,7 @@
 #include "pugixml.hpp"
 #include "settings.hpp"
 #include "exceptions.hpp"
+#include "calculation.hpp"
 #include <iostream>
 #include <memory>
 
@@ -79,25 +80,12 @@ ArmamentTemplate::ArmamentTemplate(const std::string name_, const std::string im
 
 }
 
-Armament* ArmamentTemplate::clone(float externMultiplier = 1)
+Armament* ArmamentTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Armament..." << std::endl;
 
-	/*float armor = tempTemplate.getArmor() * itemMultiplier * tempTemplate.getClass_multiplier() *
-		Chances.randomFloat(tempTemplate.getStats_low_multiplier(), tempTemplate.getStats_high_multiplier());
-	float speed = tempTemplate.getSpeed() * itemMultiplier * tempTemplate.getClass_multiplier() *
-		Chances.randomFloat(tempTemplate.getStats_low_multiplier(), tempTemplate.getStats_high_multiplier());
-	float bonus = tempTemplate.getBonus();
-*/
-	return new Armament(
-		name, 
-		image, 
-		itemClass, 
-		type, 
-		armor, 
-		speed, 
-		bonus
-	);
+	return new Armament(name, image, itemClass, type, armor * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), 
+		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus);
 }
 
 void ArmamentFactory::importConfig(std::string path)
@@ -142,15 +130,18 @@ void ArmamentFactory::importConfig(std::string path)
 
 MonsterTemplate::MonsterTemplate(const std::string name_, const std::string image_, const DifficultyLevel::Level level_, const Attribute killBonusType_,
 	const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const float killBonusLow_, const float killBonusHigh_, float hp_, float strength_, float speed_, float accuracy_) :
-	Monster(name_, image_, level_, killBonusType_, killBonusLow_, killBonusHigh_, hp_, strength_, speed_, accuracy_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {
+	killBonusLow(killBonusLow_), killBonusHigh(killBonusHigh_), Monster(name_, image_, level_, killBonusType_, 0.0f, hp_, strength_, speed_, accuracy_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) 
+{
 
 }
 
-Monster* MonsterTemplate::clone(float externMultiplier = 1)
+Monster* MonsterTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Monster..." << std::endl;
 
-	return NULL;
+	return new Monster(name, image, level, killBonusType, classMultiplier * Calculation::randomFloat(killBonusLow, killBonusHigh),
+		hp * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), strength * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		speed * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), accuracy * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier));
 }
 
 void MonsterFactory::importConfig(std::string path)
@@ -202,11 +193,11 @@ PotionTemplate::PotionTemplate(const std::string name_, const std::string image_
 
 };
 
-Potion* PotionTemplate::clone(float externMultiplier = 1)
+Potion* PotionTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Potion..." << std::endl;
 
-	return NULL;
+	return new Potion(name, image, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), duration);
 }
 
 void PotionFactory::importConfig(std::string path)
@@ -250,11 +241,14 @@ void PotionFactory::importConfig(std::string path)
 	std::cout << "PotionTemplate now contains " << objects.size() << " objects." << std::endl;
 }
 
-Weapon* WeaponTemplate::clone(float externMultiplier = 1)
+Weapon* WeaponTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Weapon..." << std::endl;
 
-	return NULL;
+	return new Weapon(name, image, itemClass, type, attack * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		accuracy * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		defence * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), slots, max);
 }
 
 WeaponTemplate::WeaponTemplate(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
@@ -308,17 +302,17 @@ void WeaponFactory::importConfig(std::string path)
 }
 
 AttackTemplate::AttackTemplate(const std::string name_, const Attribute effect_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
-	const float hpDamage_, const float hitProbability_, const float x_) :
-	Attack(name_, effect_, hpDamage_, hitProbability_, x_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
+	const float hpDamage_, const float hitProbability_, const float attributeDamage_) :
+	hpDamage(hpDamage_), attributeDamage(attributeDamage_), Attack(name_, effect_, 1.0f, hitProbability_, 1.0f, statsLowMultiplier_, statsHighMultiplier_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
 {
 
 }
 
-Attack* AttackTemplate::clone(float externMultiplier = 1)
+Attack* AttackTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Attack..." << std::endl;
 
-	return NULL;
+	return new Attack(name, effect, hpDamage * classMultiplier, hitProbability, attributeDamage * classMultiplier, statsLowMultiplier, statsHighMultiplier);
 }
 
 void AttackFactory::importConfig(std::string path)
@@ -369,7 +363,12 @@ RoomTemplate::RoomTemplate(const std::string name_, const std::string descriptio
 
 }
 
-Room* RoomTemplate::clone(float externMultiplier = 1)
+Room* RoomTemplate::clone()
+{
+	return clone(1.0f);
+}
+
+Room* RoomTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Room..." << std::endl;
 
