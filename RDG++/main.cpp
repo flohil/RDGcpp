@@ -19,13 +19,14 @@ int main()
 	sf::VideoMode desktopVmode;
 	sf::VideoMode vmode;
 	sf::RenderWindow window;
+	ResourceManager& resourceManager = ResourceManager::getInstance();
 
 	// obtain desktop vMode for default settings
 	desktopVmode = sf::VideoMode::getDesktopMode();
 
 	// game settings and prototype initialization
 	std::unique_ptr<Settings> settings;
-	std::unique_ptr<PrototypeStorage> prototypeStorage;
+	std::shared_ptr<PrototypeStorage> prototypeStorage;
 	try
 	{
 		settings.reset(new Settings(desktopVmode.width, desktopVmode.height));
@@ -50,6 +51,17 @@ int main()
 
 	// create and print all game objects for test purposes
 	prototypeStorage->testPrintGameObjects();
+
+	// load resources
+	try
+	{
+		resourceManager.loadResources(settings->IMAGE_PATH, prototypeStorage);
+	}
+	catch (LoadingException& e)
+	{
+		std::cerr << e.what() << std::endl;
+		std::cin.ignore();
+	}
 
 	// output possible resolutions
 	for (unsigned i = 0; i < vmodes.size(); i++) 

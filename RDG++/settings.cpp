@@ -8,7 +8,7 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	APPNAME("RDG++"),
 	SETTINGS_FILE_PATH("settings.txt"),
 	CONFIG_PATH("config/"),
-	IMAGE_PATH("assets/")
+	IMAGE_PATH("res/")
 {
 
 	//set default values for variables

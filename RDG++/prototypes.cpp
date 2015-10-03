@@ -29,7 +29,7 @@ PrototypeStorage::~PrototypeStorage()
 
 void PrototypeStorage::testPrintGameObjects()
 {
-	/*for (std::string objectName : armamentFactory->getObjectNames()) {
+	for (std::string objectName : armamentFactory->getObjectNames()) {
 		armamentFactory->create(objectName, 1.0f)->debugPrint();
 	}
 	for (std::string objectName : monsterFactory->getObjectNames()) {
@@ -43,7 +43,7 @@ void PrototypeStorage::testPrintGameObjects()
 	}
 	for (std::string objectName : attackFactory->getObjectNames()) {
 		attackFactory->create(objectName, 1.0f)->debugPrint();
-	}*/
+	}
 	for (std::string objectName : roomFactory->getObjectNames()) {
 		roomFactory->create(objectName, 1.0f)->debugPrint();
 	}
@@ -473,11 +473,11 @@ void RoomFactory::importConfig(std::string path)
 			const unsigned int itemCount = roomNode.child("Item_Count").text().as_uint();
 
 
-			std::cout << "importing Room: name = " << name << ", description = " << description << ", image = " << image << ", monsterCount = " << monsterCount << ", itemCount = " << itemCount << ", itemMultiplier = " << itemMultiplier << std::endl;
+			/*std::cout << "importing Room: name = " << name << ", description = " << description << ", image = " << image << ", monsterCount = " << monsterCount << ", itemCount = " << itemCount << ", itemMultiplier = " << itemMultiplier << std::endl;
 			std::cout << "doorpositions: {N = " << doorPositions[DoorPositions::North] << ", E = " << doorPositions[DoorPositions::East] << ", S = " << doorPositions[DoorPositions::South] << ", W = " << doorPositions[DoorPositions::West] << std::endl;
 			std::cout << "monsterProbabilities: {No = " << monsterProbabilities[MonsterProbabilities::No] << ", Easy = " << monsterProbabilities[MonsterProbabilities::Easy] << ", Normal = " << monsterProbabilities[MonsterProbabilities::Normal] << ", Hard = " << monsterProbabilities[MonsterProbabilities::Hard] << std::endl;
 			std::cout << "findProbabilities: {None = " << findProbabilities[Classes::None] << ", Weak = " << findProbabilities[Classes::Weak] << ", Medium = " << findProbabilities[Classes::Medium] << ", Strong = " << findProbabilities[Classes::Strong] << std::endl;
-
+*/
 			std::shared_ptr<RoomTemplate> room(new RoomTemplate(name, description, image, doorPositions, monsterProbabilities, findProbabilities, monsterCount, itemCount, itemMultiplier));
 
 			objects[room->getName()] = room;
