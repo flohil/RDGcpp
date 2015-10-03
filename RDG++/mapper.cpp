@@ -160,3 +160,19 @@ Mode EnumMapper::mapMode(std::string input)
 		throw EnumMappingException(input, "Mode");
 	}
 }
+
+WeaponType EnumMapper::mapWeaponType(std::string input)
+{
+	if (input == "single-hand")
+	{
+		return WeaponType::Single;
+	}
+	else if (input == "two-hand")
+	{
+		return WeaponType::Double;
+	}
+	else
+	{
+		throw EnumMappingException(input, "Mode");
+	}
+}

@@ -29,7 +29,7 @@ PrototypeStorage::~PrototypeStorage()
 
 void PrototypeStorage::testPrintGameObjects()
 {
-	for (std::string objectName : armamentFactory->getObjectNames()) {
+	/*for (std::string objectName : armamentFactory->getObjectNames()) {
 		armamentFactory->create(objectName, 1.0f)->debugPrint();
 	}
 	for (std::string objectName : monsterFactory->getObjectNames()) {
@@ -43,6 +43,9 @@ void PrototypeStorage::testPrintGameObjects()
 	}
 	for (std::string objectName : attackFactory->getObjectNames()) {
 		attackFactory->create(objectName, 1.0f)->debugPrint();
+	}*/
+	for (std::string objectName : roomFactory->getObjectNames()) {
+		// roomFactory->create(objectName, 1.0f)->debugPrint();
 	}
 }
 
@@ -107,6 +110,11 @@ Armament* ArmamentTemplate::clone(float externMultiplier)
 		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus);
 }
 
+std::string ArmamentTemplate::getTextureName()
+{
+	return image;
+}
+
 void ArmamentFactory::importConfig(std::string path)
 {
 	pugi::xml_document doc;
@@ -161,6 +169,11 @@ Monster* MonsterTemplate::clone(float externMultiplier)
 	return new Monster(name, image, level, killBonusType, classMultiplier * Calculation::randomFloat(killBonusLow, killBonusHigh),
 		hp * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), strength * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
 		speed * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), accuracy * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier));
+}
+
+std::string MonsterTemplate::getTextureName()
+{
+	return image;
 }
 
 void MonsterFactory::importConfig(std::string path)
@@ -219,6 +232,11 @@ Potion* PotionTemplate::clone(float externMultiplier)
 	return new Potion(name, image, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), duration);
 }
 
+std::string PotionTemplate::getTextureName()
+{
+	return image;
+}
+
 void PotionFactory::importConfig(std::string path)
 {
 	pugi::xml_document doc;
@@ -246,8 +264,8 @@ void PotionFactory::importConfig(std::string path)
 			const Target target = EnumMapper::mapTarget(potionNode.child("Target").text().as_string());
 			const Attribute effect = EnumMapper::mapAttribute(potionNode.child("Effect").text().as_string());
 			const Mode mode = EnumMapper::mapMode(potionNode.child("Mode").text().as_string());
-			const float strength = potionNode.child("Strength").text().as_float();
-			const unsigned int duration = potionNode.child("Duration").text().as_uint();
+			const float strength = potionNode.child("x").text().as_float();
+			const unsigned int duration = potionNode.child("n").text().as_uint();
 			
 			std::shared_ptr<PotionTemplate> potion(new PotionTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
 				description, target, effect, mode, strength, duration));
@@ -271,10 +289,15 @@ Weapon* WeaponTemplate::clone(float externMultiplier)
 }
 
 WeaponTemplate::WeaponTemplate(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_,
-	const std::string type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
+	const WeaponType type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
 	Weapon(name_, image_, itemClass_, type_, attack_, speed_, accuracy_, defence_, slots_, max_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_)
 {
 
+}
+
+std::string WeaponTemplate::getTextureName()
+{
+	return image;
 }
 
 void WeaponFactory::importConfig(std::string path)
@@ -301,7 +324,7 @@ void WeaponFactory::importConfig(std::string path)
 			const float classMultiplier = weaponNode.child("Class_Multiplier").text().as_float();
 			const float statsLowMultiplier = weaponNode.child("Stats_Low_Multiplier").text().as_float();
 			const float statsHighMultiplier = weaponNode.child("Stats_High_Multiplier").text().as_float();
-			const std::string type = weaponNode.child("Type").text().as_string();
+			const WeaponType type = EnumMapper::mapWeaponType(weaponNode.child("Type").text().as_string());
 			const float attack = weaponNode.child("Attack").text().as_float();
 			const float speed = weaponNode.child("Speed").text().as_float();
 			const float accuracy = weaponNode.child("Accuracy").text().as_float();
@@ -332,6 +355,11 @@ Attack* AttackTemplate::clone(float externMultiplier)
 	std::cout << "cloning Attack..." << std::endl;
 
 	return new Attack(name, effect, hpDamage * classMultiplier, hitProbability, attributeDamage * classMultiplier, statsLowMultiplier, statsHighMultiplier);
+}
+
+std::string AttackTemplate::getTextureName()
+{
+	return NULL;
 }
 
 void AttackFactory::importConfig(std::string path)
@@ -377,8 +405,8 @@ RoomTemplate::RoomTemplate(const std::string name_, const std::string descriptio
 	const std::map<Classes, const float> findProbabilities_,
 	const unsigned int monsterCount_, const unsigned int itemCount_,
 	const float itemMultiplier_) :
-	image(image_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_), 
-	itemCount(itemCount_), itemMultiplier(itemMultiplier_), Room(name_, description_)
+	doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_), 
+	itemCount(itemCount_), itemMultiplier(itemMultiplier_), Room(name_, description_, image_)
 {
 
 }
@@ -393,6 +421,11 @@ Room* RoomTemplate::clone(float externMultiplier)
 	std::cout << "cloning Room..." << std::endl;
 
 	return NULL;
+}
+
+std::string RoomTemplate::getTextureName()
+{
+	return image;
 }
 
 void RoomFactory::importConfig(std::string path)
@@ -441,8 +474,6 @@ void RoomFactory::importConfig(std::string path)
 			const std::map<Classes, const float> constFindProbabilities;
 			
 			const unsigned int itemCount = roomNode.child("Item_Count").text().as_uint();
-
-			// std::shared_ptr<Room> room(new Room())
 
 			std::shared_ptr<RoomTemplate> room(new RoomTemplate(name, description, image, constDoorPositions, constMonsterProbabilities, constFindProbabilities, monsterCount, itemCount, itemMultiplier));
 

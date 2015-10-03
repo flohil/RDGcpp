@@ -7,7 +7,8 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	COLOR_DEPTH( 32 ),
 	APPNAME("RDG++"),
 	SETTINGS_FILE_PATH("settings.txt"),
-	CONFIG_PATH("config/")
+	CONFIG_PATH("config/"),
+	IMAGE_PATH("assets/")
 {
 
 	//set default values for variables

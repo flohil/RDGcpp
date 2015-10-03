@@ -14,6 +14,7 @@ enum Target { Self, Opponent };
 enum Attribute { Hp, Speed, Accuracy, Strength };
 enum Mode { Cure, TemporaryDecrease, IncrementalDecrease, TemporaryIncrease, IncrementalIncrease };
 enum RoomTypes { Deadend, Hallway, Turn, Tjunction, Junction, Treasurechamber };
+enum WeaponType { Single, Double };
 
 // maps strings to enums
 class EnumMapper
@@ -27,6 +28,7 @@ public:
 	static Target mapTarget(std::string input);
 	static Attribute mapAttribute(std::string input);
 	static Mode mapMode(std::string input);
+	static WeaponType mapWeaponType(std::string input);
 };
 
 #endif // ENUMS_INCLUDE

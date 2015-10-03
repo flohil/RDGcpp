@@ -48,9 +48,12 @@ Item::~Item()
 
 }
 
-FightableCreature::FightableCreature(float hp, float strength, float speed, float accuracy)
+FightableCreature::FightableCreature(float hp_, float strength_, float speed_, float accuracy_)
 {
-
+	hp = hp_;
+	strength = strength_;
+	speed = speed_;
+	accuracy = accuracy_;
 }
 
 float FightableCreature::getHp() const
@@ -180,7 +183,7 @@ void Potion::debugPrint() const
 	std::cout << std::endl;
 }
 
-Weapon::Weapon(const std::string name_, const std::string image_, const Classes itemClass_, const std::string type_, const float attack_,
+Weapon::Weapon(const std::string name_, const std::string image_, const Classes itemClass_, const WeaponType type_, const float attack_,
 	const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
 	type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), max(max_), NamedObject(name_), VisibleObject(image_), Item(itemClass_)
 {
@@ -203,7 +206,7 @@ void Weapon::debugPrint() const
 	std::cout << std::endl;
 }
 
-std::string Weapon::getType() const
+WeaponType Weapon::getType() const
 {
 	return type;
 }
@@ -288,10 +291,19 @@ float Attack::getStatsHighMultiplier() const
 	return attackStatsHighMultiplier;
 }
 
-Room::Room(const std::string name_, const std::string description_) :
-	description(description_), NamedObject(name_)
+Room::Room(const std::string name_, const std::string description_, const std::string image_) :
+description(description_), NamedObject(name_), VisibleObject(image_)
 {
 
+}
+
+void Room::debugPrint() const
+{
+	std::cout << "Room: " << std::endl;
+	/*std::cout << "name = " << name << std::endl;
+	std::cout << "image = " << image << std::endl;
+	std::cout << "description = " << description << std::endl;*/
+	std::cout << std::endl;
 }
 
 std::string Room::getDescription() const

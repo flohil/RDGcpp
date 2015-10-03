@@ -8,6 +8,14 @@ const char* LocationException::what() const throw() {
 	return message_.c_str();
 }
 
+LoadingException::LoadingException(const std::string& message) : message_("Unable to load " + message) {
+
+}
+
+const char* LoadingException::what() const throw() {
+	return message_.c_str();
+}
+
 ConfigParseException::ConfigParseException(const std::string& message) : message_("Unable to parse " + message) {
 
 }

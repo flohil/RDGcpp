@@ -15,6 +15,17 @@ public:
 	virtual const char* what() const throw();
 };
 
+class LoadingException : public std::exception {
+private:
+
+	std::string message_;
+
+public:
+
+	explicit LoadingException(const std::string& message);
+	virtual const char* what() const throw();
+};
+
 class ConfigParseException : public std::exception {
 private:
 

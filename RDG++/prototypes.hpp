@@ -19,6 +19,7 @@ public:
 
 	PrototypeTemplate::~PrototypeTemplate();
 	virtual T* clone(float externMultiplier) = 0;
+	virtual std::string getTextureName() = 0;
 };
 
 // handles the different prototype templates for one object class 
@@ -29,8 +30,9 @@ class PrototypeTemplateFactory
 public:
 
 	PrototypeTemplateFactory::~PrototypeTemplateFactory();
-	T2* PrototypeTemplateFactory<T, T2>::create(std::string objectName, float externMultiplier);
+	T2* create(std::string objectName, float externMultiplier);
 	std::set<std::string> getObjectNames();
+	std::shared_ptr<PrototypeTemplate<T2>> getTemplate(std::string objectName);
 
 protected:
 
@@ -65,6 +67,7 @@ public:
 		const std::string type, const float armor, const float speed, const float bonus);
 
 	virtual Armament* clone(float externMultiplier);
+	virtual std::string getTextureName();
 };
 
 class MonsterTemplate : public Monster, public VariableTemplate, public PrototypeTemplate<Monster>
@@ -75,6 +78,7 @@ public:
 		const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, const float killBonusLow, const float killBonusHigh, float hp, float strength, float speed, float accuracy);
 
 	virtual Monster* clone(float externMultiplier);
+	virtual std::string getTextureName();
 
 private:
 
@@ -89,6 +93,7 @@ public:
 		const std::string description, const Target target, const Attribute effect, const Mode mode, const float strength, const unsigned int duration);
 
 	virtual Potion* clone(float externMultiplier);
+	virtual std::string getTextureName();
 };
 
 class WeaponTemplate : public Weapon, public VariableTemplate, public PrototypeTemplate<Weapon>
@@ -96,9 +101,10 @@ class WeaponTemplate : public Weapon, public VariableTemplate, public PrototypeT
 public:
 
 	WeaponTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
-		const std::string type, const float attack, const float speed, const float accuracy, const float defence, const unsigned int slots, const unsigned int max);
+		const WeaponType type, const float attack, const float speed, const float accuracy, const float defence, const unsigned int slots, const unsigned int max);
 
 	virtual Weapon* clone(float externMultiplier);
+	virtual std::string getTextureName();
 };
 
 class AttackTemplate : public Attack, public VariableTemplate, public PrototypeTemplate<Attack>
@@ -109,6 +115,7 @@ public:
 		const float hpDamage, const float hitProbability, const float attributeDamage);
 
 	virtual Attack* clone(float externMultiplier);
+	virtual std::string getTextureName();
 
 private:
 
@@ -129,6 +136,7 @@ public:
 
 	virtual Room* clone(float externMultiplier);
 	Room* clone();
+	virtual std::string getTextureName();
 
 	/*std::map<DoorPositions, const bool> getDoorPositions() const;
 	std::map<MonsterProbabilities, const float> getMonsterProbabilities() const;
@@ -139,7 +147,6 @@ public:
 
 private:
 
-	const std::string image;
 	const std::map<DoorPositions, const bool> doorPositions;
 	const std::map<MonsterProbabilities, const float> monsterProbabilities;
 	const std::map<Classes, const float> findProbabilities;
@@ -233,6 +240,12 @@ std::set<std::string> PrototypeTemplateFactory<T, T2>::getObjectNames()
 	std::cout << "Set contains " << objectNames.size() << " names." << std::endl;
 
 	return objectNames;
+}
+
+template <class T, class T2>
+std::shared_ptr<PrototypeTemplate<T2>> PrototypeTemplateFactory<T, T2>::getTemplate(std::string objectName)
+{
+	return objects.at(objectName);
 }
 
 template <class T, class T2>

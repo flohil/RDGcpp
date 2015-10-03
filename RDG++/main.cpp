@@ -6,6 +6,7 @@
 #include "enums.hpp"
 #include "gameObjects.hpp"
 #include "debugPrint.hpp"
+#include "resourceManager.hpp"
 #include <iostream>
 #include <fstream>
 #include <memory>

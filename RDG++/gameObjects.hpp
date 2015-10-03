@@ -133,10 +133,10 @@ class Weapon : public Item, public NamedObject, public VisibleObject, public Deb
 {
 public:
 
-	Weapon(const std::string name, const std::string image, const Classes itemClass, const std::string type, const float attack, const float speed,
+	Weapon(const std::string name, const std::string image, const Classes itemClass, const WeaponType type, const float attack, const float speed,
 		const float accuracy, const float defence, const unsigned int slots, const unsigned int max);
 
-	std::string getType() const;
+	WeaponType getType() const;
 	float getAttack() const;
 	float getSpeed() const;
 	float getAccuracy() const;
@@ -147,7 +147,7 @@ public:
 
 protected:
 
-	const std::string type;
+	const WeaponType type;
 	const float attack, speed, accuracy, defence;
 	const unsigned int slots, max;
 };
@@ -177,13 +177,14 @@ private:
 	const float attackStatsLowMultiplier, attackStatsHighMultiplier;
 };
 
-class Room : public NamedObject
+class Room : public NamedObject, public VisibleObject, public DebugPrintObject
 {
 public:
 
-	Room(const std::string name, const std::string description);
+	Room(const std::string name, const std::string description, const std::string image);
 
 	std::string getDescription() const;
+	virtual void debugPrint() const;
 
 protected:
 
