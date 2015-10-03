@@ -45,7 +45,7 @@ void PrototypeStorage::testPrintGameObjects()
 		attackFactory->create(objectName, 1.0f)->debugPrint();
 	}*/
 	for (std::string objectName : roomFactory->getObjectNames()) {
-		// roomFactory->create(objectName, 1.0f)->debugPrint();
+		roomFactory->create(objectName, 1.0f)->debugPrint();
 	}
 }
 
@@ -420,7 +420,7 @@ Room* RoomTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Room..." << std::endl;
 
-	return NULL;
+	return new Room(name, description, image);
 }
 
 std::string RoomTemplate::getTextureName()
@@ -454,14 +454,12 @@ void RoomFactory::importConfig(std::string path)
 			{
 				doorPositions.insert(std::pair<DoorPositions, const bool>(EnumMapper::mapDoorPositions(doorPosNode.name()), doorPosNode.text().as_bool()));
 			}
-			const std::map<DoorPositions, const bool> constDoorPositions = doorPositions;
 
 			std::map<MonsterProbabilities, const float> monsterProbabilities;
 			for (pugi::xml_node monsterNode = roomNode.child("Monster").first_child(); monsterNode; monsterNode = monsterNode.next_sibling())
 			{
 				monsterProbabilities.insert(std::pair<MonsterProbabilities, const float>(EnumMapper::mapMonsterProbabilities(monsterNode.name()), monsterNode.text().as_float()));
 			}
-			const std::map<MonsterProbabilities, const float> constMonsterProbabilities = monsterProbabilities;
 
 			const unsigned int monsterCount = roomNode.child("Monster_Count").text().as_uint();
 			const float itemMultiplier = roomNode.child("Item_Multiplier").text().as_float();
@@ -471,11 +469,16 @@ void RoomFactory::importConfig(std::string path)
 			{
 				findProbabilities.insert(std::pair<Classes, const float>(EnumMapper::mapClasses(findNode.name()), findNode.text().as_float()));
 			}
-			const std::map<Classes, const float> constFindProbabilities;
 			
 			const unsigned int itemCount = roomNode.child("Item_Count").text().as_uint();
 
-			std::shared_ptr<RoomTemplate> room(new RoomTemplate(name, description, image, constDoorPositions, constMonsterProbabilities, constFindProbabilities, monsterCount, itemCount, itemMultiplier));
+
+			std::cout << "importing Room: name = " << name << ", description = " << description << ", image = " << image << ", monsterCount = " << monsterCount << ", itemCount = " << itemCount << ", itemMultiplier = " << itemMultiplier << std::endl;
+			std::cout << "doorpositions: {N = " << doorPositions[DoorPositions::North] << ", E = " << doorPositions[DoorPositions::East] << ", S = " << doorPositions[DoorPositions::South] << ", W = " << doorPositions[DoorPositions::West] << std::endl;
+			std::cout << "monsterProbabilities: {No = " << monsterProbabilities[MonsterProbabilities::No] << ", Easy = " << monsterProbabilities[MonsterProbabilities::Easy] << ", Normal = " << monsterProbabilities[MonsterProbabilities::Normal] << ", Hard = " << monsterProbabilities[MonsterProbabilities::Hard] << std::endl;
+			std::cout << "findProbabilities: {None = " << findProbabilities[Classes::None] << ", Weak = " << findProbabilities[Classes::Weak] << ", Medium = " << findProbabilities[Classes::Medium] << ", Strong = " << findProbabilities[Classes::Strong] << std::endl;
+
+			std::shared_ptr<RoomTemplate> room(new RoomTemplate(name, description, image, doorPositions, monsterProbabilities, findProbabilities, monsterCount, itemCount, itemMultiplier));
 
 			objects[room->getName()] = room;
 		}

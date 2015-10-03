@@ -300,9 +300,9 @@ description(description_), NamedObject(name_), VisibleObject(image_)
 void Room::debugPrint() const
 {
 	std::cout << "Room: " << std::endl;
-	/*std::cout << "name = " << name << std::endl;
+	std::cout << "name = " << name << std::endl;
 	std::cout << "image = " << image << std::endl;
-	std::cout << "description = " << description << std::endl;*/
+	std::cout << "description = " << description << std::endl;
 	std::cout << std::endl;
 }
 
