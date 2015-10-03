@@ -79,6 +79,19 @@ type(type_), armor(armor_), speed(speed_), bonus(bonus_), NamedObject(name_), Vi
 
 }
 
+void Armament::debugPrint() const
+{
+	std::cout << "Armament: " << std::endl;
+	std::cout << "name = " << name << std::endl;
+	std::cout << "image = " << image << std::endl;
+	std::cout << "itemClass = " << itemClass << std::endl;
+	std::cout << "type = " << type << std::endl;
+	std::cout << "armor = " << armor << std::endl;
+	std::cout << "speed = " << speed << std::endl;
+	std::cout << "bonus = " << bonus << std::endl;
+	std::cout << std::endl;
+}
+
 Monster::Monster(const std::string name_, const std::string image_, const DifficultyLevel::Level level_, const Attribute killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
 	level(level_), killBonusType(killBonusType_), killBonus(killBonus_), NamedObject(name_), VisibleObject(image_), FightableCreature(hp_, strength_, speed_, accuracy_)
 {
@@ -98,6 +111,21 @@ Attribute Monster::getKillBonusType() const
 float Monster::getKillBonus() const
 {
 	return killBonus;
+}
+
+void Monster::debugPrint() const
+{
+	std::cout << "Monster: " << std::endl;
+	std::cout << "name = " << name << std::endl;
+	std::cout << "image = " << image << std::endl;
+	std::cout << "level = " << level << std::endl;
+	std::cout << "killBonusType = " << killBonusType << std::endl;
+	std::cout << "killBonus = " << killBonus << std::endl;
+	std::cout << "hp = " << hp << std::endl;
+	std::cout << "strength = " << strength << std::endl;
+	std::cout << "speed = " << speed << std::endl;
+	std::cout << "accuracy = " << accuracy << std::endl;
+	std::cout << std::endl;
 }
 
 Potion::Potion(const std::string name_, const std::string image_, const Classes itemClass_, const std::string description_, const Target target_,
@@ -137,11 +165,42 @@ unsigned int Potion::getDuration() const
 	return duration;
 }
 
+void Potion::debugPrint() const
+{
+	std::cout << "Potion: " << std::endl;
+	std::cout << "name = " << name << std::endl;
+	std::cout << "image = " << image << std::endl;
+	std::cout << "itemClass = " << itemClass << std::endl;
+	std::cout << "description = " << description << std::endl;
+	std::cout << "target = " << target << std::endl;
+	std::cout << "effect = " << effect << std::endl;
+	std::cout << "mode = " << mode << std::endl;
+	std::cout << "strength = " << strength << std::endl;
+	std::cout << "duration = " << duration << std::endl;
+	std::cout << std::endl;
+}
+
 Weapon::Weapon(const std::string name_, const std::string image_, const Classes itemClass_, const std::string type_, const float attack_,
 	const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
 	type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), max(max_), NamedObject(name_), VisibleObject(image_), Item(itemClass_)
 {
 
+}
+
+void Weapon::debugPrint() const
+{
+	std::cout << "Weapon: " << std::endl;
+	std::cout << "name = " << name << std::endl;
+	std::cout << "image = " << image << std::endl;
+	std::cout << "itemClass = " << itemClass << std::endl;
+	std::cout << "type = " << type << std::endl;
+	std::cout << "attack = " << attack << std::endl;
+	std::cout << "speed = " << speed << std::endl;
+	std::cout << "accuracy = " << accuracy << std::endl;
+	std::cout << "defence = " << defence << std::endl;
+	std::cout << "slots = " << slots << std::endl;
+	std::cout << "max = " << max << std::endl;
+	std::cout << std::endl;
 }
 
 std::string Weapon::getType() const
@@ -186,6 +245,19 @@ effect(effect_), hpDamageMultiplier(hpDamageMultiplier_), hitProbability(hitProb
 
 }
 
+void Attack::debugPrint() const
+{
+	std::cout << "Attack: " << std::endl;
+	std::cout << "name = " << name << std::endl;
+	std::cout << "effect = " << effect << std::endl;
+	std::cout << "hpDamageMultiplier = " << hpDamageMultiplier << std::endl;
+	std::cout << "hitProbability = " << hitProbability << std::endl;
+	std::cout << "attributeDamageMultiplier = " << attributeDamageMultiplier << std::endl;
+	std::cout << "attackStatsLowMultiplier = " << attackStatsLowMultiplier << std::endl;
+	std::cout << "attackStatsHighMultiplier = " << attackStatsHighMultiplier << std::endl;
+	std::cout << std::endl;
+}
+
 Attribute Attack::getEffect() const
 {
 	return effect;
@@ -216,14 +288,8 @@ float Attack::getStatsHighMultiplier() const
 	return attackStatsHighMultiplier;
 }
 
-Room::Room(const std::string name_, const std::string description_, const std::string image_,
-	const std::map<DoorPositions, const bool> doorPositions_,
-	const std::map<MonsterProbabilities, const float> monsterProbabilities_,
-	const std::map<Classes, const float> findProbabilities_,
-	const unsigned int monsterCount_, const unsigned int itemCount_,
-	const float itemMultiplier_) :
-	doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_),
-	monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_), NamedObject(name_), VisibleObject(image_)
+Room::Room(const std::string name_, const std::string description_) :
+	description(description_), NamedObject(name_)
 {
 
 }
@@ -231,34 +297,4 @@ Room::Room(const std::string name_, const std::string description_, const std::s
 std::string Room::getDescription() const
 {
 	return description;
-}
-
-std::map<DoorPositions, const bool> Room::getDoorPositions() const
-{
-	return doorPositions;
-}
-
-std::map<MonsterProbabilities, const float> Room::getMonsterProbabilities() const
-{
-	return monsterProbabilities;
-}
-
-std::map<Classes, const float> Room::getFindProbabilities() const
-{
-	return findProbabilities;
-}
-
-unsigned int Room::getMonsterCount() const
-{
-	return monsterCount;
-}
-
-unsigned int Room::getItemCount() const
-{
-	return itemCount;
-}
-
-float Room::getItemMultiplier() const
-{
-	return itemMultiplier;
 }

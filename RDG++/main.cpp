@@ -5,6 +5,7 @@
 #include "prototypes.hpp"
 #include "enums.hpp"
 #include "gameObjects.hpp"
+#include "debugPrint.hpp"
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -46,10 +47,13 @@ int main()
 	// retrieve a list of all possible fullscreen video modes
 	std::vector<sf::VideoMode> vmodes = sf::VideoMode::getFullscreenModes();
 
+	// create and print all game objects for test purposes
+	prototypeStorage->testPrintGameObjects();
+
 	// output possible resolutions
 	for (unsigned i = 0; i < vmodes.size(); i++) 
 	{
-		std::cout << vmodes[i].width << " x " << vmodes[i].height << "\n";
+		std::clog << vmodes[i].width << " x " << vmodes[i].height << "\n";
 	}
 
 	// run the program as long as the window is open
@@ -83,3 +87,4 @@ int main()
 
 	return 0;
 }
+

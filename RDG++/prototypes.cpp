@@ -27,6 +27,25 @@ PrototypeStorage::~PrototypeStorage()
 	delete roomFactory;
 }
 
+void PrototypeStorage::testPrintGameObjects()
+{
+	for (std::string objectName : armamentFactory->getObjectNames()) {
+		armamentFactory->create(objectName, 1.0f)->debugPrint();
+	}
+	for (std::string objectName : monsterFactory->getObjectNames()) {
+		monsterFactory->create(objectName, 1.0f)->debugPrint();
+	}
+	for (std::string objectName : potionFactory->getObjectNames()) {
+		potionFactory->create(objectName, 1.0f)->debugPrint();
+	}
+	for (std::string objectName : weaponFactory->getObjectNames()) {
+		weaponFactory->create(objectName, 1.0f)->debugPrint();
+	}
+	for (std::string objectName : attackFactory->getObjectNames()) {
+		attackFactory->create(objectName, 1.0f)->debugPrint();
+	}
+}
+
 void PrototypeStorage::initializeTemplates(std::string templatePath)
 {
 	std::cout << "initializing templates..." << std::endl;
@@ -358,7 +377,8 @@ RoomTemplate::RoomTemplate(const std::string name_, const std::string descriptio
 	const std::map<Classes, const float> findProbabilities_,
 	const unsigned int monsterCount_, const unsigned int itemCount_,
 	const float itemMultiplier_) :
-	Room(name_, description_, image_, doorPositions_, monsterProbabilities_, findProbabilities_, monsterCount_, itemCount_, itemMultiplier_)
+	image(image_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_), 
+	itemCount(itemCount_), itemMultiplier(itemMultiplier_), Room(name_, description_)
 {
 
 }

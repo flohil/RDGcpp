@@ -1,6 +1,7 @@
 #ifndef GAME_OBJECTS_INCLUDE
 #define GAME_OBJECTS_INCLUDE
 
+#include "debugPrint.hpp"
 #include "enums.hpp"
 #include <map>
 #include <string>
@@ -67,7 +68,7 @@ protected:
 	float hp, strength, speed, accuracy;
 };
 
-class Armament : public Item, public NamedObject, public VisibleObject
+class Armament : public Item, public NamedObject, public VisibleObject, public DebugPrintObject
 {
 public:
 
@@ -77,6 +78,7 @@ public:
 	float getArmor() const;
 	float getSpeed() const;
 	float getBonus() const;
+	virtual void debugPrint() const;
 
 protected:
 
@@ -84,7 +86,7 @@ protected:
 	const float armor, speed, bonus;
 };
 
-class Monster : public NamedObject, public VisibleObject, public FightableCreature
+class Monster : public NamedObject, public VisibleObject, public FightableCreature, public DebugPrintObject
 {
 public:
 
@@ -93,6 +95,7 @@ public:
 	DifficultyLevel::Level getLevel() const;
 	Attribute getKillBonusType() const;
 	float getKillBonus() const;
+	virtual void debugPrint() const;
 
 protected:
 
@@ -101,7 +104,7 @@ protected:
 	const float killBonus;
 };
 
-class Potion : public Item, public NamedObject, public VisibleObject
+class Potion : public Item, public NamedObject, public VisibleObject, public DebugPrintObject
 {
 public:
 
@@ -114,6 +117,7 @@ public:
 	Mode getMode() const;
 	float getStrength() const;
 	unsigned int getDuration() const;
+	virtual void debugPrint() const;
 
 protected:
 
@@ -125,7 +129,7 @@ protected:
 	const unsigned int duration;
 };
 
-class Weapon : public Item, public NamedObject, public VisibleObject
+class Weapon : public Item, public NamedObject, public VisibleObject, public DebugPrintObject
 {
 public:
 
@@ -139,6 +143,7 @@ public:
 	float getDefence() const;
 	unsigned int getSlots() const;
 	unsigned int getMax() const;
+	virtual void debugPrint() const;
 
 protected:
 
@@ -147,7 +152,7 @@ protected:
 	const unsigned int slots, max;
 };
 
-class Attack : public NamedObject
+class Attack : public NamedObject, public DebugPrintObject
 {
 public:
 
@@ -160,6 +165,7 @@ public:
 	float getAttributeDamageMultiplier() const;
 	float getStatsLowMultiplier() const;
 	float getStatsHighMultiplier() const;
+	virtual void debugPrint() const;
 
 protected:
 
@@ -171,33 +177,17 @@ private:
 	const float attackStatsLowMultiplier, attackStatsHighMultiplier;
 };
 
-class Room : public NamedObject, public VisibleObject
+class Room : public NamedObject
 {
 public:
 
-	Room(const std::string name, const std::string description, const std::string image,
-		const std::map<DoorPositions, const bool> doorPositions,
-		const std::map<MonsterProbabilities, const float> monsterProbabilities,
-		const std::map<Classes, const float> findProbabilities,
-		const unsigned int monsterCount, const unsigned int itemCount,
-		const float itemMultiplier);
+	Room(const std::string name, const std::string description);
 
 	std::string getDescription() const;
-	std::map<DoorPositions, const bool> getDoorPositions() const;
-	std::map<MonsterProbabilities, const float> getMonsterProbabilities() const;
-	std::map<Classes, const float> getFindProbabilities() const;
-	unsigned int getMonsterCount() const;
-	unsigned int getItemCount() const;
-	float getItemMultiplier() const;
 
 protected:
 
 	const std::string description;
-	const std::map<DoorPositions, const bool> doorPositions;
-	const std::map<MonsterProbabilities, const float> monsterProbabilities;
-	const std::map<Classes, const float> findProbabilities;
-	const unsigned int monsterCount, itemCount;
-	const float itemMultiplier;
 };
 
 #endif // GAME_OBJECTS_INCLUDE

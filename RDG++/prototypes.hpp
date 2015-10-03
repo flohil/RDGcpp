@@ -129,6 +129,22 @@ public:
 
 	virtual Room* clone(float externMultiplier);
 	Room* clone();
+
+	/*std::map<DoorPositions, const bool> getDoorPositions() const;
+	std::map<MonsterProbabilities, const float> getMonsterProbabilities() const;
+	std::map<Classes, const float> getFindProbabilities() const;
+	unsigned int getMonsterCount() const;
+	unsigned int getItemCount() const;
+	float getItemMultiplier() const;*/
+
+private:
+
+	const std::string image;
+	const std::map<DoorPositions, const bool> doorPositions;
+	const std::map<MonsterProbabilities, const float> monsterProbabilities;
+	const std::map<Classes, const float> findProbabilities;
+	const unsigned int monsterCount, itemCount;
+	const float itemMultiplier;
 };
 
 
@@ -187,6 +203,7 @@ public:
 	// function declarations
 	PrototypeStorage(std::string templatePath);
 	~PrototypeStorage();
+	void testPrintGameObjects();
                                                                                                                            
 private:
 
