@@ -3,10 +3,10 @@
 #include "exceptions.hpp"
 #include <memory>
 
-ResourceManager& ResourceManager::getInstance()
+// free memory from textures
+ResourceManager::~ResourceManager() 
 {
-	static ResourceManager instance;
-	return instance;
+
 }
 
 void ResourceManager::loadResources(const std::string imagesPath, std::shared_ptr<PrototypeStorage> prototypeStorage)

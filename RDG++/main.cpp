@@ -38,8 +38,6 @@ int main()
 		return -1;
 	}
 
-	Armament* testArm = prototypeStorage->armamentFactory->create("Leather Helmet", 1);
-
 	// create video mode and window
 	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);
 	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
@@ -69,6 +67,35 @@ int main()
 		std::clog << vmodes[i].width << " x " << vmodes[i].height << "\n";
 	}
 
+
+
+	// create a new vertex
+	sf::Vertex vertex;
+
+	// set its position
+	vertex.position = sf::Vector2f(10, 50);
+
+	// set its color
+	vertex.color = sf::Color::Red;
+
+	// set its texture coordinates
+	vertex.texCoords = sf::Vector2f(100, 100);
+
+	// create an array of 3 vertices that define a triangle primitive
+	sf::VertexArray triangle(sf::Triangles, 3);
+
+	// define the position of the triangle's points
+	triangle[0].position = sf::Vector2f(10, 10);
+	triangle[1].position = sf::Vector2f(100, 10);
+	triangle[2].position = sf::Vector2f(100, 100);
+
+	// define the color of the triangle's points
+	triangle[0].color = sf::Color::Red;
+	triangle[1].color = sf::Color::Blue;
+	triangle[2].color = sf::Color::Green;
+
+
+
 	// run the program as long as the window is open
 	while (window.isOpen())
 	{
@@ -91,7 +118,9 @@ int main()
 			}
 
 			// Clear the whole window before rendering a new frame
-			window.clear(sf::Color::Red);
+			window.clear(sf::Color::Black);
+
+			window.draw(triangle);
 
 			// End the current frame and display its contents on screen
 			window.display();

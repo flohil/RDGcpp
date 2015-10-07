@@ -19,7 +19,7 @@ public:
 
 	PrototypeTemplate::~PrototypeTemplate();
 	virtual T* clone(float externMultiplier) = 0;
-	virtual std::string getTextureName() = 0;
+	virtual std::string getTextureName() const = 0;
 };
 
 // handles the different prototype templates for one object class 
@@ -48,11 +48,12 @@ class VariableTemplate
 {
 public:
 
-	VariableTemplate(const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier);
+	VariableTemplate(const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_) :
+		classMultiplier(classMultiplier_), statsLowMultiplier(statsLowMultiplier_), statsHighMultiplier(statsHighMultiplier_) {};
 
-	float getClassMultiplier() const;
-	float getStatsLowMultiplier() const;
-	float getStatsHighMultiplier() const;
+	float getClassMultiplier() const { return classMultiplier; };
+	float getStatsLowMultiplier() const { return statsLowMultiplier; };
+	float getStatsHighMultiplier() const { return statsHighMultiplier; };
 
 protected:
 
@@ -63,22 +64,22 @@ class ArmamentTemplate : public Armament, public VariableTemplate, public Protot
 {
 public:
 
-	ArmamentTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
-		const std::string type, const float armor, const float speed, const float bonus);
+	ArmamentTemplate(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const std::string type_, const float armor_, const float speed_, const float bonus_) :
+		Armament(name_, image_, itemClass_, type_, armor_, speed_, bonus_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
 
 	virtual Armament* clone(float externMultiplier);
-	virtual std::string getTextureName();
+	virtual std::string getTextureName() const { return image; };
 };
 
 class MonsterTemplate : public Monster, public VariableTemplate, public PrototypeTemplate<Monster>
 {
 public:
 
-	MonsterTemplate(const std::string name, const std::string image, const DifficultyLevel::Level level, const Attribute killBonusType,
-		const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, const float killBonusLow, const float killBonusHigh, float hp, float strength, float speed, float accuracy);
+	MonsterTemplate(const std::string name_, const std::string image_, const DifficultyLevel::Level level_, const Attribute killBonusType_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const float killBonusLow_, const float killBonusHigh_, float hp_, float strength_, float speed_, float accuracy_) :
+		killBonusLow(killBonusLow_), killBonusHigh(killBonusHigh_), Monster(name_, image_, level_, killBonusType_, 0.0f, hp_, strength_, speed_, accuracy_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
 
 	virtual Monster* clone(float externMultiplier);
-	virtual std::string getTextureName();
+	virtual std::string getTextureName() const { return image; };
 
 private:
 
@@ -89,33 +90,33 @@ class PotionTemplate : public Potion, public VariableTemplate, public PrototypeT
 {
 public:
 
-	PotionTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
-		const std::string description, const Target target, const Attribute effect, const Mode mode, const float strength, const unsigned int duration);
+	PotionTemplate(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const std::string description_, const Target target_, const Attribute effect_, const Mode mode_, const float strength_, const unsigned int duration_) :
+		Potion(name_, image_, itemClass_, description_, target_, effect_, mode_, strength_, duration_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
 
 	virtual Potion* clone(float externMultiplier);
-	virtual std::string getTextureName();
+	virtual std::string getTextureName() const { return image; };
 };
 
 class WeaponTemplate : public Weapon, public VariableTemplate, public PrototypeTemplate<Weapon>
 {
 public:
 
-	WeaponTemplate(const std::string name, const std::string image, const Classes itemClass, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier, 
-		const WeaponType type, const float attack, const float speed, const float accuracy, const float defence, const unsigned int slots, const unsigned int max);
+	WeaponTemplate(const std::string name_, const std::string image_, const Classes itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const WeaponType type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
+		Weapon(name_, image_, itemClass_, type_, attack_, speed_, accuracy_, defence_, slots_, max_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
 
 	virtual Weapon* clone(float externMultiplier);
-	virtual std::string getTextureName();
+	virtual std::string getTextureName() const { return image; };
 };
 
 class AttackTemplate : public Attack, public VariableTemplate, public PrototypeTemplate<Attack>
 {
 public:
 
-	AttackTemplate(const std::string name, const Attribute effect, const float classMultiplier, const float statsLowMultiplier, const float statsHighMultiplier,
-		const float hpDamage, const float hitProbability, const float attributeDamage);
+	AttackTemplate(const std::string name_, const Attribute effect_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const float hpDamage_, const float hitProbability_, const float attributeDamage_) :
+		hpDamage(hpDamage_), attributeDamage(attributeDamage_), Attack(name_, effect_, 1.0f, hitProbability_, 1.0f, statsLowMultiplier_, statsHighMultiplier_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
 
 	virtual Attack* clone(float externMultiplier);
-	virtual std::string getTextureName();
+	virtual std::string getTextureName() const { return NULL; };
 
 private:
 
@@ -127,16 +128,18 @@ class RoomTemplate : public Room, public PrototypeTemplate<Room>
 {
 public:
 
-	RoomTemplate(const std::string name, const std::string description, const std::string image,
-		const std::map<DoorPositions, const bool> doorPositions,
-		const std::map<MonsterProbabilities, const float> monsterProbabilities,
-		const std::map<Classes, const float> findProbabilities,
-		const unsigned int monsterCount, const unsigned int itemCount,
-		const float itemMultiplier);
+	RoomTemplate(const std::string name_, const std::string description_, const std::string image_,
+		const std::map<DoorPositions, const bool> doorPositions_,
+		const std::map<MonsterProbabilities, const float> monsterProbabilities_,
+		const std::map<Classes, const float> findProbabilities_,
+		const unsigned int monsterCount_, const unsigned int itemCount_,
+		const float itemMultiplier_) :
+		doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_),
+		itemCount(itemCount_), itemMultiplier(itemMultiplier_), Room(name_, description_, image_) {};
 
 	virtual Room* clone(float externMultiplier);
-	Room* clone();
-	virtual std::string getTextureName();
+	Room* clone() { return clone(1.0f); };
+	virtual std::string getTextureName() const { return image; };
 
 	/*std::map<DoorPositions, const bool> getDoorPositions() const;
 	std::map<MonsterProbabilities, const float> getMonsterProbabilities() const;

@@ -11,7 +11,12 @@ class ResourceManager
 {
 public:
 
-	static ResourceManager& getInstance();
+	static ResourceManager& getInstance()
+	{
+		static ResourceManager instance;
+		return instance;
+	};
+
 	void loadResources(const std::string imagesPath, std::shared_ptr<PrototypeStorage> prototypeStorage);
 
 private:
@@ -20,6 +25,7 @@ private:
 
 	ResourceManager() {};
 	ResourceManager(ResourceManager const&);
+	~ResourceManager();
 	void operator = (ResourceManager const&);
 };
 

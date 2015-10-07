@@ -4,48 +4,44 @@
 #include <exception>
 #include <iostream>
 
-class LocationException : public std::exception {
-private:
-
-	std::string message_;
-
+class CustomException : public std::exception 
+{
 public:
 
-	explicit LocationException(const std::string& message);
-	virtual const char* what() const throw();
+	explicit CustomException(const std::string& message_) : message(message_) {};
+	virtual const char* what() const throw() { return message.c_str(); };
+
+private:
+
+	std::string message;
 };
 
-class LoadingException : public std::exception {
-private:
-
-	std::string message_;
-
+class LocationException : public CustomException
+{
 public:
 
-	explicit LoadingException(const std::string& message);
-	virtual const char* what() const throw();
+	explicit LocationException(const std::string& message) : CustomException("Unable to locate " + message) {};
 };
 
-class ConfigParseException : public std::exception {
-private:
-
-	std::string message_;
-
+class LoadingException : public CustomException
+{
 public:
 
-	explicit ConfigParseException(const std::string& message);
-	virtual const char* what() const throw();
+	explicit LoadingException(const std::string& message) : CustomException("Unable to load " + message) {};
 };
 
-class EnumMappingException : public std::exception {
-private:
-
-	std::string message_;
-
+class ConfigParseException : public CustomException 
+{
 public:
 
-	explicit EnumMappingException(const std::string& input, const std::string& enumName);
-	virtual const char* what() const throw();
+	explicit ConfigParseException(const std::string& message) : CustomException("Unable to parse " + message) {};
+};
+
+class EnumMappingException : public CustomException
+{
+public:
+
+	explicit EnumMappingException(const std::string& input, const std::string& enumName) : CustomException("Unable to map " + input + " to Enum " + enumName) {};
 };
 
 #endif // EXCEPTIONS_INCLUDE
