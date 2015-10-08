@@ -9,9 +9,21 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include "easylogging++.hpp"
+
+INITIALIZE_EASYLOGGINGPP
 
 int main()
 {
+	std::remove("logs/rdg++.log"); // delete custom log file at every game start
+
+	// load logger configuration
+	el::Configurations conf("logging.conf");
+	el::Loggers::reconfigureAllLoggers(conf);
+
+	std::remove("logs/myeasylog.log"); // delete standard log file
+
+	LOG(INFO) << "Starting RDG++...";
 
 	// game engine variables declaration
 	SettingsParser settingsParser;
@@ -28,6 +40,7 @@ int main()
 	std::shared_ptr<PrototypeStorage> prototypeStorage;
 	
 	settings.reset(new Settings(desktopVmode.width, desktopVmode.height));
+
 	if (!settings->loadedSuccesfully())
 	{
 		return -1;
@@ -48,8 +61,8 @@ int main()
 	// retrieve a list of all possible fullscreen video modes
 	std::vector<sf::VideoMode> vmodes = sf::VideoMode::getFullscreenModes();
 
-	//// create and print all game objects for test purposes
-	prototypeStorage->testPrintGameObjects();
+	// create and print all game objects for test purposes
+	// prototypeStorage->testPrintGameObjects();
 
 	// load resources
 	if (!resourceManager.loadResources(settings->IMAGE_PATH, prototypeStorage))
@@ -60,7 +73,7 @@ int main()
 	// output possible resolutions
 	for (unsigned i = 0; i < vmodes.size(); i++) 
 	{
-		std::clog << vmodes[i].width << " x " << vmodes[i].height << "\n";
+		//std::clog << vmodes[i].width << " x " << vmodes[i].height << "\n";
 	}
 
 
@@ -108,8 +121,7 @@ int main()
 			else if (event.type == sf::Event::KeyPressed) {
 				settings->fullscreen = !settings->fullscreen;
 				window.create(sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH), settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
-				std::cout << "fullscreen? " << settings->fullscreen << " - size: " << window.getSize().x << " x " << window.getSize().y << std::endl;
-			
+				
 				settings->saveSettings();
 			}
 

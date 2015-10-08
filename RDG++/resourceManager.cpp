@@ -1,6 +1,7 @@
 #include "resourceManager.hpp"
 #include "prototypes.hpp"
 #include <memory>
+#include "easylogging++.hpp"
 
 // free memory from textures
 ResourceManager::~ResourceManager() 
@@ -48,14 +49,14 @@ bool ResourceManager::loadResources(const std::string imagesPath, std::shared_pt
 		if (!textures.count(it->first)) {
 			if (!texture.loadFromFile(imagesPath + it->second))
 			{
-				std::cerr << "Failed to load texture " << imagesPath + it->second << std::endl;
+				LOG(ERROR) << "Failed to load texture " << imagesPath + it->second;
 				return false;
 			}
 			else
 			{
 				std::shared_ptr<sf::Texture> texturePointer(new sf::Texture(texture));
 				textures[it->first] = texturePointer;
-				std::cout << "loaded " << imagesPath + it->second << std::endl;
+				LOG(DEBUG) << "loaded " << imagesPath + it->second;
 			}
 		}
 	}
@@ -64,6 +65,8 @@ bool ResourceManager::loadResources(const std::string imagesPath, std::shared_pt
 	tilesSpritesheet.loadFromFile("rooms/tileset.png");
 
 	sf::Texture groundTexture;	
+
+	LOG(INFO) << "Resources loaded successfully";
 
 	return true;
 }

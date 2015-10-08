@@ -1,13 +1,14 @@
 #include "settings.hpp"
 #include <iostream>
 #include <fstream>
+#include "easylogging++.hpp"
 
 Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) : 
-	COLOR_DEPTH( 32 ),
 	APPNAME("RDG++"),
 	SETTINGS_FILE_PATH("settings.txt"),
 	CONFIG_PATH("config/"),
-	IMAGE_PATH("res/")
+	IMAGE_PATH("res/"),
+	COLOR_DEPTH(32)
 {
 
 	//set default values for variables
@@ -22,7 +23,7 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 void Settings::writeDefaultSettings() 
 {
 
-	std::cout << "Writing default settings." << std::endl;
+	LOG(INFO) << "Writing default settings.";
 
 	// open settings file
 	std::ofstream outfile(SETTINGS_FILE_PATH);
@@ -49,6 +50,8 @@ void Settings::saveSettings()
 
 	settingsParser.saveToFile();
 	settingsParser.print();
+
+	LOG(INFO) << "Writing settings to " << SETTINGS_FILE_PATH;
 }
 
 // loads settings from settings file
@@ -58,7 +61,7 @@ bool Settings::loadSettings()
 	// try to create new settings file if none exists
 	if (!settingsParser.loadFromFile(SETTINGS_FILE_PATH))
 	{
-		std::cout << "Settings file not found! Trying to create new settings file..." << std::endl;
+		LOG(WARNING) << "Settings file not found! Trying to create new settings file...";
 
 		// create settings file with default settings
 		writeDefaultSettings();
@@ -67,12 +70,12 @@ bool Settings::loadSettings()
 	// load settings file
 	if (!settingsParser.loadFromFile(SETTINGS_FILE_PATH))
 	{
-		std::cerr << "Error loading settings file!" << std::endl;
+		LOG(ERROR) << "Error loading settings file!";
 		return false;
 	}
 	else
 	{
-		std::cout << "Loading settings from " << SETTINGS_FILE_PATH << std::endl;
+		LOG(INFO) << "Loading settings from " << SETTINGS_FILE_PATH;
 
 		settingsParser.get("width", width);
 		settingsParser.get("height", height);
@@ -80,6 +83,8 @@ bool Settings::loadSettings()
 
 		settingsParser.print();
 	}
+
+	LOG(INFO) << "Settings loaded successfully";
 
 	return true;
 }

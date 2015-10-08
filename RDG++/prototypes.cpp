@@ -4,11 +4,10 @@
 #include "calculation.hpp"
 #include <iostream>
 #include <memory>
+#include "easylogging++.hpp"
 
 Armament* ArmamentTemplate::clone(float externMultiplier)
 {
-	std::cout << "cloning Armament..." << std::endl;
-
 	return new Armament(name, itemClass, type, armor * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), 
 		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus);
 }
@@ -18,11 +17,11 @@ bool ArmamentFactory::importConfig(const std::string& path)
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
 
-	std::cout << "importing Armament config" << std::endl;
+	LOG(DEBUG) << "importing Monster config";
 
 	if (!result)
 	{
-		std::cerr << "Failed parsing " << path << std::endl;
+		LOG(ERROR) << "Failed parsing " << path;
 		return false;
 	}
 	else
@@ -54,15 +53,15 @@ bool ArmamentFactory::importConfig(const std::string& path)
 		}
 	}
 
-	std::cout << "Load result: " << result.description() << std::endl;
-	std::cout << "ArmamentTemplate now contains " << objects.size() << " objects." << std::endl;
+	LOG(DEBUG) << "Load result: " << result.description();
+	LOG(DEBUG) << "ArmamentTemplate now contains " << objects.size() << " objects.";
 
 	return true;
 }
 
 Monster* MonsterTemplate::clone(float externMultiplier)
 {
-	std::cout << "cloning Monster..." << std::endl;
+	LOG(DEBUG) << "cloning Monster...";
 
 	return new Monster(name, level, killBonusType, classMultiplier * Calculation::randomFloat(killBonusLow, killBonusHigh),
 		hp * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), strength * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
@@ -74,11 +73,11 @@ bool MonsterFactory::importConfig(const std::string& path)
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
 
-	std::cout << "importing Monster config" << std::endl;
+	LOG(DEBUG) << "importing Monster config";
 
 	if (!result)
 	{
-		std::cerr << "Failed parsing " << path << std::endl;
+		LOG(ERROR) << "Failed parsing " << path;
 		return false;
 	}
 	else
@@ -112,15 +111,15 @@ bool MonsterFactory::importConfig(const std::string& path)
 		}
 	}
 
-	std::cout << "Load result: " << result.description() << std::endl;
-	std::cout << "MonsterTemplate now contains " << objects.size() << " objects." << std::endl;
+	LOG(DEBUG) << "Load result: " << result.description();
+	LOG(DEBUG) << "MonsterTemplate now contains " << objects.size() << " objects.";
 
 	return true;
 }
 
 Potion* PotionTemplate::clone(float externMultiplier)
 {
-	std::cout << "cloning Potion..." << std::endl;
+	LOG(DEBUG) << "cloning Potion...";
 
 	return new Potion(name, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), duration);
 }
@@ -130,11 +129,11 @@ bool PotionFactory::importConfig(const std::string& path)
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
 
-	std::cout << "importing Potion config" << std::endl;
+	LOG(DEBUG) << "importing Potion config";
 
 	if (!result)
 	{
-		std::cerr << "Failed parsing " << path << std::endl;
+		LOG(ERROR) << "Failed parsing " << path;
 		return false;
 	}
 	else
@@ -167,15 +166,15 @@ bool PotionFactory::importConfig(const std::string& path)
 		}
 	}
 
-	std::cout << "Load result: " << result.description() << std::endl;
-	std::cout << "PotionTemplate now contains " << objects.size() << " objects." << std::endl;
+	LOG(DEBUG) << "Load result: " << result.description();
+	LOG(DEBUG) << "PotionTemplate now contains " << objects.size() << " objects.";
 
 	return true;
 }
 
 Weapon* WeaponTemplate::clone(float externMultiplier)
 {
-	std::cout << "cloning Weapon..." << std::endl;
+	LOG(DEBUG) << "cloning Weapon...";
 
 	return new Weapon(name, itemClass, type, attack * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
 		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
@@ -188,11 +187,11 @@ bool WeaponFactory::importConfig(const std::string& path)
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*) path.c_str());
 
-	std::cout << "importing Weapon config" << std::endl;
+	LOG(DEBUG) << "importing Weapon config";
 
 	if (!result)
 	{
-		std::cerr << "Failed parsing " << path << std::endl;
+		LOG(ERROR) << "Failed parsing " << path;
 		return false;
 	}
 	else
@@ -228,15 +227,15 @@ bool WeaponFactory::importConfig(const std::string& path)
 		}
 	}
 
-	std::cout << "Load result: " << result.description() << std::endl;
-	std::cout << "WeaponTemplate now contains " << objects.size() << " objects." << std::endl;
+	LOG(DEBUG) << "Load result: " << result.description();
+	LOG(DEBUG) << "WeaponTemplate now contains " << objects.size() << " objects.";
 
 	return true;
 }
 
 Attack* AttackTemplate::clone(float externMultiplier)
 {
-	std::cout << "cloning Attack..." << std::endl;
+	LOG(DEBUG) << "cloning Attack...";
 
 	return new Attack(name, effect, hpDamage * classMultiplier, hitProbability, attributeDamage * classMultiplier, statsLowMultiplier, statsHighMultiplier);
 }
@@ -246,11 +245,11 @@ bool AttackFactory::importConfig(const std::string& path)
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*) path.c_str());
 
-	std::cout << "importing Attack config" << std::endl;
+	LOG(DEBUG) << "importing Attack config";
 
 	if (!result) 
 	{
-		std::cerr << "Failed parsing " << path << std::endl;
+		LOG(ERROR) << "Failed parsing " << path;
 		return false;
 	}
 	else 
@@ -280,15 +279,15 @@ bool AttackFactory::importConfig(const std::string& path)
 		}
 	}
 
-	std::cout << "Load result: " << result.description() << std::endl;
-	std::cout << "AttackTemplate now contains " << objects.size() << " objects." << std::endl;
+	LOG(DEBUG) << "Load result: " << result.description();
+	LOG(DEBUG) << "AttackTemplate now contains " << objects.size() << " objects.";
 
 	return true;
 }
 
 Room* RoomTemplate::clone(float externMultiplier)
 {
-	std::cout << "cloning Room..." << std::endl;
+	LOG(DEBUG) << "cloning Room...";
 
 	return new Room(name, description);
 }
@@ -298,11 +297,11 @@ bool RoomFactory::importConfig(const std::string& path)
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
 
-	std::cout << "importing Room config" << std::endl;
+	LOG(DEBUG) << "importing Room config";
 
 	if (!result)
 	{
-		std::cerr << "Failed parsing " << path << std::endl;
+		LOG(ERROR) << "Failed parsing " << path;
 		return false;
 	}
 	else
@@ -352,8 +351,8 @@ bool RoomFactory::importConfig(const std::string& path)
 		}
 	}
 
-	std::cout << "Load result: " << result.description() << std::endl;
-	std::cout << "RoomTemplate now contains " << objects.size() << " objects." << std::endl;
+	LOG(DEBUG) << "Load result: " << result.description();
+	LOG(DEBUG) << "RoomTemplate now contains " << objects.size() << " objects.";
 
 	return true;
 }
@@ -398,7 +397,7 @@ void PrototypeStorage::testPrintGameObjects()
 
 bool PrototypeStorage::initializeTemplates(const std::string& templatePath)
 {
-	std::cout << "initializing templates..." << std::endl;
+	LOG(INFO) << "initializing templates...";
 
 	armamentFactory = new ArmamentFactory();
 	monsterFactory = new MonsterFactory();
@@ -431,6 +430,8 @@ bool PrototypeStorage::initializeTemplates(const std::string& templatePath)
 	{
 		return false;
 	}
+
+	LOG(INFO) << "All templates initialized succesfully";
 
 	return true;
 }
