@@ -260,8 +260,6 @@ std::set<const std::string> PrototypeTemplateFactory<T, T2>::getObjectNames()
 		objectNames.insert(objectName);
 	}
 
-	std::cout << "Set contains " << objectNames.size() << " names." << std::endl;
-
 	return objectNames;
 }
 
