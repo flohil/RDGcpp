@@ -6,6 +6,7 @@
 #include "enums.hpp"
 #include <map>
 #include <string>
+#include <memory>
 
 class NamedObject
 {
@@ -20,27 +21,47 @@ protected:
 	const std::string name;
 };
 
-class VisibleObject
+class RenderableObject : public sf::Drawable, public sf::Transformable, public NamedObject
 {
 public:
 
-	VisibleObject(const std::string image_) : image(image_) {}; // to be replaced with texture pointer
+	RenderableObject(const std::string name_) : NamedObject(name_) {}; // to be replaced with texture pointer
 
-	std::string getImage() const { return image; };
 	bool isVisible() const { return visible; };
 	void setVisible(bool visible_) { visible = visible_; };
 
 protected:
 
-	const std::string image;
 	bool visible;
+
+private:
+
+	bool obtainTexture();
+
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
+	{
+		// apply the entity's transform -- combine it with the one that was passed by the caller
+		states.transform *= getTransform(); // getTransform() is defined by sf::Transformable
+
+		// apply the texture
+		states.texture = &m_texture;
+
+		// you may also override states.shader or states.blendMode if you want
+
+		// draw the vertex array
+		target.draw(m_vertices, states);
+	}
+
+	sf::VertexArray m_vertices;
+	sf::Texture m_texture;
+	std::shared_ptr<sf::Texture> texturePtr;
 };
 
-class Item
+class Item : public RenderableObject
 {
 public:
 
-	class Item(const Classes itemClass_) : itemClass(itemClass_) {};
+	class Item(const std::string name_, const Classes itemClass_) : RenderableObject(name_), itemClass(itemClass_) {};
 
 	Classes getItemClass() const { return itemClass; };
 
@@ -73,12 +94,12 @@ protected:
 	float hp, strength, speed, accuracy;
 };
 
-class Armament : public Item, public NamedObject, public VisibleObject, public DebugPrintObject, public sf::Drawable, public sf::Transformable
+class Armament : public Item, public DebugPrintObject
 {
 public:
 
-	Armament(const std::string name_, const std::string image_, const Classes itemClass_, const std::string type_, const float armor_, const float speed_, const float bonus_) :
-		type(type_), armor(armor_), speed(speed_), bonus(bonus_), NamedObject(name_), VisibleObject(image_), Item(itemClass_) {};
+	Armament(const std::string name_, const Classes itemClass_, const std::string type_, const float armor_, const float speed_, const float bonus_) :
+		type(type_), armor(armor_), speed(speed_), bonus(bonus_), Item(name_, itemClass_) {};
 
 	std::string getType() const { return type; };
 	float getArmor() const { return armor; };
@@ -90,33 +111,14 @@ protected:
 
 	const std::string type;
 	const float armor, speed, bonus;
-
-private:
-
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
-	{
-		// apply the entity's transform -- combine it with the one that was passed by the caller
-		states.transform *= getTransform(); // getTransform() is defined by sf::Transformable
-
-		// apply the texture
-		states.texture = &m_texture;
-
-		// you may also override states.shader or states.blendMode if you want
-
-		// draw the vertex array
-		target.draw(m_vertices, states);
-	}
-
-	sf::VertexArray m_vertices;
-	sf::Texture m_texture;
 };
 
-class Monster : public NamedObject, public VisibleObject, public FightableCreature, public DebugPrintObject
+class Monster : public RenderableObject, public FightableCreature, public DebugPrintObject
 {
 public:
 
-	Monster(const std::string name_, const std::string image_, const DifficultyLevel::Level level_, const Attribute killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
-		level(level_), killBonusType(killBonusType_), killBonus(killBonus_), NamedObject(name_), VisibleObject(image_), FightableCreature(hp_, strength_, speed_, accuracy_) {};
+	Monster(const std::string name_, const DifficultyLevel::Level level_, const Attribute killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
+		level(level_), killBonusType(killBonusType_), killBonus(killBonus_), RenderableObject(name_), FightableCreature(hp_, strength_, speed_, accuracy_) {};
 
 	DifficultyLevel::Level getLevel() const { return level; };
 	Attribute getKillBonusType() const { return killBonusType; };
@@ -130,12 +132,12 @@ protected:
 	const float killBonus;
 };
 
-class Potion : public Item, public NamedObject, public VisibleObject, public DebugPrintObject
+class Potion : public Item, public DebugPrintObject
 {
 public:
 
-	Potion(const std::string name_, const std::string image_, const Classes itemClass_, const std::string description_, const Target target_, const Attribute effect_, const Mode mode_, const float strength_, const unsigned int duration_) :
-		description(description_), target(target_), effect(effect_), mode(mode_), strength(strength_), duration(duration_), NamedObject(name_), VisibleObject(image_), Item(itemClass_) {};
+	Potion(const std::string name_, const Classes itemClass_, const std::string description_, const Target target_, const Attribute effect_, const Mode mode_, const float strength_, const unsigned int duration_) :
+		description(description_), target(target_), effect(effect_), mode(mode_), strength(strength_), duration(duration_), Item(name_, itemClass_) {};
 	
 	std::string getDescription() const { return description; };
 	Target getTarget() const { return target; };
@@ -155,12 +157,12 @@ protected:
 	const unsigned int duration;
 };
 
-class Weapon : public Item, public NamedObject, public VisibleObject, public DebugPrintObject
+class Weapon : public Item, public DebugPrintObject
 {
 public:
 
-	Weapon::Weapon(const std::string name_, const std::string image_, const Classes itemClass_, const WeaponType type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
-		type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), max(max_), NamedObject(name_), VisibleObject(image_), Item(itemClass_) {};
+	Weapon::Weapon(const std::string name_, const Classes itemClass_, const WeaponType type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
+		type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), max(max_), Item(name_, itemClass_) {};
 
 	WeaponType getType() const { return type; };
 	float getAttack() const { return attack; };
@@ -203,12 +205,12 @@ private:
 	const float attackStatsLowMultiplier, attackStatsHighMultiplier;
 };
 
-class Room : public NamedObject, public VisibleObject, public DebugPrintObject
+class Room : public NamedObject, public DebugPrintObject
 {
 public:
 
-	Room(const std::string name_, const std::string description_, const std::string image_) :
-		description(description_), NamedObject(name_), VisibleObject(image_) {};
+	Room(const std::string name_, const std::string description_) :
+		description(description_), NamedObject(name_) {};
 
 	std::string getDescription() const { return description; };
 	virtual void debugPrint() const;

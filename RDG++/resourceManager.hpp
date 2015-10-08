@@ -18,10 +18,11 @@ public:
 	};
 
 	void loadResources(const std::string imagesPath, std::shared_ptr<PrototypeStorage> prototypeStorage);
+	std::shared_ptr<sf::Texture> getTexture(std::string textureName) { return textures[textureName]; };
 
 private:
 
-	std::map <std::string, sf::Texture> textures;
+	std::map <std::string, std::shared_ptr<sf::Texture>> textures;
 
 	ResourceManager() {};
 	ResourceManager(ResourceManager const&);

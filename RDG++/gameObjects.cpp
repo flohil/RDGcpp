@@ -1,7 +1,14 @@
 #include "gameObjects.hpp"
 #include "enums.hpp"
+#include "resourceManager.hpp"
 #include <iostream>
 #include <map>
+
+bool RenderableObject::obtainTexture() {
+
+	texturePtr = ResourceManager::getInstance().getTexture(name);
+	return false;
+}
 
 Item::~Item()
 {
@@ -12,7 +19,6 @@ void Armament::debugPrint() const
 {
 	std::cout << "Armament: " << std::endl;
 	std::cout << "name = " << name << std::endl;
-	std::cout << "image = " << image << std::endl;
 	std::cout << "itemClass = " << itemClass << std::endl;
 	std::cout << "type = " << type << std::endl;
 	std::cout << "armor = " << armor << std::endl;
@@ -25,7 +31,6 @@ void Monster::debugPrint() const
 {
 	std::cout << "Monster: " << std::endl;
 	std::cout << "name = " << name << std::endl;
-	std::cout << "image = " << image << std::endl;
 	std::cout << "level = " << level << std::endl;
 	std::cout << "killBonusType = " << killBonusType << std::endl;
 	std::cout << "killBonus = " << killBonus << std::endl;
@@ -40,7 +45,6 @@ void Potion::debugPrint() const
 {
 	std::cout << "Potion: " << std::endl;
 	std::cout << "name = " << name << std::endl;
-	std::cout << "image = " << image << std::endl;
 	std::cout << "itemClass = " << itemClass << std::endl;
 	std::cout << "description = " << description << std::endl;
 	std::cout << "target = " << target << std::endl;
@@ -55,7 +59,6 @@ void Weapon::debugPrint() const
 {
 	std::cout << "Weapon: " << std::endl;
 	std::cout << "name = " << name << std::endl;
-	std::cout << "image = " << image << std::endl;
 	std::cout << "itemClass = " << itemClass << std::endl;
 	std::cout << "type = " << type << std::endl;
 	std::cout << "attack = " << attack << std::endl;
@@ -84,7 +87,6 @@ void Room::debugPrint() const
 {
 	std::cout << "Room: " << std::endl;
 	std::cout << "name = " << name << std::endl;
-	std::cout << "image = " << image << std::endl;
 	std::cout << "description = " << description << std::endl;
 	std::cout << std::endl;
 }

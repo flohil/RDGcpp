@@ -10,7 +10,7 @@ Armament* ArmamentTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Armament..." << std::endl;
 
-	return new Armament(name, image, itemClass, type, armor * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), 
+	return new Armament(name, itemClass, type, armor * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), 
 		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus);
 }
 
@@ -58,7 +58,7 @@ Monster* MonsterTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Monster..." << std::endl;
 
-	return new Monster(name, image, level, killBonusType, classMultiplier * Calculation::randomFloat(killBonusLow, killBonusHigh),
+	return new Monster(name, level, killBonusType, classMultiplier * Calculation::randomFloat(killBonusLow, killBonusHigh),
 		hp * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), strength * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
 		speed * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), accuracy * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier));
 }
@@ -109,7 +109,7 @@ Potion* PotionTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Potion..." << std::endl;
 
-	return new Potion(name, image, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), duration);
+	return new Potion(name, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), duration);
 }
 
 void PotionFactory::importConfig(std::string path)
@@ -157,7 +157,7 @@ Weapon* WeaponTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Weapon..." << std::endl;
 
-	return new Weapon(name, image, itemClass, type, attack * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
+	return new Weapon(name, itemClass, type, attack * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
 		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
 		accuracy * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
 		defence * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), slots, max);
@@ -254,7 +254,7 @@ Room* RoomTemplate::clone(float externMultiplier)
 {
 	std::cout << "cloning Room..." << std::endl;
 
-	return new Room(name, description, image);
+	return new Room(name, description);
 }
 
 void RoomFactory::importConfig(std::string path)
