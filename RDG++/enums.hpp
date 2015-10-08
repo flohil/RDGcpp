@@ -3,32 +3,58 @@
 
 #include <string>
 
-enum DoorPositions { North, East, South, West };
-enum MonsterProbabilities { No, Easy, Normal, Hard };
-namespace DifficultyLevel
+struct DifficultyLevel
 {
-	enum Level { Easy, Normal, Hard };
-}
-enum Classes { None, Weak, Medium, Strong };
-enum Target { Self, Opponent };
-enum Attribute { Hp, Speed, Accuracy, Strength };
-enum Mode { Cure, TemporaryDecrease, IncrementalDecrease, TemporaryIncrease, IncrementalIncrease };
-enum RoomTypes { Deadend, Hallway, Turn, Tjunction, Junction, Treasurechamber };
-enum WeaponType { Single, Double };
+	enum Enum { EASY, NORMAL, HARD, UNKNOWN };
+};
+
+struct Classes
+{
+	enum Enum { NONE, WEAK, MEDIUM, STRONG, UNKNOWN };
+};
+
+struct Target
+{
+	enum Enum { SELF, OPPONENT, UNKNOWN };
+};
+
+struct Attribute
+{
+	enum Enum { HP, SPEED, ACCURACY, STRENGTH, UNKNOWN };
+};
+
+struct Mode
+{
+	enum Enum { CURE, TEMPORARY_DECREASE, INCREMENTAL_DECREASE, TEMPORARY_INCREASE, INCREMENTAL_INCREASE, UNKNOWN };
+};
+
+struct RoomTypes
+{
+	enum Enum { DEADEND, HALLWAY, TURN, TJUNCTION, JUNCTION, TREASURECHAMBER, UNKNOWN };
+};
+
+struct WeaponType
+{
+	enum Enum { SINGLE, DOUBLE, UNKNOWN };
+};
+
+struct Attacks
+{
+	enum Enum { TORSO, HEAD, ARMS, LEGS, PARRY, SET, POTION, UNKNOWN };
+};
 
 // maps strings to enums
 class EnumMapper
 {
 public:
 
-	static DoorPositions mapDoorPositions(std::string input);
-	static MonsterProbabilities mapMonsterProbabilities(std::string input);
-	static DifficultyLevel::Level mapLevel(std::string input);
-	static Classes mapClasses(std::string input);
-	static Target mapTarget(std::string input);
-	static Attribute mapAttribute(std::string input);
-	static Mode mapMode(std::string input);
-	static WeaponType mapWeaponType(std::string input);
+	static Attacks::Enum mapAttacks(std::string input);
+	static DifficultyLevel::Enum mapLevel(std::string input);
+	static Classes::Enum mapClasses(std::string input);
+	static Target::Enum mapTarget(std::string input);
+	static Attribute::Enum mapAttribute(std::string input);
+	static Mode::Enum mapMode(std::string input);
+	static WeaponType::Enum mapWeaponType(std::string input);
 };
 
 #endif // ENUMS_INCLUDE

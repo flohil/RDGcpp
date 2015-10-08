@@ -26,10 +26,12 @@ public:
 	void writeDefaultSettings();
 	void saveSettings();
 	bool loadSettings();
+	bool loadedSuccesfully() { return successfullyLoaded; };
 
 private:
 
 	SettingsParser settingsParser;
+	bool successfullyLoaded = false;
 };
 
 #endif // SETTINGS_INCLUDE

@@ -1,5 +1,4 @@
 #include "settings.hpp"
-#include "exceptions.hpp"
 #include <iostream>
 #include <fstream>
 
@@ -16,14 +15,7 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	width = desktopWidth;
 	height = desktopHeight;
 
-	try
-	{
-		loadSettings();
-	} 
-	catch (LocationException& e)
-	{
-		throw e;
-	}	
+	successfullyLoaded = loadSettings();
 }
 
 // write initial default settings to newly created output file
@@ -75,8 +67,8 @@ bool Settings::loadSettings()
 	// load settings file
 	if (!settingsParser.loadFromFile(SETTINGS_FILE_PATH))
 	{
-		std::cout << "Error loading settings file!" << std::endl;
-		throw LocationException(SETTINGS_FILE_PATH);
+		std::cerr << "Error loading settings file!" << std::endl;
+		return false;
 	}
 	else
 	{

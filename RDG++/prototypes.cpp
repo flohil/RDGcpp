@@ -1,7 +1,6 @@
 #include "prototypes.hpp"
 #include "pugixml.hpp"
 #include "settings.hpp"
-#include "exceptions.hpp"
 #include "calculation.hpp"
 #include <iostream>
 #include <memory>
@@ -14,7 +13,7 @@ Armament* ArmamentTemplate::clone(float externMultiplier)
 		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus);
 }
 
-void ArmamentFactory::importConfig(std::string path)
+bool ArmamentFactory::importConfig(const std::string& path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
@@ -23,7 +22,8 @@ void ArmamentFactory::importConfig(std::string path)
 
 	if (!result)
 	{
-		throw ConfigParseException(path);
+		std::cerr << "Failed parsing " << path << std::endl;
+		return false;
 	}
 	else
 	{
@@ -32,19 +32,23 @@ void ArmamentFactory::importConfig(std::string path)
 		for (pugi::xml_node armamentNode = armamentsNode.first_child(); armamentNode; armamentNode = armamentNode.next_sibling())
 		{
 
-			const std::string name = armamentNode.child("Name").text().as_string();
-			const std::string image = armamentNode.child("Image").text().as_string();
-			const Classes itemClass = EnumMapper::mapClasses(armamentNode.child("Item_Class").text().as_string());
+			const std::string& name = armamentNode.child("Name").text().as_string();
+			const std::string& image = armamentNode.child("Image").text().as_string();
+			const Classes::Enum itemClass = EnumMapper::mapClasses(armamentNode.child("Item_Class").text().as_string());
 			const float classMultiplier = armamentNode.child("Class_Multiplier").text().as_float();
 			const float statsLowMultiplier = armamentNode.child("Stats_Low_Multiplier").text().as_float();
 			const float statsHighMultiplier = armamentNode.child("Stats_High_Multiplier").text().as_float();
-			const std::string type = armamentNode.child("Type").text().as_string();
+			const std::string& type = armamentNode.child("Type").text().as_string();
 			const float armor = armamentNode.child("Armor").text().as_float();
 			const float speed = armamentNode.child("Speed").text().as_float();
 			const float bonus = armamentNode.child("Bonus").text().as_float();
 
-			std::shared_ptr<ArmamentTemplate> armament(new ArmamentTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
-				type, armor, speed, bonus));
+			if (itemClass == Classes::UNKNOWN)
+			{
+				return false;
+			}
+
+			std::shared_ptr<ArmamentTemplate> armament(new ArmamentTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus));
 
 			objects[armament->getName()] = armament;
 		}
@@ -52,6 +56,8 @@ void ArmamentFactory::importConfig(std::string path)
 
 	std::cout << "Load result: " << result.description() << std::endl;
 	std::cout << "ArmamentTemplate now contains " << objects.size() << " objects." << std::endl;
+
+	return true;
 }
 
 Monster* MonsterTemplate::clone(float externMultiplier)
@@ -63,7 +69,7 @@ Monster* MonsterTemplate::clone(float externMultiplier)
 		speed * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), accuracy * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier));
 }
 
-void MonsterFactory::importConfig(std::string path)
+bool MonsterFactory::importConfig(const std::string& path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
@@ -72,7 +78,8 @@ void MonsterFactory::importConfig(std::string path)
 
 	if (!result)
 	{
-		throw ConfigParseException(path);
+		std::cerr << "Failed parsing " << path << std::endl;
+		return false;
 	}
 	else
 	{
@@ -81,10 +88,10 @@ void MonsterFactory::importConfig(std::string path)
 		for (pugi::xml_node monsterNode = monstersNode.first_child(); monsterNode; monsterNode = monsterNode.next_sibling())
 		{
 
-			const std::string name = monsterNode.child("Name").text().as_string();
-			const std::string image = monsterNode.child("Image").text().as_string();
-			const DifficultyLevel::Level level = EnumMapper::mapLevel(monsterNode.child("Level").text().as_string());
-			const Attribute killBonusType = EnumMapper::mapAttribute(monsterNode.child("Kill_Bonus_Type").text().as_string());
+			const std::string& name = monsterNode.child("Name").text().as_string();
+			const std::string& image = monsterNode.child("Image").text().as_string();
+			const DifficultyLevel::Enum level = EnumMapper::mapLevel(monsterNode.child("Level").text().as_string());
+			const Attribute::Enum killBonusType = EnumMapper::mapAttribute(monsterNode.child("Kill_Bonus_Type").text().as_string());
 			const float classMultiplier = monsterNode.child("Class_Multiplier").text().as_float();
 			const float statsLowMultiplier = monsterNode.child("Stats_Low_Multiplier").text().as_float();
 			const float statsHighMultiplier = monsterNode.child("Stats_High_Multiplier").text().as_float();
@@ -95,6 +102,10 @@ void MonsterFactory::importConfig(std::string path)
 			float speed = monsterNode.child("Speed").text().as_float();
 			float accuracy = monsterNode.child("Accuracy").text().as_float();
 
+			if (level == DifficultyLevel::UNKNOWN || killBonusType == Attribute::UNKNOWN) {
+				return false;
+			}
+
 			std::shared_ptr<MonsterTemplate> monster(new MonsterTemplate(name, image, level, killBonusType, classMultiplier, statsLowMultiplier, statsHighMultiplier, killBonusLow, killBonusHigh, hp, strength, speed, accuracy));
 
 			objects[monster->getName()] = monster;
@@ -103,6 +114,8 @@ void MonsterFactory::importConfig(std::string path)
 
 	std::cout << "Load result: " << result.description() << std::endl;
 	std::cout << "MonsterTemplate now contains " << objects.size() << " objects." << std::endl;
+
+	return true;
 }
 
 Potion* PotionTemplate::clone(float externMultiplier)
@@ -112,7 +125,7 @@ Potion* PotionTemplate::clone(float externMultiplier)
 	return new Potion(name, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), duration);
 }
 
-void PotionFactory::importConfig(std::string path)
+bool PotionFactory::importConfig(const std::string& path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
@@ -121,7 +134,8 @@ void PotionFactory::importConfig(std::string path)
 
 	if (!result)
 	{
-		throw ConfigParseException(path);
+		std::cerr << "Failed parsing " << path << std::endl;
+		return false;
 	}
 	else
 	{
@@ -129,21 +143,25 @@ void PotionFactory::importConfig(std::string path)
 
 		for (pugi::xml_node potionNode = potionsNode.first_child(); potionNode; potionNode = potionNode.next_sibling())
 		{
-			const std::string name = potionNode.child("Name").text().as_string();
-			const std::string image = potionNode.child("Image").text().as_string();
-			const Classes itemClass = EnumMapper::mapClasses(potionNode.child("Item_Class").text().as_string());
+			const std::string& name = potionNode.child("Name").text().as_string();
+			const std::string& image = potionNode.child("Image").text().as_string();
+			const Classes::Enum itemClass = EnumMapper::mapClasses(potionNode.child("Item_Class").text().as_string());
 			const float classMultiplier = potionNode.child("Class_Multiplier").text().as_float();
 			const float statsLowMultiplier = potionNode.child("Stats_Low_Multiplier").text().as_float();
 			const float statsHighMultiplier = potionNode.child("Stats_High_Multiplier").text().as_float();
-			const std::string description = potionNode.child("Description").text().as_string();
-			const Target target = EnumMapper::mapTarget(potionNode.child("Target").text().as_string());
-			const Attribute effect = EnumMapper::mapAttribute(potionNode.child("Effect").text().as_string());
-			const Mode mode = EnumMapper::mapMode(potionNode.child("Mode").text().as_string());
+			const std::string& description = potionNode.child("Description").text().as_string();
+			const Target::Enum target = EnumMapper::mapTarget(potionNode.child("Target").text().as_string());
+			const Attribute::Enum effect = EnumMapper::mapAttribute(potionNode.child("Effect").text().as_string());
+			const Mode::Enum mode = EnumMapper::mapMode(potionNode.child("Mode").text().as_string());
 			const float strength = potionNode.child("x").text().as_float();
 			const unsigned int duration = potionNode.child("n").text().as_uint();
+
+			if (itemClass == Classes::UNKNOWN || target == Target::UNKNOWN || effect == Attribute::UNKNOWN || mode == Mode::UNKNOWN)
+			{
+				return false;
+			}
 			
-			std::shared_ptr<PotionTemplate> potion(new PotionTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
-				description, target, effect, mode, strength, duration));
+			std::shared_ptr<PotionTemplate> potion(new PotionTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, description, target, effect, mode, strength, duration));
 
 			objects[potion->getName()] = potion;
 		}
@@ -151,6 +169,8 @@ void PotionFactory::importConfig(std::string path)
 
 	std::cout << "Load result: " << result.description() << std::endl;
 	std::cout << "PotionTemplate now contains " << objects.size() << " objects." << std::endl;
+
+	return true;
 }
 
 Weapon* WeaponTemplate::clone(float externMultiplier)
@@ -163,7 +183,7 @@ Weapon* WeaponTemplate::clone(float externMultiplier)
 		defence * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), slots, max);
 }
 
-void WeaponFactory::importConfig(std::string path)
+bool WeaponFactory::importConfig(const std::string& path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*) path.c_str());
@@ -172,7 +192,8 @@ void WeaponFactory::importConfig(std::string path)
 
 	if (!result)
 	{
-		throw ConfigParseException(path);
+		std::cerr << "Failed parsing " << path << std::endl;
+		return false;
 	}
 	else
 	{
@@ -181,19 +202,24 @@ void WeaponFactory::importConfig(std::string path)
 		for (pugi::xml_node weaponNode = weaponsNode.first_child(); weaponNode; weaponNode = weaponNode.next_sibling())
 		{
 
-			const std::string name = weaponNode.child("Name").text().as_string();
-			const std::string image = weaponNode.child("Image").text().as_string();
-			const Classes itemClass = EnumMapper::mapClasses(weaponNode.child("Item_Class").text().as_string());
+			const std::string& name = weaponNode.child("Name").text().as_string();
+			const std::string& image = weaponNode.child("Image").text().as_string();
+			const Classes::Enum itemClass = EnumMapper::mapClasses(weaponNode.child("Item_Class").text().as_string());
 			const float classMultiplier = weaponNode.child("Class_Multiplier").text().as_float();
 			const float statsLowMultiplier = weaponNode.child("Stats_Low_Multiplier").text().as_float();
 			const float statsHighMultiplier = weaponNode.child("Stats_High_Multiplier").text().as_float();
-			const WeaponType type = EnumMapper::mapWeaponType(weaponNode.child("Type").text().as_string());
+			const WeaponType::Enum type = EnumMapper::mapWeaponType(weaponNode.child("Type").text().as_string());
 			const float attack = weaponNode.child("Attack").text().as_float();
 			const float speed = weaponNode.child("Speed").text().as_float();
 			const float accuracy = weaponNode.child("Accuracy").text().as_float();
 			const float defence = weaponNode.child("Defence").text().as_float();
 			const unsigned int slots = weaponNode.child("Slots").text().as_uint();
 			const unsigned int max = weaponNode.child("Max").text().as_uint();
+
+			if (itemClass == Classes::UNKNOWN || type == WeaponType::UNKNOWN)
+			{
+				return false;
+			}
 
 			std::shared_ptr<WeaponTemplate> weapon(new WeaponTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
 				type, attack, speed, accuracy, defence, slots, max));
@@ -204,6 +230,8 @@ void WeaponFactory::importConfig(std::string path)
 
 	std::cout << "Load result: " << result.description() << std::endl;
 	std::cout << "WeaponTemplate now contains " << objects.size() << " objects." << std::endl;
+
+	return true;
 }
 
 Attack* AttackTemplate::clone(float externMultiplier)
@@ -213,7 +241,7 @@ Attack* AttackTemplate::clone(float externMultiplier)
 	return new Attack(name, effect, hpDamage * classMultiplier, hitProbability, attributeDamage * classMultiplier, statsLowMultiplier, statsHighMultiplier);
 }
 
-void AttackFactory::importConfig(std::string path)
+bool AttackFactory::importConfig(const std::string& path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*) path.c_str());
@@ -222,7 +250,8 @@ void AttackFactory::importConfig(std::string path)
 
 	if (!result) 
 	{
-		throw ConfigParseException(path);
+		std::cerr << "Failed parsing " << path << std::endl;
+		return false;
 	}
 	else 
 	{
@@ -231,14 +260,19 @@ void AttackFactory::importConfig(std::string path)
 		for (pugi::xml_node attackNode = attacksNode.first_child(); attackNode; attackNode = attackNode.next_sibling())
 		{
 
-			const std::string name = attackNode.child("Name").text().as_string();
-			const Attribute effect = EnumMapper::mapAttribute(attackNode.child("Effect").text().as_string());
+			const std::string& name = attackNode.child("Name").text().as_string();
+			const Attribute::Enum effect = EnumMapper::mapAttribute(attackNode.child("Effect").text().as_string());
 			const float classMultiplier = attackNode.child("Class_Multiplier").text().as_float();
 			const float statsLowMultiplier = attackNode.child("Stats_Low_Multiplier").text().as_float();
 			const float statsHighMultiplier = attackNode.child("Stats_High_Multiplier").text().as_float();
 			const float hpDamage = attackNode.child("HP_Damage").text().as_float();
 			const float hitProbability = attackNode.child("Hit_Probability").text().as_float();
 			const float x = attackNode.child("x").text().as_float();
+
+			if (effect == Attribute::UNKNOWN)
+			{
+				return false;
+			}
 
 			std::shared_ptr<AttackTemplate> attack(new AttackTemplate(name, effect, classMultiplier, statsLowMultiplier, statsHighMultiplier, hpDamage, hitProbability, x));
 
@@ -248,6 +282,8 @@ void AttackFactory::importConfig(std::string path)
 
 	std::cout << "Load result: " << result.description() << std::endl;
 	std::cout << "AttackTemplate now contains " << objects.size() << " objects." << std::endl;
+
+	return true;
 }
 
 Room* RoomTemplate::clone(float externMultiplier)
@@ -257,7 +293,7 @@ Room* RoomTemplate::clone(float externMultiplier)
 	return new Room(name, description);
 }
 
-void RoomFactory::importConfig(std::string path)
+bool RoomFactory::importConfig(const std::string& path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file((const char*)path.c_str());
@@ -266,7 +302,8 @@ void RoomFactory::importConfig(std::string path)
 
 	if (!result)
 	{
-		throw ConfigParseException(path);
+		std::cerr << "Failed parsing " << path << std::endl;
+		return false;
 	}
 	else
 	{
@@ -274,40 +311,42 @@ void RoomFactory::importConfig(std::string path)
 
 		for (pugi::xml_node roomNode = roomsNode.first_child(); roomNode; roomNode = roomNode.next_sibling())
 		{
-			const std::string name = roomNode.child("Name").text().as_string();
-			const std::string image = roomNode.child("Image").text().as_string();
-			const std::string description = roomNode.child("Description").text().as_string();
+			const std::string& name = roomNode.child("Name").text().as_string();
+			const std::string& description = roomNode.child("Description").text().as_string();
 
-			std::map<DoorPositions, const bool> doorPositions;
-			for (pugi::xml_node doorPosNode = roomNode.child("Door_Positions").first_child(); doorPosNode; doorPosNode = doorPosNode.next_sibling())
-			{
-				doorPositions.insert(std::pair<DoorPositions, const bool>(EnumMapper::mapDoorPositions(doorPosNode.name()), doorPosNode.text().as_bool()));
-			}
+			pugi::xml_node doorPosNode = roomNode.child("Door_Positions").first_child();
+			pugi::xml_node monsterNode = roomNode.child("Monster").first_child();
+			pugi::xml_node findNode = roomNode.child("Find_Probabilities").first_child();
 
-			std::map<MonsterProbabilities, const float> monsterProbabilities;
-			for (pugi::xml_node monsterNode = roomNode.child("Monster").first_child(); monsterNode; monsterNode = monsterNode.next_sibling())
+			const RoomTemplate::DoorPositions doorPositions = 
 			{
-				monsterProbabilities.insert(std::pair<MonsterProbabilities, const float>(EnumMapper::mapMonsterProbabilities(monsterNode.name()), monsterNode.text().as_float()));
-			}
+				doorPosNode.child("N").text().as_bool(),
+				doorPosNode.child("E").text().as_bool(),
+				doorPosNode.child("S").text().as_bool(),
+				doorPosNode.child("W").text().as_bool()
+			};
+			
+			const RoomTemplate::MonsterProbabilities monsterProbabilities =
+			{
+				monsterNode.child("no").text().as_float(),
+				monsterNode.child("easy").text().as_float(),
+				monsterNode.child("normal").text().as_float(),
+				monsterNode.child("hard").text().as_float()
+			};
+
+			const RoomTemplate::FindProbabilities findProbabilities =
+			{
+				findNode.child("none").text().as_float(),
+				findNode.child("weak").text().as_float(),
+				findNode.child("medium").text().as_float(),
+				findNode.child("strong").text().as_float()
+			};
 
 			const unsigned int monsterCount = roomNode.child("Monster_Count").text().as_uint();
 			const float itemMultiplier = roomNode.child("Item_Multiplier").text().as_float();
-			
-			std::map<Classes, const float> findProbabilities;
-			for (pugi::xml_node findNode = roomNode.child("Find_Probabilities").first_child(); findNode; findNode = findNode.next_sibling())
-			{
-				findProbabilities.insert(std::pair<Classes, const float>(EnumMapper::mapClasses(findNode.name()), findNode.text().as_float()));
-			}
-			
 			const unsigned int itemCount = roomNode.child("Item_Count").text().as_uint();
 
-
-			/*std::cout << "importing Room: name = " << name << ", description = " << description << ", image = " << image << ", monsterCount = " << monsterCount << ", itemCount = " << itemCount << ", itemMultiplier = " << itemMultiplier << std::endl;
-			std::cout << "doorpositions: {N = " << doorPositions[DoorPositions::North] << ", E = " << doorPositions[DoorPositions::East] << ", S = " << doorPositions[DoorPositions::South] << ", W = " << doorPositions[DoorPositions::West] << std::endl;
-			std::cout << "monsterProbabilities: {No = " << monsterProbabilities[MonsterProbabilities::No] << ", Easy = " << monsterProbabilities[MonsterProbabilities::Easy] << ", Normal = " << monsterProbabilities[MonsterProbabilities::Normal] << ", Hard = " << monsterProbabilities[MonsterProbabilities::Hard] << std::endl;
-			std::cout << "findProbabilities: {None = " << findProbabilities[Classes::None] << ", Weak = " << findProbabilities[Classes::Weak] << ", Medium = " << findProbabilities[Classes::Medium] << ", Strong = " << findProbabilities[Classes::Strong] << std::endl;
-*/
-			std::shared_ptr<RoomTemplate> room(new RoomTemplate(name, description, image, doorPositions, monsterProbabilities, findProbabilities, monsterCount, itemCount, itemMultiplier));
+			std::shared_ptr<RoomTemplate> room(new RoomTemplate(name, description, doorPositions, monsterProbabilities, findProbabilities, monsterCount, itemCount, itemMultiplier));
 
 			objects[room->getName()] = room;
 		}
@@ -315,17 +354,14 @@ void RoomFactory::importConfig(std::string path)
 
 	std::cout << "Load result: " << result.description() << std::endl;
 	std::cout << "RoomTemplate now contains " << objects.size() << " objects." << std::endl;
+
+	return true;
 }
 
-PrototypeStorage::PrototypeStorage(std::string templatePath)
+PrototypeStorage::PrototypeStorage(const std::string& templatePath_) : 
+	templatePath(templatePath_)
 {
-	try {
-		PrototypeStorage::initializeTemplates(templatePath);
-	}
-	catch (ConfigParseException& e)
-	{
-		throw e;
-	}
+	successfullyInitialized = PrototypeStorage::initializeTemplates(templatePath);
 }
 
 PrototypeStorage::~PrototypeStorage()
@@ -340,7 +376,7 @@ PrototypeStorage::~PrototypeStorage()
 
 void PrototypeStorage::testPrintGameObjects()
 {
-	for (std::string objectName : armamentFactory->getObjectNames()) {
+	for (const std::string& objectName : armamentFactory->getObjectNames()) {
 		armamentFactory->create(objectName, 1.0f)->debugPrint();
 	}
 	for (std::string objectName : monsterFactory->getObjectNames()) {
@@ -360,7 +396,7 @@ void PrototypeStorage::testPrintGameObjects()
 	}
 }
 
-void PrototypeStorage::initializeTemplates(std::string templatePath)
+bool PrototypeStorage::initializeTemplates(const std::string& templatePath)
 {
 	std::cout << "initializing templates..." << std::endl;
 
@@ -371,16 +407,30 @@ void PrototypeStorage::initializeTemplates(std::string templatePath)
 	attackFactory = new AttackFactory();
 	roomFactory = new RoomFactory();
 
-	try {
-		armamentFactory->importConfig(templatePath + "Armaments.xml");
-		monsterFactory->importConfig(templatePath + "Monsters.xml");
-		potionFactory->importConfig(templatePath + "Potions.xml");
-		weaponFactory->importConfig(templatePath + "Weapons.xml");
-		attackFactory->importConfig(templatePath + "Attacks.xml");
-		roomFactory->importConfig(templatePath + "Rooms.xml");
-	}
-	catch (ConfigParseException& e)
+	if (!armamentFactory->importConfig(templatePath + "Armaments.xml"))
 	{
-		throw e;
+		return false;
 	}
+	if (!monsterFactory->importConfig(templatePath + "Monsters.xml"))
+	{
+		return false;
+	}
+	if (!potionFactory->importConfig(templatePath + "Potions.xml"))
+	{
+		return false;
+	}
+	if (!weaponFactory->importConfig(templatePath + "Weapons.xml"))
+	{
+		return false;
+	}
+	if (!attackFactory->importConfig(templatePath + "Attacks.xml"))
+	{
+		return false;
+	}
+	if (!roomFactory->importConfig(templatePath + "Rooms.xml"))
+	{
+		return false;
+	}
+
+	return true;
 }

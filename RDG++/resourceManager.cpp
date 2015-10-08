@@ -1,6 +1,5 @@
 #include "resourceManager.hpp"
 #include "prototypes.hpp"
-#include "exceptions.hpp"
 #include <memory>
 
 // free memory from textures
@@ -9,22 +8,22 @@ ResourceManager::~ResourceManager()
 
 }
 
-void ResourceManager::loadResources(const std::string imagesPath, std::shared_ptr<PrototypeStorage> prototypeStorage)
+bool ResourceManager::loadResources(const std::string imagesPath, std::shared_ptr<PrototypeStorage> prototypeStorage)
 {
 	std::map<std::string, std::string> textureNames;
 	sf::Image tilesSpritesheet;
 
 	for (std::string objectName : prototypeStorage->armamentFactory->getObjectNames()) {
-		textureNames.insert(std::pair<std::string, std::string>(objectName, prototypeStorage->armamentFactory->getTemplate(objectName)->getTextureName()));
+		textureNames.insert(std::pair<std::string, std::string>(objectName, std::static_pointer_cast<ArmamentTemplate>(prototypeStorage->armamentFactory->getTemplate(objectName))->getTextureName()));
 	}
 	for (std::string objectName : prototypeStorage->monsterFactory->getObjectNames()) {
-		textureNames.insert(std::pair<std::string, std::string>(objectName, prototypeStorage->monsterFactory->getTemplate(objectName)->getTextureName()));
+		textureNames.insert(std::pair<std::string, std::string>(objectName, std::static_pointer_cast<MonsterTemplate>(prototypeStorage->monsterFactory->getTemplate(objectName))->getTextureName()));
 	}
 	for (std::string objectName : prototypeStorage->potionFactory->getObjectNames()) {
-		textureNames.insert(std::pair<std::string, std::string>(objectName, prototypeStorage->potionFactory->getTemplate(objectName)->getTextureName()));
+		textureNames.insert(std::pair<std::string, std::string>(objectName, std::static_pointer_cast<PotionTemplate>(prototypeStorage->potionFactory->getTemplate(objectName))->getTextureName()));
 	}
 	for (std::string objectName : prototypeStorage->weaponFactory->getObjectNames()) {
-		textureNames.insert(std::pair<std::string, std::string>(objectName, prototypeStorage->weaponFactory->getTemplate(objectName)->getTextureName()));
+		textureNames.insert(std::pair<std::string, std::string>(objectName, std::static_pointer_cast<WeaponTemplate>(prototypeStorage->weaponFactory->getTemplate(objectName))->getTextureName()));
 	}
 
 	// load room textures from tileset, not directly
@@ -49,7 +48,8 @@ void ResourceManager::loadResources(const std::string imagesPath, std::shared_pt
 		if (!textures.count(it->first)) {
 			if (!texture.loadFromFile(imagesPath + it->second))
 			{
-				throw LoadingException(imagesPath + it->second);
+				std::cerr << "Failed to load texture " << imagesPath + it->second << std::endl;
+				return false;
 			}
 			else
 			{
@@ -65,4 +65,5 @@ void ResourceManager::loadResources(const std::string imagesPath, std::shared_pt
 
 	sf::Texture groundTexture;	
 
+	return true;
 }

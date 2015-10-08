@@ -2,10 +2,11 @@
 #define RESOURCEMANAGER_INCLUDE
 
 #include <SFML/Graphics.hpp>
-#include "prototypes.hpp"
 #include <iostream>
 #include <map>
 #include <memory>
+
+class PrototypeStorage;
 
 class ResourceManager
 {
@@ -17,12 +18,12 @@ public:
 		return instance;
 	};
 
-	void loadResources(const std::string imagesPath, std::shared_ptr<PrototypeStorage> prototypeStorage);
-	std::shared_ptr<sf::Texture> getTexture(std::string textureName) { return textures[textureName]; };
+	bool loadResources(const std::string imagesPath, std::shared_ptr<PrototypeStorage> prototypeStorage);
+	std::shared_ptr<sf::Texture> getTexture(const std::string& textureName) { return textures[textureName]; };
 
 private:
 
-	std::map <std::string, std::shared_ptr<sf::Texture>> textures;
+	std::map <const std::string, std::shared_ptr<sf::Texture>> textures;
 
 	ResourceManager() {};
 	ResourceManager(ResourceManager const&);
