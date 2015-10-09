@@ -7,7 +7,7 @@ class GameState
 {
 public:
 
-	Game* game;
+	Game& game;
 
 	virtual void draw(const float deltaTime) = 0;
 	virtual void update(const float deltaTime) = 0;
