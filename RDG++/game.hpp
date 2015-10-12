@@ -6,6 +6,7 @@
 #include "settings.hpp"
 #include "prototypes.hpp"
 #include "resourceManager.hpp"
+#include "maze.hpp"
 
 // forward declaration of GameState to allow including of game.hpp in gameState.hpp and avoid include cycle
 class GameState; 
@@ -42,6 +43,7 @@ private:
 	std::vector<sf::VideoMode> vmodes;
 	sf::VideoMode desktopVmode;
 	sf::VideoMode vmode;
+	std::unique_ptr<Maze> maze;
 };
 
 #endif /* GAME_HPP */
