@@ -8,6 +8,9 @@ class GameState
 public:
 
 	Game& game;
+	std::shared_ptr < Settings > settings;
+
+	GameState(Game& game_) : game(game_) {};
 
 	virtual void draw(const float deltaTime) = 0;
 	virtual void update(const float deltaTime) = 0;

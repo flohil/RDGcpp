@@ -19,11 +19,11 @@ public:
 	};
 
 	bool loadResources(const std::string imagesPath, std::shared_ptr<PrototypeStorage> prototypeStorage);
-	std::shared_ptr<sf::Texture> getTexture(const std::string& textureName) { return textures[textureName]; };
+	sf::Texture& getTexture(const std::string& textureName) { return textures.at(textureName); };
 
 private:
 
-	std::map <const std::string, std::shared_ptr<sf::Texture>> textures;
+	std::map <const std::string, sf::Texture> textures;
 
 	ResourceManager() {};
 	ResourceManager(ResourceManager const&);

@@ -38,23 +38,22 @@ private:
 
 	bool obtainTexture();
 
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
+	virtual void draw(sf::RenderTarget& target_, sf::RenderStates states_) const
 	{
 		// apply the entity's transform -- combine it with the one that was passed by the caller
-		states.transform *= getTransform(); // getTransform() is defined by sf::Transformable
+		states_.transform *= getTransform(); // getTransform() is defined by sf::Transformable
 
 		// apply the texture
-		states.texture = &m_texture;
+		states_.texture = &texture;
 
 		// you may also override states.shader or states.blendMode if you want
 
 		// draw the vertex array
-		target.draw(m_vertices, states);
+		target_.draw(vertices, states_);
 	}
 
-	sf::VertexArray m_vertices;
-	sf::Texture m_texture;
-	std::shared_ptr<sf::Texture> texturePtr;
+	sf::VertexArray vertices;
+	sf::Texture texture;
 };
 
 class Item : public RenderableObject

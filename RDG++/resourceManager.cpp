@@ -39,6 +39,7 @@ bool ResourceManager::loadResources(const std::string imagesPath, std::shared_pt
 	textureNames.insert(std::pair<std::string, std::string>("Strength_Stats", "strength_stats.png"));
 	textureNames.insert(std::pair<std::string, std::string>("Speed_Stats", "speed_stats.png"));
 	textureNames.insert(std::pair<std::string, std::string>("Key", "key.png"));
+	textureNames.insert(std::pair<std::string, std::string>("tileset", "rooms/tileset.png"));
 
 	// load single textures
 	for (std::map<std::string, std::string>::iterator it = textureNames.begin(); it != textureNames.end(); ++it){
@@ -54,17 +55,11 @@ bool ResourceManager::loadResources(const std::string imagesPath, std::shared_pt
 			}
 			else
 			{
-				std::shared_ptr<sf::Texture> texturePointer(new sf::Texture(texture));
-				textures[it->first] = texturePointer;
+				textures[it->first] = texture;
 				LOG(DEBUG) << "loaded " << imagesPath + it->second;
 			}
 		}
 	}
-
-	// load room tiles textures from spritesheet
-	tilesSpritesheet.loadFromFile("rooms/tileset.png");
-
-	sf::Texture groundTexture;	
 
 	LOG(INFO) << "Resources loaded successfully";
 

@@ -10,6 +10,7 @@
 #include <memory>
 #include "easylogging++.hpp"
 #include "game.hpp"
+#include "gameStateMainMenu.hpp"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -36,11 +37,8 @@ int main()
 		return -1;
 	}
 
-	if (!game.gameLoop())
-	{
-		LOG(ERROR) << "Shutting down with errors...";
-		return -1;
-	}
+	game.pushState(new GameStateMainMenu(game));
+	game.gameLoop();
 
 	LOG(INFO) << "Shutting down...";
 	return 0;

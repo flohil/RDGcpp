@@ -16,6 +16,7 @@ public:
 
 	std::stack<GameState*> states;
 	sf::RenderWindow window;
+	sf::Sprite background;
 
 	bool initializedSuccessfully() const { return successfullyInitialized; };
 	void pushState(GameState* state);
@@ -23,7 +24,11 @@ public:
 	void changeState(GameState* state);
 	GameState* peekState();
 
-	bool gameLoop();
+	void gameLoop();
+	std::shared_ptr<Settings> getSettings() const { return settings; };
+	std::shared_ptr<PrototypeStorage> getPrototypeStorage() const { return prototypeStorage; };
+	ResourceManager& getResourceManager() const { return resourceManager; };
+	std::vector<sf::VideoMode> getVModes() const { return vmodes; };
 
 	Game();
 	~Game();
@@ -31,7 +36,7 @@ public:
 private:
 
 	bool successfullyInitialized = true;
-	std::unique_ptr<Settings> settings;
+	std::shared_ptr<Settings> settings;
 	std::shared_ptr<PrototypeStorage> prototypeStorage;
 	ResourceManager& resourceManager = ResourceManager::getInstance();
 	std::vector<sf::VideoMode> vmodes;

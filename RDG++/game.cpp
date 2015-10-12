@@ -7,6 +7,51 @@
 #include "gameState.hpp"
 #include "easylogging++.hpp"
 
+Game::Game()
+{
+	LOG(INFO) << "Starting RDG++...";
+
+	// obtain desktop vMode for default settings
+	desktopVmode = sf::VideoMode::getDesktopMode();
+
+	// game settings and prototype initialization
+	settings.reset(new Settings(desktopVmode.width, desktopVmode.height));
+	if (!settings->loadedSuccesfully())
+	{
+		successfullyInitialized = false;
+		return;
+	}
+
+	prototypeStorage.reset(new PrototypeStorage(settings->CONFIG_PATH));
+	if (!prototypeStorage->initializedSuccessfully())
+	{
+		successfullyInitialized = false;
+		return;
+	}
+
+	// create video mode and window
+	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);
+	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+
+	window.setFramerateLimit(60); //limit fps to 60 
+
+	// retrieve a list of all possible fullscreen video modes
+	std::vector<sf::VideoMode> vmodes = sf::VideoMode::getFullscreenModes();
+
+	// create and print all game objects for test purposes
+	// prototypeStorage->testPrintGameObjects();
+
+	// load resources
+	if (!resourceManager.loadResources(settings->IMAGE_PATH, prototypeStorage))
+	{
+		successfullyInitialized = false;
+		return;
+	}
+
+	background.setTexture(resourceManager.getTexture("tileset"));
+
+}
+
 void Game::pushState(GameState* state)
 {
 	this->states.push(state);
@@ -42,7 +87,7 @@ GameState* Game::peekState()
 	return this->states.top();
 }
 
-bool Game::gameLoop()
+void Game::gameLoop()
 {
 	sf::Clock clock;
 
@@ -84,72 +129,14 @@ bool Game::gameLoop()
 		peekState()->handleInput();
 		peekState()->update(deltaTime);*/
 
-		// check all the window's events that were triggered since the last iteration of the loop
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			// "close requested" event: we close the window
-			if (event.type == sf::Event::Closed) {
+		// Clear the whole window before rendering a new frame
+		window.clear(sf::Color::Black);
 
-				window.close();
-			}
-			else if (event.type == sf::Event::KeyPressed) {
-				settings->fullscreen = !settings->fullscreen;
-				window.create(sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH), settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+		//peekState()->draw(deltaTime);
+		window.draw(triangle);
 
-				settings->saveSettings();
-			}
-
-			// Clear the whole window before rendering a new frame
-			window.clear(sf::Color::Black);
-
-			//peekState()->draw(deltaTime);
-			window.draw(triangle);
-
-			// End the current frame and display its contents on screen
-			window.display();
-		}
-	}
-
-	return true;
-}
-
-Game::Game()
-{
-	LOG(INFO) << "Starting RDG++...";
-
-	// obtain desktop vMode for default settings
-	desktopVmode = sf::VideoMode::getDesktopMode();
-
-	// game settings and prototype initialization
-	settings.reset(new Settings(desktopVmode.width, desktopVmode.height));
-	if (!settings->loadedSuccesfully())
-	{
-		successfullyInitialized = false;
-	}
-
-	prototypeStorage.reset(new PrototypeStorage(settings->CONFIG_PATH));
-	if (!prototypeStorage->initializedSuccessfully())
-	{
-		successfullyInitialized = false;
-	}
-
-	// create video mode and window
-	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);
-	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
-
-	window.setFramerateLimit(60); //limit fps to 60 
-
-	// retrieve a list of all possible fullscreen video modes
-	std::vector<sf::VideoMode> vmodes = sf::VideoMode::getFullscreenModes();
-
-	// create and print all game objects for test purposes
-	// prototypeStorage->testPrintGameObjects();
-
-	// load resources
-	if (!resourceManager.loadResources(settings->IMAGE_PATH, prototypeStorage))
-	{
-		successfullyInitialized = false;
+		// End the current frame and display its contents on screen
+		window.display();
 	}
 }
 

@@ -6,7 +6,7 @@
 
 bool RenderableObject::obtainTexture() {
 
-	texturePtr = ResourceManager::getInstance().getTexture(name);
+	texture = ResourceManager::getInstance().getTexture(name);
 	return false;
 }
 
