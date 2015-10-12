@@ -20,6 +20,7 @@ public:
 	unsigned int width;
 	unsigned int height;
 	bool fullscreen;
+	unsigned int mazeSize;
 
 	// functions
 	Settings(unsigned int desktopWidth, unsigned int desktopHeight);

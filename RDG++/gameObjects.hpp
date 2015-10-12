@@ -21,7 +21,8 @@ protected:
 	const std::string name;
 };
 
-class RenderableObject : public sf::Drawable, public sf::Transformable, public NamedObject
+// public sf::Drawable, public sf::Transformable, 
+class RenderableObject : public NamedObject
 {
 public:
 
@@ -38,22 +39,26 @@ private:
 
 	bool obtainTexture();
 
-	virtual void draw(sf::RenderTarget& target_, sf::RenderStates states_) const
-	{
-		// apply the entity's transform -- combine it with the one that was passed by the caller
-		states_.transform *= getTransform(); // getTransform() is defined by sf::Transformable
+	//virtual void draw(sf::RenderTarget& target_, sf::RenderStates states_) const
+	//{
+	//	// apply the entity's transform -- combine it with the one that was passed by the caller
+	//	states_.transform *= getTransform(); // getTransform() is defined by sf::Transformable
 
-		// apply the texture
-		states_.texture = &texture;
+	//	// apply the texture
+	//	states_.texture = &texture;
 
-		// you may also override states.shader or states.blendMode if you want
+	//	// you may also override states.shader or states.blendMode if you want
 
-		// draw the vertex array
-		target_.draw(vertices, states_);
-	}
+	//	// draw the vertex array
+	//	target_.draw(vertices, states_);
+	//}
 
-	sf::VertexArray vertices;
+	//sf::VertexArray vertices;
+
+	void draw(sf::RenderWindow& window, float deltaTime);
+
 	sf::Texture texture;
+	sf::Sprite sprite;
 };
 
 class Item : public RenderableObject

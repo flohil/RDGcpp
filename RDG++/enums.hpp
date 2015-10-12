@@ -3,6 +3,11 @@
 
 #include <string>
 
+struct ViewingDirections
+{
+	enum Enum { N, E, S, W };
+};
+
 struct DifficultyLevel
 {
 	enum Enum { EASY, NORMAL, HARD, UNKNOWN };

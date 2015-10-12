@@ -10,6 +10,11 @@ bool RenderableObject::obtainTexture() {
 	return false;
 }
 
+void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)
+{
+	window.draw(sprite);
+}
+
 Item::~Item()
 {
 

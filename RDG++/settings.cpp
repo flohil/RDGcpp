@@ -15,6 +15,7 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	fullscreen = true;
 	width = desktopWidth;
 	height = desktopHeight;
+	mazeSize = 5;
 
 	successfullyLoaded = loadSettings();
 }
