@@ -49,7 +49,6 @@ Game::Game()
 	}
 
 	background.setTexture(resourceManager.getTexture("tileset"));
-
 }
 
 void Game::pushState(GameState* state)
@@ -91,51 +90,19 @@ void Game::gameLoop()
 {
 	sf::Clock clock;
 
-	// create a new vertex
-	sf::Vertex vertex;
-
-	// set its position
-	vertex.position = sf::Vector2f(10, 50);
-
-	// set its color
-	vertex.color = sf::Color::Red;
-
-	// set its texture coordinates
-	vertex.texCoords = sf::Vector2f(100, 100);
-
-	// create an array of 3 vertices that define a triangle primitive
-	sf::VertexArray triangle(sf::Triangles, 3);
-
-	// define the position of the triangle's points
-	triangle[0].position = sf::Vector2f(10, 10);
-	triangle[1].position = sf::Vector2f(100, 10);
-	triangle[2].position = sf::Vector2f(100, 100);
-
-	// define the color of the triangle's points
-	triangle[0].color = sf::Color::Red;
-	triangle[1].color = sf::Color::Blue;
-	triangle[2].color = sf::Color::Green;
-
-
 	while (window.isOpen())
 	{
 		sf::Time elapsed = clock.restart();
 		float deltaTime = elapsed.asSeconds();
 
-		/*if (peekState() == nullptr)
+		if (peekState() == nullptr)
 		{
 			continue;
 		}
 		peekState()->handleInput();
-		peekState()->update(deltaTime);*/
-
-		// Clear the whole window before rendering a new frame
+		peekState()->update(deltaTime);
 		window.clear(sf::Color::Black);
-
-		//peekState()->draw(deltaTime);
-		window.draw(triangle);
-
-		// End the current frame and display its contents on screen
+		peekState()->draw(deltaTime);
 		window.display();
 	}
 }

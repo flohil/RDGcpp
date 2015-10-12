@@ -36,6 +36,9 @@ int main()
 		LOG(ERROR) << "Game initialization failed. Shutting down...";
 		return -1;
 	}
+	else {
+		LOG(INFO) << "Game initialized successfully";
+	}
 
 	game.pushState(new GameStateMainMenu(game));
 	game.gameLoop();
