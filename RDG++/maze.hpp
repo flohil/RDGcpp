@@ -31,12 +31,12 @@ private:
 	void _openDoor(ViewingDirections::Enum dir);
 	std::shared_ptr<MazeRoom> closeDoor(ViewingDirections::Enum dir, Maze& maze);
 	void _closeDoor(ViewingDirections::Enum dir);
-	std::shared_ptr<MazeRoom> isDoorOpen(ViewingDirections::Enum dir) const;
+	bool isDoorOpen(ViewingDirections::Enum dir) const;
 	std::set<ViewingDirections::Enum> getOpenDoors() const;
 	std::set<ViewingDirections::Enum> getClosedDoors() const;
-	ViewingDirections::Enum* getOpenDoorsArray() const;
-	ViewingDirections::Enum* getClosedDoorsArray() const;
-	std::shared_ptr<MazeRoom> getAdjacentRoom(ViewingDirections::Enum dir) const;
+	std::vector<ViewingDirections::Enum> getOpenDoorsArray() const;
+	std::vector<ViewingDirections::Enum> getClosedDoorsArray() const;
+	std::shared_ptr<MazeRoom> getAdjacentRoom(ViewingDirections::Enum dir, Maze& maze) const;
 };
 
 class Maze
@@ -51,7 +51,8 @@ public:
 
 	void generate();
 	void print() const;
-	std::shared_ptr<MazeRoom> getRoom(const Point pos);
+	std::shared_ptr<MazeRoom> getRoom(const Point pos) const;
+	Point getTreasurePos() const;
 
 private:
 
@@ -62,13 +63,16 @@ private:
 	const unsigned int correctPaths;
 	const Point treasure;
 
-	std::set<MazeRoom> startSet;
-	std::set<MazeRoom> notFinishedStartSet;
-	std::set<MazeRoom> endSet;
-	std::set<MazeRoom> notFinishedEndSet;
-	std::set<MazeRoom> freeSet;
+	std::set<std::shared_ptr<MazeRoom>> startSet;
+	std::set<std::shared_ptr<MazeRoom>> notFinishedStartSet;
+	std::set<std::shared_ptr<MazeRoom>> endSet;
+	std::set<std::shared_ptr<MazeRoom>> notFinishedEndSet;
+	std::set<std::shared_ptr<MazeRoom>> freeSet;
 
-	std::vector<std::vector<MazeRoom>> maze;
+	std::vector<std::vector<std::shared_ptr<MazeRoom>>> maze;
+
+	bool openRandomDoor(std::set<std::shared_ptr<MazeRoom>> &notFinished, std::set<std::shared_ptr<MazeRoom>> &additional, std::set<std::shared_ptr<MazeRoom>> &compare);
+	bool openRandomDoor(std::set<std::shared_ptr<MazeRoom>> &notFinished, std::set<std::shared_ptr<MazeRoom>> &additional, std::set<std::shared_ptr<MazeRoom>> &compare, bool ignoreFinished);
 };
 
 #endif // MAZE

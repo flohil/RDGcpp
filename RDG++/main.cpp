@@ -1,3 +1,7 @@
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include <SFML/Graphics.hpp>
 #include "settings.hpp"
 #include "prototypes.hpp"
@@ -16,8 +20,11 @@ INITIALIZE_EASYLOGGINGPP
 
 int main()
 {
+	// check for memory leaks
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 
-//initialize logging
+// initialize logging
 
 	std::remove("logs/rdg++.log"); // delete custom log file at every game start
 
@@ -27,7 +34,7 @@ int main()
 
 	std::remove("logs/myeasylog.log"); // delete standard log file
 
-//start game
+// start game
 
 	Game game;
 
