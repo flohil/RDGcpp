@@ -47,7 +47,10 @@ public:
 	Maze(const Point size_) : Maze(size_, Point{ 0u, 0u }, Point{ size_.x - 1, size_.y - 1 }, true, 1u, Point{ size_.x / 2, size_.y / 2 }) {};
 	Maze(const Point size_, bool treasureRoom_, const unsigned int correctPaths_) : Maze(size_, Point{ 0u, 0u }, Point{ size_.x - 1, size_.y - 1 }, treasureRoom_, correctPaths_, Point{ size_.x / 2, size_.y / 2 }) {};
 	Maze(const Point size_, const Point start_, const Point end_, bool treasureRoom_, const unsigned int correctPaths_, const Point treasure_) :
-		size(size_), start(start_), end(end_), treasureRoom(treasureRoom_), correctPaths(correctPaths_), treasure(treasure_) {};
+		size(size_), start(start_), end(end_), treasureRoom(treasureRoom_), correctPaths(correctPaths_), treasure(treasure_) 
+	{
+		//maze(size_, std::vector<std::shared_ptr<MazeRoom>>(size_));
+	};
 
 	void generate();
 	void print() const;

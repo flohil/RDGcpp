@@ -18,4 +18,8 @@ Iter select_randomly(Iter start, Iter end) {
 	return select_randomly(start, end, gen);
 }
 
+/* sample usage */
+//vector<int> foo;
+//int r = *select_randomly(foo.begin(), foo.end());
+
 #endif // RANDOM

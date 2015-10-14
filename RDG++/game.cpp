@@ -49,6 +49,7 @@ Game::Game()
 	}
 
 	background.setTexture(resourceManager.getTexture("tileset"));
+	background.setTextureRect(sf::IntRect(1*32,0,32,32));
 }
 
 void Game::pushState(GameState* state)
@@ -88,6 +89,10 @@ GameState* Game::peekState()
 
 void Game::gameLoop()
 {
+	maze.reset(new Maze(settings->mazeSize));
+	maze->generate();
+	maze->print();
+
 	sf::Clock clock;
 
 	while (window.isOpen())

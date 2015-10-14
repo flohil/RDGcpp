@@ -3,6 +3,16 @@
 
 #include <string>
 
+struct ObjectType
+{
+	enum Enum { ITEM, CREATURE, ATTACK, ROOM, TILE, WALL };
+};
+
+struct ItemType
+{
+	enum Enum { WEAPON, ARMAMENT, POTION };
+};
+
 struct ViewingDirections
 {
 	enum Enum { N, E, S, W };
@@ -60,6 +70,9 @@ public:
 	static Attribute::Enum mapAttribute(std::string input);
 	static Mode::Enum mapMode(std::string input);
 	static WeaponType::Enum mapWeaponType(std::string input);
+	static RoomTypes::Enum mapRoomTypes(std::string input);
+
+	static std::string mapRoomNames(RoomTypes::Enum input);
 };
 
 #endif // ENUMS_INCLUDE

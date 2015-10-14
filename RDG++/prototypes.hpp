@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <memory>
+#include <list>
 #include "enums.hpp"
 #include "gameObjects.hpp"
 
@@ -18,7 +19,7 @@ class PrototypeTemplate
 public:
 
 	PrototypeTemplate::~PrototypeTemplate();
-	virtual T* clone(float externMultiplier) = 0;
+	virtual std::shared_ptr<T> clone(float externMultiplier) = 0;
 };
 
 // handles the different prototype templates for one object class 
@@ -29,7 +30,7 @@ class PrototypeTemplateFactory
 public:
 
 	PrototypeTemplateFactory::~PrototypeTemplateFactory();
-	T2* create(const std::string& objectName, float externMultiplier);
+	std::shared_ptr<T2> create(const std::string& objectName, float externMultiplier);
 	std::set<const std::string> getObjectNames();
 	std::shared_ptr<PrototypeTemplate<T2>> getTemplate(const std::string& objectName);
 
@@ -79,7 +80,7 @@ public:
 	ArmamentTemplate(const std::string& name_, const std::string& textureName_, const Classes::Enum itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const std::string& type_, const float armor_, const float speed_, const float bonus_) :
 		Armament(name_, itemClass_, type_, armor_, speed_, bonus_), TexturedTemplate(textureName_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
 
-	virtual Armament* clone(float externMultiplier);
+	virtual std::shared_ptr<Armament> clone(float externMultiplier);
 };
 
 class MonsterTemplate : public Monster, public TexturedTemplate, public VariableTemplate, public PrototypeTemplate<Monster>
@@ -89,7 +90,7 @@ public:
 	MonsterTemplate(const std::string& name_, const std::string& textureName_, const DifficultyLevel::Enum level_, const Attribute::Enum killBonusType_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const float killBonusLow_, const float killBonusHigh_, float hp_, float strength_, float speed_, float accuracy_) :
 		Monster(name_, level_, killBonusType_, 0.0f, hp_, strength_, speed_, accuracy_), TexturedTemplate(textureName_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_), killBonusLow(killBonusLow_), killBonusHigh(killBonusHigh_) {};
 
-	virtual Monster* clone(float externMultiplier);
+	virtual std::shared_ptr<Monster> clone(float externMultiplier);
 
 private:
 
@@ -103,7 +104,7 @@ public:
 	PotionTemplate(const std::string& name_, const std::string& textureName_, const Classes::Enum itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const std::string& description_, const Target::Enum target_, const Attribute::Enum effect_, const Mode::Enum mode_, const float strength_, const unsigned int duration_) :
 		Potion(name_, itemClass_, description_, target_, effect_, mode_, strength_, duration_), TexturedTemplate(textureName_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
 
-	virtual Potion* clone(float externMultiplier);
+	virtual std::shared_ptr<Potion> clone(float externMultiplier);
 };
 
 class WeaponTemplate : public Weapon, public TexturedTemplate, public VariableTemplate, public PrototypeTemplate<Weapon>
@@ -113,7 +114,7 @@ public:
 	WeaponTemplate(const std::string& name_, const std::string& textureName_, const Classes::Enum itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const WeaponType::Enum type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
 		Weapon(name_, itemClass_, type_, attack_, speed_, accuracy_, defence_, slots_, max_), TexturedTemplate(textureName_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
 
-	virtual Weapon* clone(float externMultiplier);
+	virtual std::shared_ptr<Weapon> clone(float externMultiplier);
 };
 
 class AttackTemplate : public Attack, public VariableTemplate, public PrototypeTemplate<Attack>
@@ -123,7 +124,7 @@ public:
 	AttackTemplate(const std::string& name_, const Attribute::Enum effect_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const float hpDamage_, const float hitProbability_, const float attributeDamage_) :
 		Attack(name_, effect_, 1.0f, hitProbability_, 1.0f, statsLowMultiplier_, statsHighMultiplier_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_), hpDamage(hpDamage_), attributeDamage(attributeDamage_) {};
 
-	virtual Attack* clone(float externMultiplier);
+	virtual std::shared_ptr<Attack> clone(float externMultiplier);
 
 private:
 
@@ -159,11 +160,12 @@ public:
 		float hard;
 	};
 
-	RoomTemplate(const std::string& name_, const std::string& description_, const DoorPositions doorPositions_, MonsterProbabilities monsterProbabilities_, FindProbabilities findProbabilities_, const unsigned int monsterCount_, const unsigned int itemCount_, const float itemMultiplier_) :
-		Room(name_, description_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_) {};
+	RoomTemplate(const std::string& name_, RoomTypes::Enum roomType_, const std::string& description_, const DoorPositions doorPositions_, MonsterProbabilities monsterProbabilities_, FindProbabilities findProbabilities_, const unsigned int monsterCount_, const unsigned int itemCount_, const float itemMultiplier_) :
+		Room(name_, roomType_, description_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_) {};
 
-	virtual Room* clone(float externMultiplier);
-	Room* clone() { return clone(1.0f); };
+	virtual std::shared_ptr<Room> clone(float externMultiplier) { return clone(RoomTypes::JUNCTION, externMultiplier); };
+	std::shared_ptr<Room> clone(RoomTypes::Enum roomType) { return clone(roomType, 1.0f); };
+	std::shared_ptr<Room> clone(RoomTypes::Enum roomType, float externMultiplier);
 
 private:
 
@@ -179,36 +181,75 @@ private:
 class ArmamentFactory : public PrototypeTemplateFactory<ArmamentTemplate, Armament>
 {
 public:
+
 	virtual bool importConfig(const std::string& path);
+	std::map<Classes::Enum, std::list<std::string>> getArmamentsClassified() const { return armamentsClassified; };
+
+private:
+
+	std::map<Classes::Enum, std::list<std::string>> armamentsClassified;
+	std::list<std::string> weakList;
+	std::list<std::string> mediumList;
+	std::list<std::string> strongList;
 };
 
 class MonsterFactory : public PrototypeTemplateFactory<MonsterTemplate, Monster>
 {
 public:
+
 	virtual bool importConfig(const std::string& path);
+	std::map<DifficultyLevel::Enum, std::list<std::string>> getMonstersLeveled() const { return monstersLeveled; };
+
+private:
+
+	std::map<DifficultyLevel::Enum, std::list<std::string>> monstersLeveled;
+	std::list<std::string> easyList;
+	std::list<std::string> normalList;
+	std::list<std::string> hardList;
 };
 
 class PotionFactory : public PrototypeTemplateFactory<PotionTemplate, Potion>
 {
 public:
+
 	virtual bool importConfig(const std::string& path);
+	std::map<Classes::Enum, std::list<std::string>> getPotionsClassified() const { return potionsClassified; };
+
+private:
+
+	std::map<Classes::Enum, std::list<std::string>> potionsClassified;
+	std::list<std::string> weakList;
+	std::list<std::string> mediumList;
+	std::list<std::string> strongList;
 };
 
 class WeaponFactory : public PrototypeTemplateFactory<WeaponTemplate, Weapon>
 {
 public:
+
 	virtual bool importConfig(const std::string& path);
+	std::map<Classes::Enum, std::list<std::string>> getWeaponsClassified() const { return weaponsClassified; };
+
+private:
+
+	std::map<Classes::Enum, std::list<std::string>> weaponsClassified;
+	std::list<std::string> weakList;
+	std::list<std::string> mediumList;
+	std::list<std::string> strongList;
 };
 
 class AttackFactory : public PrototypeTemplateFactory<AttackTemplate, Attack>
 {
 public:
+
 	virtual bool importConfig(const std::string& path);
 };
 
 class RoomFactory : public PrototypeTemplateFactory<RoomTemplate, Room>
 {
 public:
+
+	std::shared_ptr<Room> create(RoomTypes::Enum roomType);
 	virtual bool importConfig(const std::string& path);
 };
 
@@ -220,22 +261,29 @@ public:
 	// variable declarations
 	const std::string templatePath;
 
-	ArmamentFactory* armamentFactory;
-	MonsterFactory* monsterFactory;
-	PotionFactory* potionFactory;
-	WeaponFactory* weaponFactory;
-	AttackFactory* attackFactory;
-	RoomFactory* roomFactory;
+	std::unique_ptr<ArmamentFactory> armamentFactory;
+	std::unique_ptr<MonsterFactory> monsterFactory;
+	std::unique_ptr<PotionFactory> potionFactory;
+	std::unique_ptr<WeaponFactory> weaponFactory;
+	std::unique_ptr<AttackFactory> attackFactory;
+	std::unique_ptr<RoomFactory> roomFactory;
 
 	// function declarations
 	PrototypeStorage(const std::string& templatePath);
 	~PrototypeStorage();
 	void testPrintGameObjects();
 	bool initializedSuccessfully() { return successfullyInitialized; };
-                                                                                                                           
+	std::map<DifficultyLevel::Enum, std::list<std::string>> getMonstersLeveled() const { return monsterFactory->getMonstersLeveled(); };
+	std::map<Classes::Enum, std::list<std::pair<std::string, ItemType::Enum>>> getItemsClassList() const { return itemsClassList; };
+	std::map<Classes::Enum, std::list<std::string>> getArmamentsClassified() const { return armamentFactory->getArmamentsClassified(); };
+	std::map<Classes::Enum, std::list<std::string>> getPotionsClassified() const { return potionFactory->getPotionsClassified(); };
+	std::map<Classes::Enum, std::list<std::string>> getWeaponsClassified() const { return weaponFactory->getWeaponsClassified(); };
+
 private:
 
 	bool successfullyInitialized = false;
+
+	std::map<Classes::Enum, std::list<std::pair<std::string, ItemType::Enum>>> itemsClassList;
 
 	// function declarations
 	bool initializeTemplates(const std::string& templatePath);
@@ -270,7 +318,7 @@ std::shared_ptr<PrototypeTemplate<T2>> PrototypeTemplateFactory<T, T2>::getTempl
 }
 
 template <class T, class T2>
-T2* PrototypeTemplateFactory<T, T2>::create(const std::string& objectName, float externMultiplier)
+std::shared_ptr<T2> PrototypeTemplateFactory<T, T2>::create(const std::string& objectName, float externMultiplier)
 {
 	return objects[objectName]->clone(externMultiplier);
 }

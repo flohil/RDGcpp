@@ -44,6 +44,7 @@ private:
 	sf::VideoMode desktopVmode;
 	sf::VideoMode vmode;
 	std::unique_ptr<Maze> maze;
+
 };
 
 #endif /* GAME_HPP */

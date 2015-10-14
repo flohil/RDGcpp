@@ -1,6 +1,7 @@
 #include "maze.hpp"
 #include <iostream>
 #include "random.hpp"
+#include "easylogging++.hpp"
 
 const std::set<ViewingDirections::Enum> MazeRoom::allDirs 
 {
@@ -12,12 +13,14 @@ const std::set<ViewingDirections::Enum> MazeRoom::allDirs
 
 void Maze::generate()
 {
+
 	for (unsigned int x = 0; x < size.x; x++)
 	{
+		std::vector<std::shared_ptr<MazeRoom>> row;
 		for (unsigned int y = 0; y < size.y; y++)
 		{
 			std::shared_ptr<MazeRoom> room(new MazeRoom(Point{ x, y }));
-			maze[x][y] = room;
+			row.push_back(room);
 
 			if (x == start.x && y == start.y)
 			{
@@ -34,6 +37,8 @@ void Maze::generate()
 				freeSet.insert(room);
 			}
 		}
+
+		maze.push_back(row);
 	}
 
 	if (treasureRoom)
@@ -106,11 +111,11 @@ void Maze::print() const
 
 	std::string resStr = "";
 
-	for (unsigned int y = 0; y < maze[0].size(); y++)
+	for (unsigned int y = 0; y < maze[0].size(); y++) // column
 	{
-		for (unsigned int i = 0; i < 3; i++)
+		for (unsigned int i = 0; i < 3; i++) // room height
 		{
-			for (unsigned int x = 0; x < maze.size(); x++)
+			for (unsigned int x = 0; x < maze.size(); x++) // row
 			{
 				if (i == 0)
 				{
@@ -118,14 +123,14 @@ void Maze::print() const
 
 					if (maze[x][y]->isDoorOpen(ViewingDirections::N))
 					{
-						resStr.append(" ");
+						resStr.append("-");
 					}
 					else
 					{
 						resStr.append("#");
 					}
 					
-					if (x == maze.size() - 1)
+					if (x == (maze.size() - 1))
 					{
 						resStr.append("#");
 					}
@@ -134,7 +139,7 @@ void Maze::print() const
 				{
 					if (maze[x][y]->isDoorOpen(ViewingDirections::W))
 					{
-						resStr.append(" ");
+						resStr.append("|");
 					}
 					else
 					{
@@ -143,11 +148,11 @@ void Maze::print() const
 
 					resStr.append(" ");
 
-					if (maze.size() - 1)
+					if (x == (maze.size() - 1))
 					{
 						if (maze[x][y]->isDoorOpen(ViewingDirections::E))
 						{
-							resStr.append(" ");
+							resStr.append("|");
 						}
 						else
 						{
@@ -155,7 +160,7 @@ void Maze::print() const
 						}
 					}
 				}
-				else if (y != maze[0].size() - 1)
+				else if (y != (maze[0].size() - 1))
 				{
 					continue;
 				}
@@ -165,14 +170,14 @@ void Maze::print() const
 
 					if (maze[x][y]->isDoorOpen(ViewingDirections::S))
 					{
-						resStr.append(" ");
+						resStr.append("-");
 					}
 					else
 					{
 						resStr.append("#");
 					}
 
-					if (x == maze.size() - 1)
+					if (x == (maze.size() - 1))
 					{
 						resStr.append("#");
 					}
@@ -186,7 +191,8 @@ void Maze::print() const
 		}
 	}
 
-	std::cout << resStr << std::endl;
+	LOG(DEBUG) << std::endl << resStr;
+	//std::cout << resStr << std::endl;
 }
 
 std::shared_ptr<MazeRoom> Maze::getRoom(const Point pos) const

@@ -4,9 +4,9 @@
 #include <iostream>
 #include <map>
 
-bool RenderableObject::obtainTexture() {
+bool RenderableObject::obtainSprite() {
 
-	texture = ResourceManager::getInstance().getTexture(name);
+	sprite = ResourceManager::getInstance().getSprite(name);
 	return false;
 }
 
@@ -15,8 +15,7 @@ void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)
 	window.draw(sprite);
 }
 
-Item::~Item()
-{
+Item::~Item() {
 
 }
 
