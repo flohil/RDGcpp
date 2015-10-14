@@ -6,8 +6,7 @@
 #include <map>
 #include <memory>
 #include <list>
-
-class PrototypeStorage;
+#include "settings.hpp"
 
 class ResourceManager
 {
@@ -19,13 +18,16 @@ public:
 		return instance;
 	};
 
-	bool loadResources(const std::string imagesPath, std::shared_ptr<PrototypeStorage> prototypeStorage);
+	void setSettings(std::shared_ptr<Settings> settings_) { settings = settings_; };
+	bool loadTexture(const std::string& textureName, const std::string& texturePath);
+	bool loadAdditionalResources();
 	sf::Texture& getTexture(const std::string& textureName) { return textures.at(textureName); };
 	sf::Sprite& getSprite(const std::string& spriteName) { return sprites.at(spriteName); };
 	sf::Sprite& getRandomTile(const std::string& tileName);
 
 private:
 
+	std::shared_ptr<Settings> settings;
 	std::map <const std::string, sf::Texture> textures;
 	std::map <const std::string, sf::Sprite> sprites;
 	std::map <const std::string, std::list<sf::Sprite>> tiles;

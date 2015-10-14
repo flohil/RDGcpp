@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include "easylogging++.hpp"
+#include "resourceManager.hpp"
 
 std::shared_ptr<Armament> ArmamentTemplate::clone(float externMultiplier)
 {
@@ -61,6 +62,8 @@ bool ArmamentFactory::importConfig(const std::string& path)
 				default:
 					break;
 			}
+
+			ResourceManager::getInstance().loadTexture(name, image);
 
 			std::shared_ptr<ArmamentTemplate> armament(new ArmamentTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus));
 
@@ -139,6 +142,8 @@ bool MonsterFactory::importConfig(const std::string& path)
 					break;
 			}
 
+			ResourceManager::getInstance().loadTexture(name, image);
+
 			std::shared_ptr<MonsterTemplate> monster(new MonsterTemplate(name, image, level, killBonusType, classMultiplier, statsLowMultiplier, statsHighMultiplier, killBonusLow, killBonusHigh, hp, strength, speed, accuracy));
 
 			objects[monster->getName()] = monster;
@@ -212,6 +217,8 @@ bool PotionFactory::importConfig(const std::string& path)
 				default:
 					break;
 			}
+
+			ResourceManager::getInstance().loadTexture(name, image);
 
 			std::shared_ptr<PotionTemplate> potion(new PotionTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, description, target, effect, mode, strength, duration));
 
@@ -292,6 +299,8 @@ bool WeaponFactory::importConfig(const std::string& path)
 					break;
 			}
 
+			ResourceManager::getInstance().loadTexture(name, image);
+
 			std::shared_ptr<WeaponTemplate> weapon(new WeaponTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
 				type, attack, speed, accuracy, defence, slots, max));
 
@@ -361,7 +370,7 @@ bool AttackFactory::importConfig(const std::string& path)
 	return true;
 }
 
-std::shared_ptr<Room> RoomTemplate::clone(RoomTypes::Enum roomType, float externMultiplier)
+std::shared_ptr<Room> RoomTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Room...";
 
@@ -433,11 +442,6 @@ bool RoomFactory::importConfig(const std::string& path)
 	return true;
 }
 
-std::shared_ptr<Room> RoomFactory::create(RoomTypes::Enum roomType)
-{
-	return objects[EnumMapper::mapRoomNames(roomType)]->clone(roomType);
-}
-
 PrototypeStorage::PrototypeStorage(const std::string& templatePath_) : 
 	templatePath(templatePath_)
 {
@@ -472,7 +476,7 @@ void PrototypeStorage::testPrintGameObjects()
 		attackFactory->create(objectName, 1.0f)->debugPrint();
 	}
 	for (std::string objectName : roomFactory->getObjectNames()) {
-		roomFactory->create(EnumMapper::mapRoomTypes(objectName))->debugPrint();
+		roomFactory->create(objectName, 1.0f)->debugPrint();
 	}
 }
 

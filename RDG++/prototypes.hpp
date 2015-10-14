@@ -30,6 +30,7 @@ class PrototypeTemplateFactory
 public:
 
 	PrototypeTemplateFactory::~PrototypeTemplateFactory();
+	std::shared_ptr<T2> create(const std::string& objectName) { return create(objectName, 1.0f); };
 	std::shared_ptr<T2> create(const std::string& objectName, float externMultiplier);
 	std::set<const std::string> getObjectNames();
 	std::shared_ptr<PrototypeTemplate<T2>> getTemplate(const std::string& objectName);
@@ -163,9 +164,8 @@ public:
 	RoomTemplate(const std::string& name_, RoomTypes::Enum roomType_, const std::string& description_, const DoorPositions doorPositions_, MonsterProbabilities monsterProbabilities_, FindProbabilities findProbabilities_, const unsigned int monsterCount_, const unsigned int itemCount_, const float itemMultiplier_) :
 		Room(name_, roomType_, description_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_) {};
 
-	virtual std::shared_ptr<Room> clone(float externMultiplier) { return clone(RoomTypes::JUNCTION, externMultiplier); };
-	std::shared_ptr<Room> clone(RoomTypes::Enum roomType) { return clone(roomType, 1.0f); };
-	std::shared_ptr<Room> clone(RoomTypes::Enum roomType, float externMultiplier);
+	virtual std::shared_ptr<Room> clone(float externMultiplier);
+	std::shared_ptr<Room> clone() { return clone(1.0f); };
 
 private:
 
@@ -249,7 +249,6 @@ class RoomFactory : public PrototypeTemplateFactory<RoomTemplate, Room>
 {
 public:
 
-	std::shared_ptr<Room> create(RoomTypes::Enum roomType);
 	virtual bool importConfig(const std::string& path);
 };
 

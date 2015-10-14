@@ -187,7 +187,7 @@ void Map::loadRooms()
 			//detect room types and load according room
 			RoomTypes::Enum type = detectRoomType(Point{ i, j });
 			
-			rooms[i][j] = game.getPrototypeStorage()->roomFactory->create(type);
+			rooms[i][j] = game.getPrototypeStorage()->roomFactory->create(EnumMapper::mapRoomNames(type));
 		}
 	}
 
@@ -210,9 +210,27 @@ void Map::fillWalls()
 			// load walls and set them to not passable
 			if (wallModX == 0 || wallModY == 0)
 			{
-				//overlay[i][j].reset(new RenderableObject("darkGreyGround", ObjectType::TILE));
+				overlay[i][j].reset(new RenderableObject("darkGreyGround", ObjectType::TILE));
 			}
 		}
+	}
+
+	Maze maze(settings->mazeSize);
+	maze.generate();
+
+	// roomloop
+	for (unsigned int i = 0; i < settings->mazeSize; i++) 
+	{
+		for (unsigned int j = 0; j < settings->mazeSize; j++) 
+		{
+			for (ViewingDirections::Enum dir : maze.getRoom(Point{ i, j })->getOpenDoors()){
+				setDoors(Point{ i, j }, dir);
+			}
+		}
+	}
+
+	for (ViewingDirections::Enum dir : maze.getRoom(Point{ maze.getTreasurePos().x, maze.getTreasurePos().y })->getOpenDoors()){
+		setDoors(Point{ maze.getTreasurePos().x, maze.getTreasurePos().y }, dir);
 	}
 }
 

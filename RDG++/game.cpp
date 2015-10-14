@@ -14,7 +14,7 @@ Game::Game()
 	// obtain desktop vMode for default settings
 	desktopVmode = sf::VideoMode::getDesktopMode();
 
-	// game settings and prototype initialization
+	// game settings initialization
 	settings.reset(new Settings(desktopVmode.width, desktopVmode.height));
 	if (!settings->loadedSuccesfully())
 	{
@@ -22,6 +22,16 @@ Game::Game()
 		return;
 	}
 
+	resourceManager.setSettings(settings);
+
+	// load resources
+	if (!resourceManager.loadAdditionalResources())
+	{
+		successfullyInitialized = false;
+		return;
+	}
+
+	// prototype initalization
 	prototypeStorage.reset(new PrototypeStorage(settings->CONFIG_PATH));
 	if (!prototypeStorage->initializedSuccessfully())
 	{
@@ -40,13 +50,6 @@ Game::Game()
 
 	// create and print all game objects for test purposes
 	// prototypeStorage->testPrintGameObjects();
-
-	// load resources
-	if (!resourceManager.loadResources(settings->IMAGE_PATH, prototypeStorage))
-	{
-		successfullyInitialized = false;
-		return;
-	}
 
 	background.setTexture(resourceManager.getTexture("tileset"));
 	background.setTextureRect(sf::IntRect(1*32,0,32,32));

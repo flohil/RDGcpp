@@ -21,6 +21,11 @@ public:
 
 	MazeRoom(const Point pos_) : pos(pos_) {};
 
+	std::set<ViewingDirections::Enum> getOpenDoors() const;
+	std::set<ViewingDirections::Enum> getClosedDoors() const;
+	std::vector<ViewingDirections::Enum> getOpenDoorsArray() const;
+	std::vector<ViewingDirections::Enum> getClosedDoorsArray() const;
+	bool isDoorOpen(ViewingDirections::Enum dir) const;
 
 private:
 
@@ -31,11 +36,6 @@ private:
 	void _openDoor(ViewingDirections::Enum dir);
 	std::shared_ptr<MazeRoom> closeDoor(ViewingDirections::Enum dir, Maze& maze);
 	void _closeDoor(ViewingDirections::Enum dir);
-	bool isDoorOpen(ViewingDirections::Enum dir) const;
-	std::set<ViewingDirections::Enum> getOpenDoors() const;
-	std::set<ViewingDirections::Enum> getClosedDoors() const;
-	std::vector<ViewingDirections::Enum> getOpenDoorsArray() const;
-	std::vector<ViewingDirections::Enum> getClosedDoorsArray() const;
 	std::shared_ptr<MazeRoom> getAdjacentRoom(ViewingDirections::Enum dir, Maze& maze) const;
 };
 
