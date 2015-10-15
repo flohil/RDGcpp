@@ -215,36 +215,129 @@ void Map::fillWalls()
 		}
 	}
 
-	Maze maze(settings->mazeSize);
-	maze.generate();
+	maze.reset(new Maze(settings->mazeSize));
+	maze->generate();
 
 	// roomloop
 	for (unsigned int i = 0; i < settings->mazeSize; i++) 
 	{
 		for (unsigned int j = 0; j < settings->mazeSize; j++) 
 		{
-			for (ViewingDirections::Enum dir : maze.getRoom(Point{ i, j })->getOpenDoors()){
+			for (ViewingDirections::Enum dir : maze->getRoom(Point{ i, j })->getOpenDoors()){
 				setDoors(Point{ i, j }, dir);
 			}
 		}
 	}
 
-	for (ViewingDirections::Enum dir : maze.getRoom(Point{ maze.getTreasurePos().x, maze.getTreasurePos().y })->getOpenDoors()){
-		setDoors(Point{ maze.getTreasurePos().x, maze.getTreasurePos().y }, dir);
+	for (ViewingDirections::Enum dir : maze->getRoom(Point{ maze->getTreasurePos().x, maze->getTreasurePos().y })->getOpenDoors()){
+		setDoors(Point{ maze->getTreasurePos().x, maze->getTreasurePos().y }, dir);
 	}
 }
 
 void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 {
+	unsigned int doorx1 = 0;
+	unsigned int doorx2 = 0;
+	unsigned int doory1 = 0;
+	unsigned int doory2 = 0;
+	float angle = 0;
 
+	switch (dir) {
+	case ViewingDirections::N:
+		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1);
+		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1);
+		doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2);
+		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2) + 1;
+		angle = 0.0f;
+		break;
+	case ViewingDirections::E:
+		doorx1 = (roomIndizes.x + 1) * (settings->ROOM_WIDTH + 1);
+		doorx2 = (roomIndizes.x + 1) * (settings->ROOM_WIDTH + 1);
+		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
+		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
+		angle = 90.0f;
+		break;
+	case ViewingDirections::S:
+		doory1 = (roomIndizes.y + 1) * (settings->ROOM_HEIGHT + 1);
+		doory2 = (roomIndizes.y + 1) * (settings->ROOM_HEIGHT + 1);
+		doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2);
+		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2) + 1;
+		angle = 180.0f;
+		break;
+	case ViewingDirections::W:
+		doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1);
+		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1);
+		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
+		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
+		angle = 270.0f;
+		break;
+	}
+
+	// treasure chamber
+	if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y) {
+		background[doorx1][doory1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle));
+		overlay[doorx1][doory1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle));
+		background[doorx2][doory2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
+		overlay[doorx2][doory2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
+	}
+	// normal door
+	else {
+		background[doorx1][doory1].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
+		overlay[doorx1][doory1] = nullptr;
+		background[doorx2][doory2].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
+		overlay[doorx2][doory2] = nullptr;
+	}
 }
 
 void Map::placeKey()
 {
+	// random rooms
+	unsigned int randRoomX = (rand() % (unsigned int)settings->mazeSize);
+	unsigned int randRoomY = 0;
 
+	do
+	{
+		randRoomY = (rand() % (unsigned int)settings->mazeSize);
+	} while (randRoomX == randRoomY);
+
+	// random tiles in room
+	unsigned int randTileX = (rand() % (unsigned int)settings->ROOM_WIDTH);
+	unsigned int randTileY = 0;
+
+	do
+	{
+		randRoomY = (rand() % (unsigned int)settings->ROOM_HEIGHT);
+	} while (randRoomX == randRoomY);
+
+	rooms[randRoomX][randRoomY]->getOverlay()[randTileX][randTileY].reset(new RenderableObject("key", ObjectType::KEY));
 }
 
-void increaseBalance(std::string balanceMap, std::string name, ItemType itemType)
+// Increase the balance counter for added monster
+void Map::increaseMonsterBalance(std::string name)
 {
+	typedef std::map<DifficultyLevel::Enum, std::map<std::string, unsigned int>> itType;
 
+	for (itType::iterator it = monsterBalance.begin(); it != monsterBalance.end(); ++it)
+	{
+		if (it->second.find(name) != it->second.end())
+		{
+			it->second[name]++;
+			return;
+		}
+	}
+}
+
+// Increase the balance counter for an added item
+void Map::increaseItemBalance(std::string name)
+{
+	typedef std::map<Classes::Enum, std::map<std::string, ItemBalance>> itType;
+
+	for (itType::iterator it = itemsBalance.begin(); it != itemsBalance.end(); ++it)
+	{
+		if (it->second.find(name) != it->second.end())
+		{
+			it->second[name].balanceCount++;
+			return;
+		}
+	}
 }

@@ -31,6 +31,7 @@ public:
 private:
 
 	Game& game;
+	std::unique_ptr<Maze> maze;
 	std::shared_ptr<Settings> settings;
 
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> background;
@@ -68,7 +69,8 @@ private:
 	void fillWalls();
 	void setDoors(Point roomIndizes, ViewingDirections::Enum dir);
 	void placeKey();
-	void increaseBalance(std::string balanceMap, std::string name, ItemType itemType);
+	void increaseMonsterBalance(std::string name);
+	void increaseItemBalance(std::string name);
 };
 
 #endif /* MAP */

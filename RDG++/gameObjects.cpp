@@ -15,6 +15,11 @@ void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)
 	window.draw(sprite);
 }
 
+void RenderableObject::setRotation(const float angle)
+{
+	sprite.setRotation(angle);
+}
+
 Item::~Item() {
 
 }

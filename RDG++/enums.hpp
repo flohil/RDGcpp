@@ -5,7 +5,7 @@
 
 struct ObjectType
 {
-	enum Enum { ITEM, CREATURE, ATTACK, ROOM, TILE, WALL };
+	enum Enum { ITEM, CREATURE, ATTACK, ROOM, TILE, WALL, KEY };
 };
 
 struct ItemType

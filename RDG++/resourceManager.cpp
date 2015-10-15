@@ -40,19 +40,6 @@ bool ResourceManager::loadAdditionalResources()
 {
 	std::map<std::string, std::string> textureNames;
 
-	/*for (std::string objectName : prototypeStorage->armamentFactory->getObjectNames()) {
-		textureNames.insert(std::pair<std::string, std::string>(objectName, std::static_pointer_cast<ArmamentTemplate>(prototypeStorage->armamentFactory->getTemplate(objectName))->getTextureName()));
-	}
-	for (std::string objectName : prototypeStorage->monsterFactory->getObjectNames()) {
-		textureNames.insert(std::pair<std::string, std::string>(objectName, std::static_pointer_cast<MonsterTemplate>(prototypeStorage->monsterFactory->getTemplate(objectName))->getTextureName()));
-	}
-	for (std::string objectName : prototypeStorage->potionFactory->getObjectNames()) {
-		textureNames.insert(std::pair<std::string, std::string>(objectName, std::static_pointer_cast<PotionTemplate>(prototypeStorage->potionFactory->getTemplate(objectName))->getTextureName()));
-	}
-	for (std::string objectName : prototypeStorage->weaponFactory->getObjectNames()) {
-		textureNames.insert(std::pair<std::string, std::string>(objectName, std::static_pointer_cast<WeaponTemplate>(prototypeStorage->weaponFactory->getTemplate(objectName))->getTextureName()));
-	}*/
-
 	textureNames.insert(std::pair<std::string, std::string>("PlayerBig", "soldier_64x64.png"));
 	textureNames.insert(std::pair<std::string, std::string>("PlayerSmall", "soldier_32x32.png"));
 	textureNames.insert(std::pair<std::string, std::string>("Armor_Background", "warrior_160x160.png"));
@@ -90,7 +77,7 @@ void ResourceManager::loadTiles()
 	greyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(2 * ts, 1 * ts, ts, ts)));
 	greyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(2 * ts, 2 * ts, ts, ts)));
 	greyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(2 * ts, 3 * ts, ts, ts)));
-	tiles.insert(spritePair("greyGrounds", greyGrounds));
+	tiles.insert(spritePair("greyGround", greyGrounds));
 
 	std::list<sf::Sprite> darkGreyGrounds;
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(3 * ts, 3 * ts, ts, ts)));
@@ -101,7 +88,7 @@ void ResourceManager::loadTiles()
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(4 * ts, 4 * ts, ts, ts)));
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(4 * ts, 5 * ts, ts, ts)));
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(4 * ts, 6 * ts, ts, ts)));
-	tiles.insert(spritePair("darkGreyGrounds", darkGreyGrounds));
+	tiles.insert(spritePair("darkGreyGround", darkGreyGrounds));
 
 	std::list<sf::Sprite> yellowOneGrounds;
 	yellowOneGrounds.push_back(sf::Sprite(tileset, sf::IntRect(3 * ts, 0, ts, ts)));
@@ -113,7 +100,7 @@ void ResourceManager::loadTiles()
 	yellowOneGrounds.push_back(sf::Sprite(tileset, sf::IntRect(5 * ts, 0, ts, ts)));
 	yellowOneGrounds.push_back(sf::Sprite(tileset, sf::IntRect(5 * ts, 1 * ts, ts, ts)));
 	yellowOneGrounds.push_back(sf::Sprite(tileset, sf::IntRect(5 * ts, 2 * ts, ts, ts)));
-	tiles.insert(spritePair("yellowOneGrounds", yellowOneGrounds));
+	tiles.insert(spritePair("yellowOneGround", yellowOneGrounds));
 
 	std::list<sf::Sprite> yellowTwoGrounds;
 	yellowTwoGrounds.push_back(sf::Sprite(tileset, sf::IntRect(6 * ts, 0, ts, ts)));
@@ -125,7 +112,7 @@ void ResourceManager::loadTiles()
 	yellowTwoGrounds.push_back(sf::Sprite(tileset, sf::IntRect(8 * ts, 0, ts, ts)));
 	yellowTwoGrounds.push_back(sf::Sprite(tileset, sf::IntRect(8 * ts, 1 * ts, ts, ts)));
 	yellowTwoGrounds.push_back(sf::Sprite(tileset, sf::IntRect(8 * ts, 2 * ts, ts, ts)));
-	tiles.insert(spritePair("yellowTwoGrounds", yellowTwoGrounds));
+	tiles.insert(spritePair("yellowTwoGround", yellowTwoGrounds));
 
 	std::list<sf::Sprite> greenGrounds;
 	greenGrounds.push_back(sf::Sprite(tileset, sf::IntRect(5 * ts, 4 * ts, ts, ts)));
@@ -137,7 +124,7 @@ void ResourceManager::loadTiles()
 	greenGrounds.push_back(sf::Sprite(tileset, sf::IntRect(7 * ts, 4 * ts, ts, ts)));
 	greenGrounds.push_back(sf::Sprite(tileset, sf::IntRect(7 * ts, 5 * ts, ts, ts)));
 	greenGrounds.push_back(sf::Sprite(tileset, sf::IntRect(7 * ts, 6 * ts, ts, ts)));
-	tiles.insert(spritePair("greenGrounds", greenGrounds));
+	tiles.insert(spritePair("greenGround", greenGrounds));
 
 	std::list<sf::Sprite> brownGrounds;
 	brownGrounds.push_back(sf::Sprite(tileset, sf::IntRect(0, 4 * ts, ts, ts)));
@@ -149,7 +136,7 @@ void ResourceManager::loadTiles()
 	brownGrounds.push_back(sf::Sprite(tileset, sf::IntRect(0, 4 * ts, ts, ts)));
 	brownGrounds.push_back(sf::Sprite(tileset, sf::IntRect(1 * ts, 5 * ts, ts, ts)));
 	brownGrounds.push_back(sf::Sprite(tileset, sf::IntRect(2 * ts, 6 * ts, ts, ts)));
-	tiles.insert(spritePair("brownGrounds", brownGrounds));
+	tiles.insert(spritePair("brownGround", brownGrounds));
 
 	std::list<sf::Sprite> doorGroundOne;
 	doorGroundOne.push_back(sf::Sprite(tileset, sf::IntRect(5 * ts, 3 * ts, ts, ts)));

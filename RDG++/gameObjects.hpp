@@ -28,10 +28,12 @@ class RenderableObject : public GameObject
 {
 public:
 
-	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_) : GameObject(name_, objectType_) { obtainSprite(); }; // to be replaced with texture pointer
+	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_) : GameObject(name_, objectType_), visible(true) { obtainSprite(); }; // to be replaced with texture pointer
+	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_, float angle_) : GameObject(name_, objectType_), visible(true) { obtainSprite(); setRotation(angle_); }; // to be replaced with texture pointer
 
 	bool isVisible() const { return visible; };
-	void setVisible(bool visible_) { visible = visible_; };
+	void setVisible(const bool visible_) { visible = visible_; };
+	void setRotation(const float angle);
 
 protected:
 
