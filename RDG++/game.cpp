@@ -6,6 +6,7 @@
 #include "game.hpp"
 #include "gameState.hpp"
 #include "easylogging++.hpp"
+#include "map.hpp"
 
 Game::Game()
 {
@@ -92,9 +93,8 @@ GameState* Game::peekState()
 
 void Game::gameLoop()
 {
-	maze.reset(new Maze(settings->mazeSize));
-	maze->generate();
-	maze->print();
+	Map map(*this);
+	map.init();
 
 	sf::Clock clock;
 

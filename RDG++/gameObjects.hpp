@@ -28,8 +28,8 @@ class RenderableObject : public GameObject
 {
 public:
 
-	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_) : GameObject(name_, objectType_), visible(true) { obtainSprite(); }; // to be replaced with texture pointer
-	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_, float angle_) : GameObject(name_, objectType_), visible(true) { obtainSprite(); setRotation(angle_); }; // to be replaced with texture pointer
+	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_) : GameObject(name_, objectType_), visible(true) { obtainSprite(objectType_); }; // to be replaced with texture pointer
+	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_, float angle_) : GameObject(name_, objectType_), visible(true) { obtainSprite(objectType_); setRotation(angle_); }; // to be replaced with texture pointer
 
 	bool isVisible() const { return visible; };
 	void setVisible(const bool visible_) { visible = visible_; };
@@ -41,7 +41,7 @@ protected:
 
 private:
 
-	bool obtainSprite();
+	bool obtainSprite(ObjectType::Enum objectType);
 
 	//virtual void draw(sf::RenderTarget& target_, sf::RenderStates states_) const
 	//{
@@ -205,20 +205,19 @@ class Room : public GameObject, public DebugPrintObject
 {
 public:
 
-	Room(const std::string& name_, const RoomTypes::Enum roomType_, const std::string& description_) :
-		GameObject(name_, ObjectType::ROOM), description(description_), roomType(roomType_) {};
+	Room(const std::string& name_, const std::string& description_) :
+		GameObject(name_, ObjectType::ROOM), description(description_) {};
+
+	std::vector<std::vector<std::shared_ptr<RenderableObject>>> background;
+	std::vector<std::vector<std::shared_ptr<RenderableObject>>> overlay;
 
 	std::string getDescription() const { return description; };
-	std::vector<std::vector<std::shared_ptr<RenderableObject>>> getBackround() const { return background; };
-	std::vector<std::vector<std::shared_ptr<RenderableObject>>> getOverlay() const { return overlay; };
+	void initialize();
 	virtual void debugPrint() const;
 
 protected:
 
-	const RoomTypes::Enum roomType;
 	const std::string description;
-	std::vector<std::vector<std::shared_ptr<RenderableObject>>> background;
-	std::vector<std::vector<std::shared_ptr<RenderableObject>>> overlay;
 };
 
 #endif // GAME_OBJECTS_INCLUDE

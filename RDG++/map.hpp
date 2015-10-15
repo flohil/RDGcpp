@@ -71,6 +71,9 @@ private:
 	void placeKey();
 	void increaseMonsterBalance(std::string name);
 	void increaseItemBalance(std::string name);
+	void fillGround(std::shared_ptr<Room> room, RoomTypes::Enum type);
+	void addMonster(std::shared_ptr<Room> room, RoomTypes::Enum type);
+	void addItems(std::shared_ptr<Room> room, RoomTypes::Enum type);
 };
 
 #endif /* MAP */

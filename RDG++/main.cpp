@@ -3,15 +3,8 @@
 #include <crtdbg.h>
 
 #include <SFML/Graphics.hpp>
-#include "settings.hpp"
-#include "prototypes.hpp"
-#include "enums.hpp"
-#include "gameObjects.hpp"
-#include "debugPrint.hpp"
-#include "resourceManager.hpp"
 #include <iostream>
 #include <fstream>
-#include <memory>
 #include "easylogging++.hpp"
 #include "game.hpp"
 #include "gameStateMainMenu.hpp"

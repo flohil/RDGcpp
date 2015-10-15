@@ -374,7 +374,7 @@ std::shared_ptr<Room> RoomTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Room...";
 
-	return std::shared_ptr<Room>(new Room(name, roomType, description));
+	return std::shared_ptr<Room>(new Room(name, description));
 }
 
 bool RoomFactory::importConfig(const std::string& path)
@@ -430,7 +430,7 @@ bool RoomFactory::importConfig(const std::string& path)
 			const float itemMultiplier = roomNode.child("Item_Multiplier").text().as_float();
 			const unsigned int itemCount = roomNode.child("Item_Count").text().as_uint();
 
-			std::shared_ptr<RoomTemplate> room(new RoomTemplate(name, EnumMapper::mapRoomTypes(name), description, doorPositions, monsterProbabilities, findProbabilities, monsterCount, itemCount, itemMultiplier));
+			std::shared_ptr<RoomTemplate> room(new RoomTemplate(name, description, doorPositions, monsterProbabilities, findProbabilities, monsterCount, itemCount, itemMultiplier));
 
 			objects[room->getName()] = room;
 		}
@@ -515,6 +515,60 @@ bool PrototypeStorage::initializeTemplates(const std::string& templatePath)
 	{
 		return false;
 	}
+
+	typedef std::pair<std::string, ItemType::Enum> itemPair;
+	std::list<itemPair> weaklist;
+	std::list<itemPair> mediumlist;
+	std::list<itemPair> stronglist;
+
+	// obtain all items classified
+	std::map<Classes::Enum, std::list<std::string>> armamentsClassified = getArmamentsClassified();
+	for (std::string itemName : armamentsClassified.at(Classes::WEAK))
+	{
+		weaklist.push_back(itemPair(itemName, ItemType::ARMAMENT));
+	}
+	for (std::string itemName : armamentsClassified.at(Classes::MEDIUM))
+	{
+		mediumlist.push_back(itemPair(itemName, ItemType::ARMAMENT));
+	}
+	for (std::string itemName : armamentsClassified.at(Classes::STRONG))
+	{
+		stronglist.push_back(itemPair(itemName, ItemType::ARMAMENT));
+	}
+
+	std::map<Classes::Enum, std::list<std::string>> potionsClassified = getPotionsClassified();
+	for (std::string itemName : potionsClassified.at(Classes::WEAK))
+	{
+		weaklist.push_back(itemPair(itemName, ItemType::POTION));
+	}
+	for (std::string itemName : potionsClassified.at(Classes::MEDIUM))
+	{
+		mediumlist.push_back(itemPair(itemName, ItemType::POTION));
+	}
+	for (std::string itemName : potionsClassified.at(Classes::STRONG))
+	{
+		stronglist.push_back(itemPair(itemName, ItemType::POTION));
+	}
+
+	std::map<Classes::Enum, std::list<std::string>> weaponsClassified = getWeaponsClassified();
+	for (std::string itemName : weaponsClassified.at(Classes::WEAK))
+	{
+		weaklist.push_back(itemPair(itemName, ItemType::WEAPON));
+	}
+	for (std::string itemName : weaponsClassified.at(Classes::MEDIUM))
+	{
+		mediumlist.push_back(itemPair(itemName, ItemType::WEAPON));
+	}
+	for (std::string itemName : weaponsClassified.at(Classes::STRONG))
+	{
+		stronglist.push_back(itemPair(itemName, ItemType::WEAPON));
+	}
+
+	typedef std::pair<Classes::Enum, std::list<std::pair<std::string, ItemType::Enum>>> itemClassListPair;
+
+	itemsClassList.insert(itemClassListPair(Classes::WEAK, weaklist));
+	itemsClassList.insert(itemClassListPair(Classes::MEDIUM, mediumlist));
+	itemsClassList.insert(itemClassListPair(Classes::STRONG, stronglist));
 
 	LOG(INFO) << "All templates initialized succesfully";
 

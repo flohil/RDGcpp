@@ -100,6 +100,8 @@ void Maze::generate()
 		room->openDoor(ViewingDirections::E, *this);
 		room->openDoor(ViewingDirections::W, *this);
 	}
+
+	LOG(INFO) << "successfully generated maze with size " << size.x;
 }
 
 void Maze::print() const

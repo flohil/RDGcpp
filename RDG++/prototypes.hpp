@@ -161,8 +161,8 @@ public:
 		float hard;
 	};
 
-	RoomTemplate(const std::string& name_, RoomTypes::Enum roomType_, const std::string& description_, const DoorPositions doorPositions_, MonsterProbabilities monsterProbabilities_, FindProbabilities findProbabilities_, const unsigned int monsterCount_, const unsigned int itemCount_, const float itemMultiplier_) :
-		Room(name_, roomType_, description_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_) {};
+	RoomTemplate(const std::string& name_, const std::string& description_, const DoorPositions doorPositions_, MonsterProbabilities monsterProbabilities_, FindProbabilities findProbabilities_, const unsigned int monsterCount_, const unsigned int itemCount_, const float itemMultiplier_) :
+		Room(name_, description_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_) {};
 
 	virtual std::shared_ptr<Room> clone(float externMultiplier);
 	std::shared_ptr<Room> clone() { return clone(1.0f); };

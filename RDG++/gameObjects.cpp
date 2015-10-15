@@ -4,9 +4,16 @@
 #include <iostream>
 #include <map>
 
-bool RenderableObject::obtainSprite() {
+bool RenderableObject::obtainSprite(ObjectType::Enum objectType) {
 
-	sprite = ResourceManager::getInstance().getSprite(name);
+	if (objectType == ObjectType::TILE)
+	{
+		sprite = ResourceManager::getInstance().getRandomTile(name);
+	}
+	else
+	{
+		sprite = ResourceManager::getInstance().getSprite(name);
+	}
 	return false;
 }
 
