@@ -78,7 +78,7 @@ void Map::init()
 
 	fillWalls();
 	loadRooms();
-	//fillWithRooms();
+	fillWithRooms();
 
 	LOG(INFO) << "successfully initialized map";
 }
@@ -205,23 +205,11 @@ void Map::loadRooms()
 			
 			std::shared_ptr<Room> room(game.getPrototypeStorage()->roomFactory->create(EnumMapper::mapRoomNames(type)));
 
-			// null-initialize overlay and background
-			for (unsigned int y = 0; y < settings->ROOM_WIDTH; y++)
-			{
-				std::vector<std::shared_ptr<RenderableObject>> overlayRow;
-				std::vector<std::shared_ptr<RenderableObject>> backgroundRow;
-				for (unsigned int x = 0; x < settings->ROOM_HEIGHT; x++)
-				{
-					overlayRow.push_back(nullptr);
-					backgroundRow.push_back(nullptr);
-				}
-				room->overlay.push_back(overlayRow);
-				room->background.push_back(backgroundRow);
-			}
+			room->initialize(settings->ROOM_WIDTH, settings->ROOM_HEIGHT);
 
-			/*fillGround(room, type);
+			fillGround(room, type);
 			addMonster(room, type);
-			addItems(room, type);*/
+			addItems(room, type);
 
 			rooms[i][j] = room;
 		}
@@ -261,7 +249,29 @@ void Map::fillGround(std::shared_ptr<Room> room, RoomTypes::Enum type)
 
 void Map::addMonster(std::shared_ptr<Room> room, RoomTypes::Enum type)
 {
+	//Map<Levels, Float> monsterProbabilities = tempTemplate.getMonster();
+	//int monsterCount = tempTemplate.getMonsterCount();
 
+	///* place monsters on random, free fields in the room */
+	//for (int i = 0; i < monsterCount; i++) {
+
+	//	/* first find a free field, return null if no free field is found after 15 rounds */
+	//	Point randPoint = Chances.randomFreeField(overlay);
+
+	//	if (randPoint != null) { //no free field was found 
+
+	//		/* get a random Monster, according to the monster levels allowed in this Room's definition*/
+	//		String monsterName = Chances.randomMonster(monsterProbabilities, monsterBalance, balanceOffsets);
+
+	//		if (monsterName != null) { //no monster shall be placed
+	//			overlay[randPoint.x][randPoint.y] = MonsterFactory.createMonster(monsterName);
+	//			map.increaseBalance("monsterBalance", monsterName, null);
+	//		}
+	//	}
+	//	else {
+	//		break;
+	//	}
+	//}
 }
 
 void Map::addItems(std::shared_ptr<Room> room, RoomTypes::Enum type)
@@ -410,21 +420,7 @@ void Map::placeKey()
 		randRoomY = (rand() % (unsigned int)settings->ROOM_HEIGHT);
 	} while (randRoomX == randRoomY);
 
-	std::cout << "placing key at room( " << randRoomX << ", " << randRoomY << ") at tile (" << randTileX << ", " << randTileY << ")" << std::endl;
-
-	std::cout << "rooms size: " << rooms.size() << " x " << rooms[0].size() << std::endl;
-	std::cout << "room background size: " << rooms[randRoomX][randRoomY]->background.size() << " x " << rooms[randRoomX][randRoomY]->background[0].size() << std::endl;
-	std::cout << "room overlay size: " << rooms[randRoomX][randRoomY]->overlay.size() << " x " << rooms[randRoomX][randRoomY]->overlay[0].size() << std::endl;
-
-	std::shared_ptr<Room> test = rooms[randRoomX][randRoomY];
-	std::shared_ptr<RenderableObject> bla = test->overlay[randTileX][randTileY];
-
-	if (bla == nullptr)
-	{
-		std::cout << "yes its a nullptr" << std::endl;
-	}
-
-	//rooms[randRoomX][randRoomY]->overlay[randTileX][randTileY].reset(new RenderableObject("key", ObjectType::KEY));
+	rooms[randRoomX][randRoomY]->overlay[randTileX][randTileY].reset(new RenderableObject("key", ObjectType::KEY));
 }
 
 // Increase the balance counter for added monster

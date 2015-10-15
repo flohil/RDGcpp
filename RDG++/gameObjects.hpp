@@ -212,7 +212,7 @@ public:
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> overlay;
 
 	std::string getDescription() const { return description; };
-	void initialize();
+	void initialize(unsigned int width, unsigned int height);
 	virtual void debugPrint() const;
 
 protected:

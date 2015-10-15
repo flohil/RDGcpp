@@ -40,13 +40,13 @@ bool ResourceManager::loadAdditionalResources()
 {
 	std::map<std::string, std::string> textureNames;
 
-	textureNames.insert(std::pair<std::string, std::string>("PlayerBig", "soldier_64x64.png"));
-	textureNames.insert(std::pair<std::string, std::string>("PlayerSmall", "soldier_32x32.png"));
-	textureNames.insert(std::pair<std::string, std::string>("Armor_Background", "warrior_160x160.png"));
-	textureNames.insert(std::pair<std::string, std::string>("Accuracy_Stats", "accuracy_stats.png"));
-	textureNames.insert(std::pair<std::string, std::string>("Strength_Stats", "strength_stats.png"));
-	textureNames.insert(std::pair<std::string, std::string>("Speed_Stats", "speed_stats.png"));
-	textureNames.insert(std::pair<std::string, std::string>("Key", "key.png"));
+	textureNames.insert(std::pair<std::string, std::string>("playerBig", "soldier_64x64.png"));
+	textureNames.insert(std::pair<std::string, std::string>("playerSmall", "soldier_32x32.png"));
+	textureNames.insert(std::pair<std::string, std::string>("armorBackground", "warrior_160x160.png"));
+	textureNames.insert(std::pair<std::string, std::string>("accuracyStats", "accuracy_stats.png"));
+	textureNames.insert(std::pair<std::string, std::string>("strengthStats", "strength_stats.png"));
+	textureNames.insert(std::pair<std::string, std::string>("speedStats", "speed_stats.png"));
+	textureNames.insert(std::pair<std::string, std::string>("key", "key.png"));
 	textureNames.insert(std::pair<std::string, std::string>("tileset", "rooms/tileset.png"));
 
 	// load single textures

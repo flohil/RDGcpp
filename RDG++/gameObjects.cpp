@@ -106,3 +106,20 @@ void Room::debugPrint() const
 	std::cout << "description = " << description << std::endl;
 	std::cout << std::endl;
 }
+
+void Room::initialize(unsigned int width, unsigned int height)
+{
+	// null-initialize overlay and background
+	for (unsigned int y = 0; y < width; y++)
+	{
+		std::vector<std::shared_ptr<RenderableObject>> overlayRow;
+		std::vector<std::shared_ptr<RenderableObject>> backgroundRow;
+		for (unsigned int x = 0; x < height; x++)
+		{
+			overlayRow.push_back(nullptr);
+			backgroundRow.push_back(nullptr);
+		}
+		overlay.push_back(overlayRow);
+		background.push_back(backgroundRow);
+	}
+}
