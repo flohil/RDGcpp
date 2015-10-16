@@ -151,5 +151,5 @@ void ResourceManager::loadTiles()
 
 sf::Sprite& ResourceManager::getRandomTile(const std::string& tileName)
 {
-	return *select_randomly(tiles[tileName].begin(), tiles[tileName].end());
+	return *selectRandomly(tiles[tileName].begin(), tiles[tileName].end());
 }

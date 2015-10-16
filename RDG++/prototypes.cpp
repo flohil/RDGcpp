@@ -418,7 +418,7 @@ bool RoomFactory::importConfig(const std::string& path)
 				monsterNode.child("hard").text().as_float()
 			};
 
-			const RoomTemplate::FindProbabilities findProbabilities =
+			const RoomTemplate::ItemProbabilities findProbabilities =
 			{
 				findNode.child("none").text().as_float(),
 				findNode.child("weak").text().as_float(),

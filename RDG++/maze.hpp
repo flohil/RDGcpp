@@ -6,11 +6,6 @@
 #include <vector>
 #include <memory>
 
-struct Point {
-	unsigned int x;
-	unsigned int y;
-};
-
 class MazeRoom
 {
 public:

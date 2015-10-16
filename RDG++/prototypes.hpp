@@ -153,25 +153,31 @@ public:
 		float hard;
 	};
 
-	struct FindProbabilities
+	struct ItemProbabilities
 	{
-		float no;
-		float easy;
-		float normal;
-		float hard;
+		float none;
+		float weak;
+		float medium;
+		float strong;
 	};
 
-	RoomTemplate(const std::string& name_, const std::string& description_, const DoorPositions doorPositions_, MonsterProbabilities monsterProbabilities_, FindProbabilities findProbabilities_, const unsigned int monsterCount_, const unsigned int itemCount_, const float itemMultiplier_) :
-		Room(name_, description_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), findProbabilities(findProbabilities_), monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_) {};
+	RoomTemplate(const std::string& name_, const std::string& description_, const DoorPositions doorPositions_, MonsterProbabilities monsterProbabilities_, ItemProbabilities itemProbabilities_, const unsigned int monsterCount_, const unsigned int itemCount_, const float itemMultiplier_) :
+		Room(name_, description_), doorPositions(doorPositions_), monsterProbabilities(monsterProbabilities_), itemProbabilities(itemProbabilities_), monsterCount(monsterCount_), itemCount(itemCount_), itemMultiplier(itemMultiplier_) {};
 
 	virtual std::shared_ptr<Room> clone(float externMultiplier);
 	std::shared_ptr<Room> clone() { return clone(1.0f); };
+	unsigned int getMonsterCount() const { return monsterCount; };
+	unsigned int getitemCount() const { return itemCount; };
+	float getItemMultiplier() const { return itemMultiplier; };
+	DoorPositions getDoorPositions() const { return doorPositions; };
+	MonsterProbabilities getMonsterProbabilities() const { return monsterProbabilities; };
+	ItemProbabilities getItemProbabilities() const { return itemProbabilities; };
 
 private:
 
 	const DoorPositions doorPositions;
 	const MonsterProbabilities monsterProbabilities;
-	const FindProbabilities findProbabilities;
+	const ItemProbabilities itemProbabilities;
 	const unsigned int monsterCount, itemCount;
 	const float itemMultiplier;
 };

@@ -249,29 +249,28 @@ void Map::fillGround(std::shared_ptr<Room> room, RoomTypes::Enum type)
 
 void Map::addMonster(std::shared_ptr<Room> room, RoomTypes::Enum type)
 {
-	//Map<Levels, Float> monsterProbabilities = tempTemplate.getMonster();
-	//int monsterCount = tempTemplate.getMonsterCount();
+	std::shared_ptr<RoomTemplate> roomTemplate = std::dynamic_pointer_cast<RoomTemplate>(game.getPrototypeStorage()->roomFactory->getTemplate(EnumMapper::mapRoomNames(type)));
+	
+	// place monsters on random, free fields in the room
+	for (unsigned int i = 0; i < roomTemplate->getMonsterCount(); i++) {
 
-	///* place monsters on random, free fields in the room */
-	//for (int i = 0; i < monsterCount; i++) {
+		// first find a free field, return null if no free field is found after 15 rounds
+		//Point randPoint = Chances.randomFreeField(overlay);
 
-	//	/* first find a free field, return null if no free field is found after 15 rounds */
-	//	Point randPoint = Chances.randomFreeField(overlay);
+		//if (randPoint != null) { //no free field was found 
 
-	//	if (randPoint != null) { //no free field was found 
+		//	/* get a random Monster, according to the monster levels allowed in this Room's definition*/
+		//	String monsterName = Chances.randomMonster(monsterProbabilities, monsterBalance, balanceOffsets);
 
-	//		/* get a random Monster, according to the monster levels allowed in this Room's definition*/
-	//		String monsterName = Chances.randomMonster(monsterProbabilities, monsterBalance, balanceOffsets);
-
-	//		if (monsterName != null) { //no monster shall be placed
-	//			overlay[randPoint.x][randPoint.y] = MonsterFactory.createMonster(monsterName);
-	//			map.increaseBalance("monsterBalance", monsterName, null);
-	//		}
-	//	}
-	//	else {
-	//		break;
-	//	}
-	//}
+		//	if (monsterName != null) { //no monster shall be placed
+		//		overlay[randPoint.x][randPoint.y] = MonsterFactory.createMonster(monsterName);
+		//		map.increaseBalance("monsterBalance", monsterName, null);
+		//	}
+		//}
+		//else {
+		//	break;
+		//}
+	}
 }
 
 void Map::addItems(std::shared_ptr<Room> room, RoomTypes::Enum type)

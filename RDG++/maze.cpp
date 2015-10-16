@@ -233,7 +233,7 @@ bool Maze::openRandomDoor(std::set<std::shared_ptr<MazeRoom>> &notFinished, std:
 	}
 
 	// get a random room
-	std::shared_ptr<MazeRoom> room(*select_randomly(rooms.begin(), rooms.end()));
+	std::shared_ptr<MazeRoom> room(*selectRandomly(rooms.begin(), rooms.end()));
 
 	// get all closed doors of that random room and if there are none remove the room from the not finished set and return false
 	std::vector<ViewingDirections::Enum> closedDoors = room->getClosedDoorsArray();
@@ -245,7 +245,7 @@ bool Maze::openRandomDoor(std::set<std::shared_ptr<MazeRoom>> &notFinished, std:
 	}
 
 	// get a random direction
-	ViewingDirections::Enum dir = *select_randomly(closedDoors.begin(), closedDoors.end());
+	ViewingDirections::Enum dir = *selectRandomly(closedDoors.begin(), closedDoors.end());
 
 	// open the door on that random direction
 	std::shared_ptr<MazeRoom> connectedRoom = room->openDoor(dir, *this);

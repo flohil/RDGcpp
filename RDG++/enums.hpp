@@ -5,17 +5,17 @@
 
 struct ObjectType
 {
-	enum Enum { ITEM, CREATURE, ATTACK, ROOM, TILE, WALL, KEY };
+	enum Enum { ITEM, CREATURE, ATTACK, ROOM, TILE, WALL, KEY, UNKNWON };
 };
 
 struct ItemType
 {
-	enum Enum { WEAPON, ARMAMENT, POTION };
+	enum Enum { WEAPON, ARMAMENT, POTION, UNKNOWN };
 };
 
 struct ViewingDirections
 {
-	enum Enum { N, E, S, W };
+	enum Enum { N, E, S, W, UNKNOWN };
 };
 
 struct DifficultyLevel
@@ -56,6 +56,24 @@ struct WeaponType
 struct Attacks
 {
 	enum Enum { TORSO, HEAD, ARMS, LEGS, PARRY, SET, POTION, UNKNOWN };
+};
+
+
+struct Point {
+	unsigned int x;
+	unsigned int y;
+};
+
+struct ItemBalance
+{
+	ItemType::Enum itemType;
+	unsigned int balanceCount;
+};
+
+struct ItemTypeName
+{
+	std::string itemName;
+	ItemType::Enum itemType;
 };
 
 // maps strings to enums

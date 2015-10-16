@@ -6,12 +6,6 @@
 #include "gameObjects.hpp"
 #include "game.hpp"
 
-struct ItemBalance
-{
-	ItemType::Enum itemType;
-	unsigned int balanceCount;
-};
-
 class Map
 {
 public:
