@@ -167,7 +167,7 @@ public:
 	virtual std::shared_ptr<Room> clone(float externMultiplier);
 	std::shared_ptr<Room> clone() { return clone(1.0f); };
 	unsigned int getMonsterCount() const { return monsterCount; };
-	unsigned int getitemCount() const { return itemCount; };
+	unsigned int getItemCount() const { return itemCount; };
 	float getItemMultiplier() const { return itemMultiplier; };
 	DoorPositions getDoorPositions() const { return doorPositions; };
 	MonsterProbabilities getMonsterProbabilities() const { return monsterProbabilities; };

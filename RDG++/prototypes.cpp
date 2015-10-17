@@ -1,7 +1,7 @@
 #include "prototypes.hpp"
 #include "pugixml.hpp"
 #include "settings.hpp"
-#include "calculation.hpp"
+#include "chances.hpp"
 #include <iostream>
 #include <memory>
 #include "easylogging++.hpp"
@@ -9,8 +9,8 @@
 
 std::shared_ptr<Armament> ArmamentTemplate::clone(float externMultiplier)
 {
-	return std::shared_ptr<Armament>(new Armament(name, itemClass, type, armor * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus));
+	return std::shared_ptr<Armament>(new Armament(name, itemClass, type, armor * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		speed * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus));
 }
 
 bool ArmamentFactory::importConfig(const std::string& path)
@@ -85,9 +85,9 @@ std::shared_ptr<Monster> MonsterTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Monster...";
 
-	return std::shared_ptr<Monster>(new Monster(name, level, killBonusType, classMultiplier * Calculation::randomFloat(killBonusLow, killBonusHigh),
-		hp * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), strength * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		speed * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), accuracy * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier)));
+	return std::shared_ptr<Monster>(new Monster(name, level, killBonusType, classMultiplier * Chances::randomFloat(killBonusLow, killBonusHigh),
+		hp * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), strength * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		speed * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), accuracy * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier)));
 }
 
 bool MonsterFactory::importConfig(const std::string& path)
@@ -164,7 +164,7 @@ std::shared_ptr<Potion> PotionTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Potion...";
 
-	return std::shared_ptr<Potion>(new Potion(name, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), duration));
+	return std::shared_ptr<Potion>(new Potion(name, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), duration));
 }
 
 bool PotionFactory::importConfig(const std::string& path)
@@ -240,10 +240,10 @@ std::shared_ptr<Weapon> WeaponTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Weapon...";
 
-	return std::shared_ptr<Weapon>(new Weapon(name, itemClass, type, attack * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		accuracy * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		defence * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), slots, max));
+	return std::shared_ptr<Weapon>(new Weapon(name, itemClass, type, attack * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		speed * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		accuracy * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		defence * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), slots, max));
 }
 
 bool WeaponFactory::importConfig(const std::string& path)
@@ -398,9 +398,9 @@ bool RoomFactory::importConfig(const std::string& path)
 			const std::string& name = roomNode.child("Name").text().as_string();
 			const std::string& description = roomNode.child("Description").text().as_string();
 
-			pugi::xml_node doorPosNode = roomNode.child("Door_Positions").first_child();
-			pugi::xml_node monsterNode = roomNode.child("Monster").first_child();
-			pugi::xml_node findNode = roomNode.child("Find_Probabilities").first_child();
+			pugi::xml_node doorPosNode = roomNode.child("Door_Positions");
+			pugi::xml_node monsterNode = roomNode.child("Monster");
+			pugi::xml_node findNode = roomNode.child("Find_Probabilities");
 
 			const RoomTemplate::DoorPositions doorPositions = 
 			{

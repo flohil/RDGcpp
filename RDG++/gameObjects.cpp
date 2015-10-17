@@ -110,11 +110,11 @@ void Room::debugPrint() const
 void Room::initialize(unsigned int width, unsigned int height)
 {
 	// null-initialize overlay and background
-	for (unsigned int y = 0; y < width; y++)
+	for (unsigned int y = 0; y < height; y++) //rows
 	{
 		std::vector<std::shared_ptr<RenderableObject>> overlayRow;
 		std::vector<std::shared_ptr<RenderableObject>> backgroundRow;
-		for (unsigned int x = 0; x < height; x++)
+		for (unsigned int x = 0; x < width; x++) //cols
 		{
 			overlayRow.push_back(nullptr);
 			backgroundRow.push_back(nullptr);

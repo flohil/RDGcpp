@@ -1,21 +1,21 @@
-#include "calculation.hpp"
+#include "chances.hpp"
 #include "prototypes.hpp"
 #include "random.hpp"
 #include <iostream>
 
-float Calculation::randomFloat(float min, float max) {
+float Chances::randomFloat(float min, float max) {
 	float random = ((float) rand()) / (float) RAND_MAX;
 	float diff = max - min;
 	float r = random * diff;
 	return min + r;
 }
 
-unsigned int Calculation::randomUInt(unsigned int min, unsigned int max) {
+unsigned int Chances::randomUInt(unsigned int min, unsigned int max) {
 	return min + (rand() % (int)(max - min + 1));
 }
 
 // returns the name of a random monster, keeping them somewhat balanced 
-std::string Calculation::randomMonster(RoomTemplate::MonsterProbabilities &monsterProbabilities, std::map<DifficultyLevel::Enum, std::map<std::string, unsigned int>> &monsterBalance, 
+std::string Chances::randomMonster(RoomTemplate::MonsterProbabilities &monsterProbabilities, std::map<DifficultyLevel::Enum, std::map<std::string, unsigned int>> &monsterBalance, 
 	std::map<std::string, unsigned int> &monsterBalanceOffsets, std::map<DifficultyLevel::Enum, std::list<std::string>> &monstersLeveled)
 {
 	// used to sum up all single possibility values from configloader
@@ -25,7 +25,7 @@ std::string Calculation::randomMonster(RoomTemplate::MonsterProbabilities &monst
 	float randFloat = 0;
 
 	// the determined, random monster level
-	DifficultyLevel::Enum monsterLevel;
+	DifficultyLevel::Enum monsterLevel = DifficultyLevel::UNKNOWN;
 
 	// offset needed for balancing occurrence of same leveled items
 	unsigned int offset = 0;
@@ -121,10 +121,9 @@ std::map<Classes::Enum, std::map<std::string, ItemBalance>> itemsBalance;
 std::map<std::string, unsigned int> itemBalanceOffsets;
 
 // returns name and type of a random Item, keeping them somewhat balanced
-ItemTypeName Calculation::randomItem(RoomTemplate::ItemProbabilities itemProbabilities, std::map<Classes::Enum, std::map<std::string, ItemBalance>> &itemsBalance,
+ItemTypeName Chances::randomItem(RoomTemplate::ItemProbabilities itemProbabilities, std::map<Classes::Enum, std::map<std::string, ItemBalance>> &itemsBalance,
 	std::map<std::string, unsigned int> &itemBalanceOffsets, std::map<Classes::Enum, std::list<std::pair<std::string, ItemType::Enum>>> &itemsClassList)
 {
-
 	// used to sum up all single possibility values for all items from configloader
 	float sum = 0;
 
@@ -132,7 +131,7 @@ ItemTypeName Calculation::randomItem(RoomTemplate::ItemProbabilities itemProbabi
 	float randFloat = 0;
 
 	// the determined, random itemClass
-	Classes::Enum itemClass;
+	Classes::Enum itemClass = Classes::UNKNOWN;
 
 	// offset needed for balancing occurrence of same leveled items
 	unsigned int offset = 0;
@@ -176,7 +175,7 @@ ItemTypeName Calculation::randomItem(RoomTemplate::ItemProbabilities itemProbabi
 	}
 
 	// no item shall be placed in this room
-	if (itemClass == Classes::NONE) {
+	if (itemClass == Classes::NONE || itemClass == Classes::UNKNOWN) {
 		return ItemTypeName{ "", ItemType::UNKNOWN};
 	}
 
@@ -226,13 +225,13 @@ ItemTypeName Calculation::randomItem(RoomTemplate::ItemProbabilities itemProbabi
 }
 
 // returns a random monster attack
-Attacks::Enum Calculation::randomAttackType() {
+Attacks::Enum Chances::randomAttackType() {
 
 	return static_cast<Attacks::Enum>(randomUInt(3)); // 0: TORSO, 1: HEAD, 2: ARMS, 3: LEGS
 }
 
 // returns Point for a random Room on the map, excluding the treasure Chamber
-Point Calculation::randomRoom(unsigned int roomsX, unsigned int roomsY) {
+Point Chances::randomRoom(unsigned int roomsX, unsigned int roomsY) {
 
 	unsigned int middleX = (unsigned int) roomsX / 2;
 	unsigned int middleY = (unsigned int) roomsY / 2;
@@ -240,8 +239,8 @@ Point Calculation::randomRoom(unsigned int roomsX, unsigned int roomsY) {
 	unsigned int randY = 0;
 
 	do {
-		randX = randomUInt(roomsX);
-		randY = randomUInt(roomsY);
+		randX = randomUInt(roomsX - 1);
+		randY = randomUInt(roomsY - 1);
 	} while (randX == middleX && randY == middleY);
 
 	Point randRoom{ randX, randY };
@@ -250,16 +249,18 @@ Point Calculation::randomRoom(unsigned int roomsX, unsigned int roomsY) {
 }
 
 // returns random empty tile in tilemap
-Point Calculation::randomTile(std::vector<std::vector<std::shared_ptr<RenderableObject>>> &tilemap, unsigned int width, unsigned int height, unsigned int maxIterations) {
+FoundPoint Chances::randomFreeTile(std::vector<std::vector<std::shared_ptr<RenderableObject>>> &tilemap, unsigned int maxIterations) {
 
+	unsigned int height = tilemap.size();
+	unsigned int width = tilemap[0].size();
 	unsigned int randX = 0;
 	unsigned int randY = 0;
 	bool found = false;
 	unsigned int ctr = 0;
 
 	do {
-		randX = randomUInt(width);
-		randY = randomUInt(height);
+		randY = randomUInt(width - 1);
+		randX = randomUInt(height - 1);
 
 		if (tilemap[randX][randY] == nullptr) {
 			found = true;
@@ -269,5 +270,5 @@ Point Calculation::randomTile(std::vector<std::vector<std::shared_ptr<Renderable
 
 	Point randTile{ randX, randY };
 
-	return randTile;
+	return FoundPoint{ randTile, found };
 }

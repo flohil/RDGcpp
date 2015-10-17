@@ -76,6 +76,12 @@ struct ItemTypeName
 	ItemType::Enum itemType;
 };
 
+struct FoundPoint
+{
+	Point point;
+	bool found;
+};
+
 // maps strings to enums
 class EnumMapper
 {

@@ -3,7 +3,7 @@
 #include "random.hpp"
 #include "easylogging++.hpp"
 
-const std::set<ViewingDirections::Enum> MazeRoom::allDirs 
+const std::set<ViewingDirections::Enum> MazeRoom::allDirs
 {
 	ViewingDirections::N,
 	ViewingDirections::E,
@@ -96,7 +96,7 @@ void Maze::generate()
 
 	if (treasureRoom)
 	{
-		std::shared_ptr<MazeRoom> room (maze[treasure.x][treasure.y]);
+		std::shared_ptr<MazeRoom> room(maze[treasure.x][treasure.y]);
 		room->openDoor(ViewingDirections::E, *this);
 		room->openDoor(ViewingDirections::W, *this);
 	}
@@ -131,7 +131,7 @@ void Maze::print() const
 					{
 						resStr.append("#");
 					}
-					
+
 					if (x == (maze.size() - 1))
 					{
 						resStr.append("#");
@@ -304,32 +304,32 @@ std::shared_ptr<MazeRoom> MazeRoom::openDoor(ViewingDirections::Enum dir, Maze& 
 
 	switch (dir)
 	{
-		case ViewingDirections::N:
-			if ((room = maze.getRoom(Point{ pos.x, pos.y - 1 })) != nullptr)
-			{
-				room->_openDoor(ViewingDirections::S);
-			}
-			break;
-		case ViewingDirections::E:
-			if ((room = maze.getRoom(Point{ pos.x + 1, pos.y })) != nullptr)
-			{
-				room->_openDoor(ViewingDirections::W);
-			}
-			break;
-		case ViewingDirections::S:
-			if ((room = maze.getRoom(Point{ pos.x, pos.y + 1 })) != nullptr)
-			{
-				room->_openDoor(ViewingDirections::N);
-			}
-			break;
-		case ViewingDirections::W:
-			if ((room = maze.getRoom(Point{ pos.x - 1, pos.y })) != nullptr)
-			{
-				room->_openDoor(ViewingDirections::E);
-			}
-			break;
+	case ViewingDirections::N:
+		if ((room = maze.getRoom(Point{ pos.x, pos.y - 1 })) != nullptr)
+		{
+			room->_openDoor(ViewingDirections::S);
+		}
+		break;
+	case ViewingDirections::E:
+		if ((room = maze.getRoom(Point{ pos.x + 1, pos.y })) != nullptr)
+		{
+			room->_openDoor(ViewingDirections::W);
+		}
+		break;
+	case ViewingDirections::S:
+		if ((room = maze.getRoom(Point{ pos.x, pos.y + 1 })) != nullptr)
+		{
+			room->_openDoor(ViewingDirections::N);
+		}
+		break;
+	case ViewingDirections::W:
+		if ((room = maze.getRoom(Point{ pos.x - 1, pos.y })) != nullptr)
+		{
+			room->_openDoor(ViewingDirections::E);
+		}
+		break;
 	}
-	
+
 	return room;
 }
 
@@ -402,7 +402,7 @@ std::set<ViewingDirections::Enum> MazeRoom::getClosedDoors() const
 }
 
 std::vector<ViewingDirections::Enum> MazeRoom::getOpenDoorsArray() const
-{ 
+{
 	std::vector<ViewingDirections::Enum> openDoorsArray;
 
 	for (ViewingDirections::Enum dir : openDoors)

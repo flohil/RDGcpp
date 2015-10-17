@@ -51,6 +51,7 @@ public:
 	void print() const;
 	std::shared_ptr<MazeRoom> getRoom(const Point pos) const;
 	Point getTreasurePos() const;
+	Point getSize() const { return size; };
 
 private:
 

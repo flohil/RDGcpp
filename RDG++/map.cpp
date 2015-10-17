@@ -1,14 +1,20 @@
 #include "map.hpp"
 #include "easylogging++.hpp"
+#include "chances.hpp"
 
 void Map::init()
 {
+	// construct maze
+	maze.reset(new Maze(settings->mazeSize));
+	maze->generate();
+	maze->print();
+
 	// null-initialize overlay and background
-	for (unsigned int i = 0; i < width; i++)
+	for (unsigned int i = 0; i < height; i++)
 	{
 		std::vector<std::shared_ptr<RenderableObject>> overlayRow;
 		std::vector<std::shared_ptr<RenderableObject>> backgroundRow;
-		for (unsigned int j = 0; j < height; j++)
+		for (unsigned int j = 0; j < width; j++)
 		{
 			overlayRow.push_back(nullptr);
 			backgroundRow.push_back(nullptr);
@@ -18,10 +24,10 @@ void Map::init()
 	}
 
 	// null-initialize rooms
-	for (unsigned int i = 0; i < settings->mazeSize; i++)
+	for (unsigned int i = 0; i < maze->getSize().y; i++) //rows
 	{
 		std::vector<std::shared_ptr<Room>> roomsRow;
-		for (unsigned int j = 0; j < settings->mazeSize; j++)
+		for (unsigned int j = 0; j < maze->getSize().x; j++) //cols
 		{
 			roomsRow.push_back(nullptr);
 		}
@@ -83,126 +89,52 @@ void Map::init()
 	LOG(INFO) << "successfully initialized map";
 }
 
-bool Map::isFieldPassable(Point fieldPos) const 
+// fills the map with walls and doors
+void Map::fillWalls()
 {
-	if (overlay[fieldPos.x][fieldPos.y] != nullptr)
+	// load walls and doors
+	for (unsigned int i = 0; i < height; i++)
 	{
-		return false;
-	}
-	return true;
-}
-
-void Map::fillWithRooms() 
-{
-	for (unsigned int i = 0; i < settings->mazeSize; i++)
-	{
-		for (unsigned int j = 0; j < settings->mazeSize; j++)
+		for (unsigned int j = 0; j < width; j++)
 		{
-			for (unsigned int x = 0; x < settings->ROOM_WIDTH; x++)
+			unsigned int wallModY = i % (settings->ROOM_HEIGHT + 1);
+			unsigned int wallModX = j % (settings->ROOM_WIDTH + 1);
+			
+			// load walls and set them to not passable
+			if (wallModX == 0 || wallModY == 0)
 			{
-				for (unsigned int y = 0; y < settings->ROOM_HEIGHT; y++)
-				{
-					unsigned int posX = i * (settings->ROOM_WIDTH + 1) + x + 1;
-					unsigned int posY = j * (settings->ROOM_HEIGHT + 1) + y + 1;
-
-					background[posX][posY] = rooms[i][j]->background[x][y];
-					overlay[posX][posY] = rooms[i][j]->overlay[x][y];
-				}
+				overlay[i][j].reset(new RenderableObject("darkGreyGround", ObjectType::TILE));
 			}
 		}
 	}
-}
 
-RoomTypes::Enum Map::detectRoomType(Point indizes) const
-{
-	// door positions -> set to true if there is a door a this position
-	bool doorPos[4] { false, false, false, false }; // N, E, S, W
-
-	const unsigned int roomWidth = settings->ROOM_WIDTH;
-	const unsigned int roomHeight = settings->ROOM_HEIGHT;
-
-	unsigned int horDoorX = (indizes.x + 1) * (roomWidth + 1) - (roomWidth / 2) - 1;
-	unsigned int horDoorY1 = indizes.y * (roomHeight + 1);
-	unsigned int horDoorY2 = (indizes.y + 1) * (roomHeight + 1);
-	unsigned int verDoorX1 = indizes.x * (roomWidth + 1);
-	unsigned int verDoorX2 = (indizes.x + 1) * (roomWidth + 1);
-	unsigned int verDoorY = (indizes.y + 1) * (roomHeight + 1) - roomHeight / 2 - 1;
-
-	unsigned int doorCount = 0;
-
-	RoomTypes::Enum type = RoomTypes::UNKNOWN;
-
-	if (overlay[horDoorX][horDoorY1] == nullptr)
+	// roomloop
+	for (unsigned int i = 0; i < maze->getSize().y; i++) //height
 	{
-		doorPos[0] = true;
-		doorCount++;
-	}
-	if (overlay[verDoorX1][verDoorY] == nullptr)
-	{
-		doorPos[1] = true;
-		doorCount++;
-	}
-	if (overlay[horDoorX][horDoorY2] == nullptr)
-	{
-		doorPos[2] = true;
-		doorCount++;
-	}
-	if (overlay[verDoorX2][verDoorY] == nullptr)
-	{
-		doorPos[3] = true;
-		doorCount++;
-	}
-
-	// detect room types based on the number of doors - for 2 doors also check door positions
-	switch (doorCount)
-	{
-		case 1:
-			type = RoomTypes::DEADEND;
-			break;
-		case 2:
-			for (unsigned int z = 0; z < 4; z++)
+		for (unsigned int j = 0; j < maze->getSize().x; j++) //width
+		{
+			for (ViewingDirections::Enum dir : maze->getRoom(Point{ j, i })->getOpenDoors())
 			{
-				unsigned int posTurn = (z + 1) % 4;
-				unsigned int posHallway = (z + 2) % 4;
-
-				if (doorPos[z] && doorPos[posTurn])
-				{
-					type = RoomTypes::TURN;
-					break;
-				}
-				if (doorPos[z] && doorPos[posHallway])
-				{
-					type = RoomTypes::HALLWAY;
-					break;
-				}
+				setDoors(Point{ j, i }, dir);
 			}
-			break;
-		case 3:
-			type = RoomTypes::TJUNCTION;
-			break;
-		case 4:
-			type = RoomTypes::JUNCTION;
-			break;
+		}
 	}
 
-	// check for treasure chamber -> middle of the map
-	if ((indizes.x == settings->mazeSize / 2) && (indizes.y == settings->mazeSize / 2))
+	for (ViewingDirections::Enum dir : maze->getRoom(Point{ maze->getTreasurePos().x, maze->getTreasurePos().y })->getOpenDoors())
 	{
-		type = RoomTypes::TREASURECHAMBER;
+		setDoors(Point{ maze->getTreasurePos().x, maze->getTreasurePos().y }, dir);
 	}
-
-	return type;
 }
 
 void Map::loadRooms()
 {
-	for (unsigned int i = 0; i < settings->mazeSize; i++)
+	for (unsigned int i = 0; i < maze->getSize().y; i++) //rows
 	{
-		for (unsigned int j = 0; j < settings->mazeSize; j++)
+		for (unsigned int j = 0; j < maze->getSize().x; j++) //cols
 		{
-			//detect room types and load according room
-			RoomTypes::Enum type = detectRoomType(Point{ i, j });
-			
+			// detect room types and load according room
+			RoomTypes::Enum type = detectRoomType(Point{ j, i });
+
 			std::shared_ptr<Room> room(game.getPrototypeStorage()->roomFactory->create(EnumMapper::mapRoomNames(type)));
 
 			room->initialize(settings->ROOM_WIDTH, settings->ROOM_HEIGHT);
@@ -218,11 +150,88 @@ void Map::loadRooms()
 	placeKey();
 }
 
+void Map::fillWithRooms() 
+{
+
+	for (unsigned int i = 0; i < settings->mazeSize; i++)
+	{
+		for (unsigned int j = 0; j < settings->mazeSize; j++)
+		{
+			for (unsigned int y = 0; y < settings->ROOM_HEIGHT; y++)
+			{
+				for (unsigned int x = 0; x < settings->ROOM_WIDTH; x++)
+				{
+					unsigned int posY = i * (settings->ROOM_HEIGHT + 1) + y + 1; //row
+					unsigned int posX = j * (settings->ROOM_WIDTH + 1) + x + 1; //column
+
+					background[posY][posX] = rooms[i][j]->background[y][x];
+					overlay[posY][posX] = rooms[i][j]->overlay[y][x];
+				}
+			}
+		}
+	}
+}
+
+void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
+{
+	unsigned int doorx1 = 0;
+	unsigned int doorx2 = 0;
+	unsigned int doory1 = 0;
+	unsigned int doory2 = 0;
+	float angle = 0;
+
+	switch (dir) {
+	case ViewingDirections::N:
+		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1);
+		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1);
+		doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2);
+		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2) + 1;
+		angle = 0.0f;
+		break;
+	case ViewingDirections::E:
+		doorx1 = (roomIndizes.x + 1) * (settings->ROOM_WIDTH + 1);
+		doorx2 = (roomIndizes.x + 1) * (settings->ROOM_WIDTH + 1);
+		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
+		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
+		angle = 90.0f;
+		break;
+	case ViewingDirections::S:
+		doory1 = (roomIndizes.y + 1) * (settings->ROOM_HEIGHT + 1);
+		doory2 = (roomIndizes.y + 1) * (settings->ROOM_HEIGHT + 1);
+		doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2);
+		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2) + 1;
+		angle = 180.0f;
+		break;
+	case ViewingDirections::W:
+		doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1);
+		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1);
+		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
+		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
+		angle = 270.0f;
+		break;
+	}
+
+	// treasure chamber
+	if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y) {
+		background[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle));
+		overlay[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle));
+		background[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
+		overlay[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
+	}
+	// normal door
+	else {
+		background[doory1][doorx1].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
+		overlay[doory1][doorx1] = nullptr;
+		background[doory2][doorx2].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
+		overlay[doory2][doorx2] = nullptr;
+	}
+}
+
 void Map::fillGround(std::shared_ptr<Room> room, RoomTypes::Enum type)
 {
 	// fill background according to room type
-	for (unsigned int i = 0; i <= settings->ROOM_WIDTH - 1; i++) {
-		for (unsigned int j = 0; j <= settings->ROOM_HEIGHT - 1; j++) {
+	for (unsigned int i = 0; i < room->background.size(); i++) {
+		for (unsigned int j = 0; j < room->background[0].size(); j++) {
 			switch (type) {
 			case RoomTypes::DEADEND:
 				room->background[i][j].reset(new RenderableObject("yellowOneGround", ObjectType::TILE));
@@ -247,179 +256,177 @@ void Map::fillGround(std::shared_ptr<Room> room, RoomTypes::Enum type)
 	}
 }
 
+RoomTypes::Enum Map::detectRoomType(Point indizes) const
+{
+	// door positions -> set to true if there is a door at this position
+	bool doorPos[4] { false, false, false, false }; // N, E, S, W
+
+	const unsigned int roomWidth = settings->ROOM_WIDTH;
+	const unsigned int roomHeight = settings->ROOM_HEIGHT;
+
+	unsigned int horDoorX = (indizes.x + 1) * (roomWidth + 1) - (roomWidth / 2) - 1;
+	unsigned int horDoorY1 = indizes.y * (roomHeight + 1);
+	unsigned int horDoorY2 = (indizes.y + 1) * (roomHeight + 1);
+	unsigned int verDoorX1 = indizes.x * (roomWidth + 1);
+	unsigned int verDoorX2 = (indizes.x + 1) * (roomWidth + 1);
+	unsigned int verDoorY = (indizes.y + 1) * (roomHeight + 1) - roomHeight / 2 - 1;
+
+	unsigned int doorCount = 0;
+
+	RoomTypes::Enum type = RoomTypes::UNKNOWN;
+
+	if (overlay[horDoorY1][horDoorX] == nullptr)
+	{
+		doorPos[0] = true;
+		doorCount++;
+	}
+	if (overlay[verDoorY][verDoorX1] == nullptr)
+	{
+		doorPos[1] = true;
+		doorCount++;
+	}
+	if (overlay[horDoorY2][horDoorX] == nullptr)
+	{
+		doorPos[2] = true;
+		doorCount++;
+	}
+	if (overlay[verDoorY][verDoorX2] == nullptr)
+	{
+		doorPos[3] = true;
+		doorCount++;
+	}
+
+	// detect room types based on the number of doors - for 2 doors also check door positions
+	switch (doorCount)
+	{
+	case 1:
+		type = RoomTypes::DEADEND;
+		break;
+	case 2:
+		for (unsigned int z = 0; z < 4; z++)
+		{
+			unsigned int posTurn = (z + 1) % 4;
+			unsigned int posHallway = (z + 2) % 4;
+
+			if (doorPos[z] && doorPos[posTurn])
+			{
+				type = RoomTypes::TURN;
+				break;
+			}
+			if (doorPos[z] && doorPos[posHallway])
+			{
+				type = RoomTypes::HALLWAY;
+				break;
+			}
+		}
+		break;
+	case 3:
+		type = RoomTypes::TJUNCTION;
+		break;
+	case 4:
+		type = RoomTypes::JUNCTION;
+		break;
+	}
+
+	// check for treasure chamber -> middle of the map
+	if ((indizes.x == maze->getSize().x / 2) && (indizes.y == maze->getSize().y / 2))
+	{
+		type = RoomTypes::TREASURECHAMBER;
+	}
+
+	return type;
+}
+
 void Map::addMonster(std::shared_ptr<Room> room, RoomTypes::Enum type)
 {
 	std::shared_ptr<RoomTemplate> roomTemplate = std::dynamic_pointer_cast<RoomTemplate>(game.getPrototypeStorage()->roomFactory->getTemplate(EnumMapper::mapRoomNames(type)));
-	
+
 	// place monsters on random, free fields in the room
-	for (unsigned int i = 0; i < roomTemplate->getMonsterCount(); i++) {
+	for (unsigned int i = 0; i < roomTemplate->getMonsterCount(); i++)
+	{
 
 		// first find a free field, return null if no free field is found after 15 rounds
-		//Point randPoint = Chances.randomFreeField(overlay);
+		FoundPoint randPoint = Chances::randomFreeTile(room->overlay, settings->MAX_TRIES);
 
-		//if (randPoint != null) { //no free field was found 
+		if (randPoint.found != false) //a free field was found 
+		{
+			// get a random Monster, according to the monster levels allowed in this Room's definition
+			std::string monsterName = Chances::randomMonster(roomTemplate->getMonsterProbabilities(), monsterBalance, monsterBalanceOffsets, game.getPrototypeStorage()->monsterFactory->getMonstersLeveled());
 
-		//	/* get a random Monster, according to the monster levels allowed in this Room's definition*/
-		//	String monsterName = Chances.randomMonster(monsterProbabilities, monsterBalance, balanceOffsets);
-
-		//	if (monsterName != null) { //no monster shall be placed
-		//		overlay[randPoint.x][randPoint.y] = MonsterFactory.createMonster(monsterName);
-		//		map.increaseBalance("monsterBalance", monsterName, null);
-		//	}
-		//}
-		//else {
-		//	break;
-		//}
+			if (monsterName != "") //no monster shall be placed
+			{
+				room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->monsterFactory->create(monsterName);
+				increaseMonsterBalance(monsterName);
+			}
+		}
+		else {
+			break;
+		}
 	}
 }
 
 void Map::addItems(std::shared_ptr<Room> room, RoomTypes::Enum type)
 {
+	std::shared_ptr<RoomTemplate> roomTemplate = std::dynamic_pointer_cast<RoomTemplate>(game.getPrototypeStorage()->roomFactory->getTemplate(EnumMapper::mapRoomNames(type)));
 
-	//game.getPrototypeStorage()->roomFactory->getTemplate(EnumMapper::mapRoomNames(type));
-	//Map<ItemClasses, Float> itemProbabilities = tempTemplate.getFind_probabilities();
-	//int itemCount = tempTemplate.getItemCount();
-
-	///* place items on random, free fields in the room */
-	//for (int i = 0; i < itemCount; i++) {
-
-	//	/* first find a free field, return null if no free field is found after 15 rounds */
-	//	Point randPoint = Chances.randomFreeField(overlay);
-
-	//	if (randPoint != null) { //no free field was found 
-
-	//		/* get a random Item, according to the item levels allowed in this Room's definition*/
-	//		Item item = Chances.randomItem(itemProbabilities, itemsBalance, balanceOffsets);
-
-	//		if (item != null) { //no item shall be placed
-	//			//use itemMultiplier
-	//			room->overlay[randPoint.x][randPoint.y] = ItemFactory.createItem(item, tempTemplate.getItemMultiplier());
-	//			map.increaseBalance("itemsBalance", null, item);
-	//		}
-	//	}
-	//	else {
-	//		break;
-	//	}
-	//}
-}
-
-// fills the map with walls and doors
-void Map::fillWalls()
-{
-	// load walls and doors
-	for (unsigned int i = 0; i < width; i++)
+	// place items on random, free fields in the room
+	for (unsigned int i = 0; i < roomTemplate->getItemCount(); i++)
 	{
-		for (unsigned int j = 0; j < height; j++)
+		// first find a free field, return null if no free field is found after 15 rounds
+		FoundPoint randPoint = Chances::randomFreeTile(room->overlay, settings->MAX_TRIES);
+
+		if (randPoint.found != false) //a free field was found 
 		{
-			unsigned int wallModX = i % (settings->ROOM_WIDTH + 1);
-			unsigned int wallModY = j % (settings->ROOM_HEIGHT + 1);
 
-			unsigned int roomX = i / (settings->ROOM_WIDTH + 1);
+			// get a random Monster, according to the monster levels allowed in this Room's definition
+			ItemTypeName item = Chances::randomItem(roomTemplate->getItemProbabilities(), itemsBalance, itemBalanceOffsets, game.getPrototypeStorage()->getItemsClassList());
 
-			// load walls and set them to not passable
-			if (wallModX == 0 || wallModY == 0)
+			if (item.itemName != "") // no item shall be placed
 			{
-				overlay[i][j].reset(new RenderableObject("darkGreyGround", ObjectType::TILE));
+				switch (item.itemType)
+				{
+					case ItemType::ARMAMENT:
+						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->armamentFactory->create(item.itemName);
+						break;
+					case ItemType::POTION:
+						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->potionFactory->create(item.itemName);
+						break;
+					case ItemType::WEAPON:
+						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->weaponFactory->create(item.itemName);
+						break;
+					default:
+						break;
+				}
+				increaseItemBalance(item.itemName);
 			}
 		}
-	}
-
-	maze.reset(new Maze(settings->mazeSize));
-	maze->generate();
-	maze->print();
-
-	// roomloop
-	for (unsigned int i = 0; i < settings->mazeSize; i++) 
-	{
-		for (unsigned int j = 0; j < settings->mazeSize; j++) 
-		{
-			for (ViewingDirections::Enum dir : maze->getRoom(Point{ i, j })->getOpenDoors()){
-				setDoors(Point{ i, j }, dir);
-			}
+		else {
+			break;
 		}
-	}
-
-	for (ViewingDirections::Enum dir : maze->getRoom(Point{ maze->getTreasurePos().x, maze->getTreasurePos().y })->getOpenDoors()){
-		setDoors(Point{ maze->getTreasurePos().x, maze->getTreasurePos().y }, dir);
-	}
-}
-
-void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
-{
-	unsigned int doorx1 = 0;
-	unsigned int doorx2 = 0;
-	unsigned int doory1 = 0;
-	unsigned int doory2 = 0;
-	float angle = 0;
-
-	switch (dir) {
-		case ViewingDirections::N:
-			doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1);
-			doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1);
-			doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2);
-			doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2) + 1;
-			angle = 0.0f;
-			break;
-		case ViewingDirections::E:
-			doorx1 = (roomIndizes.x + 1) * (settings->ROOM_WIDTH + 1);
-			doorx2 = (roomIndizes.x + 1) * (settings->ROOM_WIDTH + 1);
-			doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
-			doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
-			angle = 90.0f;
-			break;
-		case ViewingDirections::S:
-			doory1 = (roomIndizes.y + 1) * (settings->ROOM_HEIGHT + 1);
-			doory2 = (roomIndizes.y + 1) * (settings->ROOM_HEIGHT + 1);
-			doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2);
-			doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2) + 1;
-			angle = 180.0f;
-			break;
-		case ViewingDirections::W:
-			doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1);
-			doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1);
-			doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
-			doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
-			angle = 270.0f;
-			break;
-	}
-	
-	// treasure chamber
-	if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y) {
-		background[doorx1][doory1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle));
-		overlay[doorx1][doory1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle));
-		background[doorx2][doory2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
-		overlay[doorx2][doory2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
-	}
-	// normal door
-	else {
-		background[doorx1][doory1].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
-		overlay[doorx1][doory1] = nullptr;
-		background[doorx2][doory2].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
-		overlay[doorx2][doory2] = nullptr;
 	}
 }
 
 void Map::placeKey()
 {
-	// random rooms
-	unsigned int randRoomX = (rand() % (unsigned int)settings->mazeSize);
-	unsigned int randRoomY = 0;
+	bool placedKey = false;
+
+	Point randRoom;
+	FoundPoint randTile;
 
 	do
 	{
-		randRoomY = (rand() % (unsigned int)settings->mazeSize);
-	} while (randRoomX == randRoomY);
+		randRoom = Chances::randomRoom(settings->mazeSize, settings->mazeSize);
 
-	// random tiles in room
-	unsigned int randTileX = (rand() % (unsigned int)settings->ROOM_WIDTH);
-	unsigned int randTileY = 0;
+		randTile = Chances::randomFreeTile(rooms[randRoom.x][randRoom.y]->overlay, settings->MAX_TRIES);
 
-	do
-	{
-		randRoomY = (rand() % (unsigned int)settings->ROOM_HEIGHT);
-	} while (randRoomX == randRoomY);
+		if (randTile.found)
+		{
+			placedKey = true;
+		}
 
-	rooms[randRoomX][randRoomY]->overlay[randTileX][randTileY].reset(new RenderableObject("key", ObjectType::KEY));
+	} while (!placedKey);
+
+	rooms[randRoom.x][randRoom.y]->overlay[randTile.point.x][randTile.point.y].reset(new RenderableObject("key", ObjectType::KEY));
 }
 
 // Increase the balance counter for added monster
@@ -450,4 +457,13 @@ void Map::increaseItemBalance(std::string name)
 			return;
 		}
 	}
+}
+
+bool Map::isFieldPassable(Point fieldPos) const
+{
+	if (overlay[fieldPos.x][fieldPos.y] != nullptr)
+	{
+		return false;
+	}
+	return true;
 }

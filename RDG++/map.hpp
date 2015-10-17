@@ -18,9 +18,9 @@ public:
 	void init();
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> getBackround() const { return background; };
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> getOverlay() const { return overlay; };
-	bool isFieldPassable(Point fieldPos) const;
 	std::shared_ptr<RenderableObject> getOverlayObject(Point pos) const { return overlay[pos.x][pos.y]; };
 	void setOverlayObject(Point pos, std::shared_ptr<RenderableObject> obj) { overlay[pos.x][pos.y] = obj; };
+	bool isFieldPassable(Point fieldPos) const;
 
 private:
 
