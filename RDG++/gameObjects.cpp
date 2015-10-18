@@ -95,3 +95,11 @@ void Room::debugPrint() const
 	std::cout << "description = " << description << std::endl;
 	std::cout << std::endl;
 }
+
+void Creature::resetOriginals()
+{
+	this->hp = this->orHp;
+	this->accuracy = this->orAccuracy;
+	this->speed = this->orSpeed;
+	this->strength = this->orStrength;
+}

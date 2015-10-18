@@ -80,9 +80,16 @@ class Creature
 {
 public:
 
-	Creature(float hp_, float strength_, float speed_, float accuracy_) : hp(hp_), strength(strength_), speed(speed_), accuracy(accuracy_) {};
+	Creature(float hp_, float strength_, float speed_, float accuracy_)
+		: orHp(hp_), orStrength(strength_), orSpeed(speed_), orAccuracy(accuracy_), hp(hp_), strength(strength_), speed(speed_), accuracy(accuracy_) {};
 
 	float hp, strength, speed, accuracy;
+
+	void resetOriginals();
+
+private:
+	float orHp, orStrength, orSpeed, orAccuracy;
+
 };
 
 class Armament : public Item, public DebugPrintObject
