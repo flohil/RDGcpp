@@ -26,6 +26,7 @@ public:
 	unsigned int mazeSize;
 	unsigned int tileSize;
 	unsigned int creatureSize;
+	std::string playerName;
 
 	// functions
 	Settings(unsigned int desktopWidth, unsigned int desktopHeight);
