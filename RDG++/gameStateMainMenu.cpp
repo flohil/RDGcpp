@@ -90,7 +90,7 @@ void GameStateMainMenu::loadgame()
 {
 	LOG(INFO) << "Loading game world...";
 
-	game.pushState(new GameStateGame(game));
+	game.pushState(std::shared_ptr<GameState>(new GameStateGame(game)));
 
 	return;
 }

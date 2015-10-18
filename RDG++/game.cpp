@@ -52,24 +52,25 @@ Game::Game()
 	// prototypeStorage->testPrintGameObjects();
 }
 
-void Game::pushState(GameState* state)
+void Game::pushState(std::shared_ptr<GameState> state)
 {
-	this->states.push(state);
+	states.push(state);
 
 	return;
 }
 
 void Game::popState()
 {
-	delete this->states.top();
-	this->states.pop();
+	LOG(DEBUG) << "deleting state " << states.top();
+	//delete states.top();
+	states.pop();
 
 	return;
 }
 
-void Game::changeState(GameState* state)
+void Game::changeState(std::shared_ptr<GameState> state)
 {
-	if (!this->states.empty())
+	if (!states.empty())
 	{
 		popState();
 	}
@@ -78,13 +79,13 @@ void Game::changeState(GameState* state)
 	return;
 }
 
-GameState* Game::peekState()
+std::shared_ptr<GameState> Game::peekState()
 {
-	if (this->states.empty())
+	if (states.empty())
 	{
 		return nullptr;
 	}
-	return this->states.top();
+	return states.top();
 }
 
 void Game::gameLoop()
@@ -110,7 +111,7 @@ void Game::gameLoop()
 
 Game::~Game()
 {
-	while (!this->states.empty())
+	while (!states.empty())
 	{
 		popState();
 	}

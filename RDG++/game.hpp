@@ -15,16 +15,16 @@ class Game
 {
 public:
 
-	std::stack<GameState*> states;
+	std::stack<std::shared_ptr<GameState>> states;
 	sf::RenderWindow window;
 	std::shared_ptr<RenderableObject> background;
 	sf::Sprite backgroundSprite;
 
 	bool initializedSuccessfully() const { return successfullyInitialized; };
-	void pushState(GameState* state);
+	void pushState(std::shared_ptr<GameState> state);
 	void popState();
-	void changeState(GameState* state);
-	GameState* peekState();
+	void changeState(std::shared_ptr<GameState> state);
+	std::shared_ptr<GameState> peekState();
 
 	void gameLoop();
 	std::shared_ptr<Settings> getSettings() const { return settings; };

@@ -58,7 +58,6 @@ void GameStateGame::handleInput()
 			// just sample code - remove later on
 			if (event.key.code == sf::Keyboard::Escape)
 			{
-				delete map.get();
 				game.window.close();
 			}
 			else
