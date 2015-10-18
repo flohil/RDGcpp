@@ -79,6 +79,11 @@ public:
 	Creature(float hp_, float strength_, float speed_, float accuracy_, CreatureType::Enum creatureType_) : hp(hp_), strength(strength_), speed(speed_), accuracy(accuracy_), creatureType(creatureType_) {};
 
 	float hp, strength, speed, accuracy;
+
+	CreatureType::Enum getCreatureType() { return creatureType; };
+
+private:
+
 	CreatureType::Enum creatureType;
 };
 
