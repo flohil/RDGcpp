@@ -76,15 +76,24 @@ class Creature
 {
 public:
 
-	Creature(float hp_, float strength_, float speed_, float accuracy_)
-		: orHp(hp_), orStrength(strength_), orSpeed(speed_), orAccuracy(accuracy_), hp(hp_), strength(strength_), speed(speed_), accuracy(accuracy_) {};
+	Creature(float hp_, float strength_, float speed_, float accuracy_, CreatureType::Enum creatureType_)
+		: orHp(hp_), orStrength(strength_), orSpeed(speed_), orAccuracy(accuracy_), hp(hp_), strength(strength_), speed(speed_), accuracy(accuracy_), creatureType(creatureType_) {};
 
 	float hp, strength, speed, accuracy;
 
 	void resetOriginals();
+	CreatureType::Enum getCreatureType() { return creatureType; };
 
 private:
-	float orHp, orStrength, orSpeed, orAccuracy;
+
+	CreatureType::Enum creatureType;
+};
+
+class Player : public Creature
+{
+public: 
+
+	Player(float hp_, float strength_, float speed_, float accuracy_) : Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER) {};
 
 };
 
@@ -112,7 +121,7 @@ class Monster : public RenderableObject, public Creature, public DebugPrintObjec
 public:
 
 	Monster(const std::string& name_, const DifficultyLevel::Enum level_, const Attribute::Enum killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
-		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_), level(level_), killBonusType(killBonusType_), killBonus(killBonus_) {};
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER), level(level_), killBonusType(killBonusType_), killBonus(killBonus_) {};
 
 	DifficultyLevel::Enum getLevel() const { return level; };
 	Attribute::Enum getKillBonusType() const { return killBonusType; };

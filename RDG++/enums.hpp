@@ -15,7 +15,7 @@ struct ItemType
 
 struct CreatureType
 {
-	enum Enum { CREATURE, PLAYER };
+	enum Enum { MONSTER, PLAYER, UNKNOWN };
 };
 
 struct ViewingDirections
