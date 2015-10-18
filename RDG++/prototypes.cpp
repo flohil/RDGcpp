@@ -1,15 +1,16 @@
 #include "prototypes.hpp"
 #include "pugixml.hpp"
 #include "settings.hpp"
-#include "calculation.hpp"
+#include "chances.hpp"
 #include <iostream>
 #include <memory>
 #include "easylogging++.hpp"
+#include "resourceManager.hpp"
 
-Armament* ArmamentTemplate::clone(float externMultiplier)
+std::shared_ptr<Armament> ArmamentTemplate::clone(float externMultiplier)
 {
-	return new Armament(name, itemClass, type, armor * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), 
-		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus);
+	return std::shared_ptr<Armament>(new Armament(name, itemClass, type, armor * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		speed * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus));
 }
 
 bool ArmamentFactory::importConfig(const std::string& path)
@@ -47,11 +48,32 @@ bool ArmamentFactory::importConfig(const std::string& path)
 				return false;
 			}
 
+			switch (itemClass)
+			{
+				case Classes::WEAK:
+					weakList.push_back(name);
+					break;
+				case Classes::MEDIUM:
+					mediumList.push_back(name);
+					break;
+				case Classes::STRONG:
+					strongList.push_back(name);
+					break;
+				default:
+					break;
+			}
+
+			ResourceManager::getInstance().loadTexture(name, image);
+
 			std::shared_ptr<ArmamentTemplate> armament(new ArmamentTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus));
 
 			objects[armament->getName()] = armament;
 		}
 	}
+
+	armamentsClassified.insert(std::pair<Classes::Enum, std::list<std::string>>(Classes::WEAK, weakList));
+	armamentsClassified.insert(std::pair<Classes::Enum, std::list<std::string>>(Classes::MEDIUM, mediumList));
+	armamentsClassified.insert(std::pair<Classes::Enum, std::list<std::string>>(Classes::STRONG, strongList));
 
 	LOG(DEBUG) << "Load result: " << result.description();
 	LOG(DEBUG) << "ArmamentTemplate now contains " << objects.size() << " objects.";
@@ -59,13 +81,13 @@ bool ArmamentFactory::importConfig(const std::string& path)
 	return true;
 }
 
-Monster* MonsterTemplate::clone(float externMultiplier)
+std::shared_ptr<Monster> MonsterTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Monster...";
 
-	return new Monster(name, level, killBonusType, classMultiplier * Calculation::randomFloat(killBonusLow, killBonusHigh),
-		hp * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), strength * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		speed * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), accuracy * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier));
+	return std::shared_ptr<Monster>(new Monster(name, level, killBonusType, classMultiplier * Chances::randomFloat(killBonusLow, killBonusHigh),
+		hp * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), strength * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		speed * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), accuracy * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier)));
 }
 
 bool MonsterFactory::importConfig(const std::string& path)
@@ -105,11 +127,33 @@ bool MonsterFactory::importConfig(const std::string& path)
 				return false;
 			}
 
+			switch (level)
+			{
+				case DifficultyLevel::EASY:
+					easyList.push_back(name);
+					break;
+				case DifficultyLevel::NORMAL:
+					normalList.push_back(name);
+					break;
+				case DifficultyLevel::HARD:
+					hardList.push_back(name);
+					break;
+				default:
+					break;
+			}
+
+			ResourceManager::getInstance().loadTexture(name, image);
+			ResourceManager::getInstance().loadTexture(name + "_big", image.substr(0, image.find(".png")) + "_big.png");
+
 			std::shared_ptr<MonsterTemplate> monster(new MonsterTemplate(name, image, level, killBonusType, classMultiplier, statsLowMultiplier, statsHighMultiplier, killBonusLow, killBonusHigh, hp, strength, speed, accuracy));
 
 			objects[monster->getName()] = monster;
 		}
 	}
+
+	monstersLeveled.insert(std::pair<DifficultyLevel::Enum, std::list<std::string>>(DifficultyLevel::EASY, easyList));
+	monstersLeveled.insert(std::pair<DifficultyLevel::Enum, std::list<std::string>>(DifficultyLevel::NORMAL, normalList));
+	monstersLeveled.insert(std::pair<DifficultyLevel::Enum, std::list<std::string>>(DifficultyLevel::HARD, hardList));
 
 	LOG(DEBUG) << "Load result: " << result.description();
 	LOG(DEBUG) << "MonsterTemplate now contains " << objects.size() << " objects.";
@@ -117,11 +161,11 @@ bool MonsterFactory::importConfig(const std::string& path)
 	return true;
 }
 
-Potion* PotionTemplate::clone(float externMultiplier)
+std::shared_ptr<Potion> PotionTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Potion...";
 
-	return new Potion(name, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), duration);
+	return std::shared_ptr<Potion>(new Potion(name, itemClass, description, target, effect, mode, strength * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), duration));
 }
 
 bool PotionFactory::importConfig(const std::string& path)
@@ -160,11 +204,32 @@ bool PotionFactory::importConfig(const std::string& path)
 				return false;
 			}
 			
+			switch (itemClass)
+			{
+				case Classes::WEAK:
+					weakList.push_back(name);
+					break;
+				case Classes::MEDIUM:
+					mediumList.push_back(name);
+					break;
+				case Classes::STRONG:
+					strongList.push_back(name);
+					break;
+				default:
+					break;
+			}
+
+			ResourceManager::getInstance().loadTexture(name, image);
+
 			std::shared_ptr<PotionTemplate> potion(new PotionTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, description, target, effect, mode, strength, duration));
 
 			objects[potion->getName()] = potion;
 		}
 	}
+
+	potionsClassified.insert(std::pair<Classes::Enum, std::list<std::string>>(Classes::WEAK, weakList));
+	potionsClassified.insert(std::pair<Classes::Enum, std::list<std::string>>(Classes::MEDIUM, mediumList));
+	potionsClassified.insert(std::pair<Classes::Enum, std::list<std::string>>(Classes::STRONG, strongList));
 
 	LOG(DEBUG) << "Load result: " << result.description();
 	LOG(DEBUG) << "PotionTemplate now contains " << objects.size() << " objects.";
@@ -172,14 +237,14 @@ bool PotionFactory::importConfig(const std::string& path)
 	return true;
 }
 
-Weapon* WeaponTemplate::clone(float externMultiplier)
+std::shared_ptr<Weapon> WeaponTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Weapon...";
 
-	return new Weapon(name, itemClass, type, attack * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		speed * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		accuracy * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		defence * externMultiplier * classMultiplier * Calculation::randomFloat(statsLowMultiplier, statsHighMultiplier), slots, max);
+	return std::shared_ptr<Weapon>(new Weapon(name, itemClass, type, attack * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		speed * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		accuracy * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		defence * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), slots, maxWeapons));
 }
 
 bool WeaponFactory::importConfig(const std::string& path)
@@ -220,6 +285,23 @@ bool WeaponFactory::importConfig(const std::string& path)
 				return false;
 			}
 
+			switch (itemClass)
+			{
+				case Classes::WEAK:
+					weakList.push_back(name);
+					break;
+				case Classes::MEDIUM:
+					mediumList.push_back(name);
+					break;
+				case Classes::STRONG:
+					strongList.push_back(name);
+					break;
+				default:
+					break;
+			}
+
+			ResourceManager::getInstance().loadTexture(name, image);
+
 			std::shared_ptr<WeaponTemplate> weapon(new WeaponTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
 				type, attack, speed, accuracy, defence, slots, max));
 
@@ -227,17 +309,21 @@ bool WeaponFactory::importConfig(const std::string& path)
 		}
 	}
 
+	weaponsClassified.insert(std::pair<Classes::Enum, std::list<std::string>>(Classes::WEAK, weakList));
+	weaponsClassified.insert(std::pair<Classes::Enum, std::list<std::string>>(Classes::MEDIUM, mediumList));
+	weaponsClassified.insert(std::pair<Classes::Enum, std::list<std::string>>(Classes::STRONG, strongList));
+
 	LOG(DEBUG) << "Load result: " << result.description();
 	LOG(DEBUG) << "WeaponTemplate now contains " << objects.size() << " objects.";
 
 	return true;
 }
 
-Attack* AttackTemplate::clone(float externMultiplier)
+std::shared_ptr<Attack> AttackTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Attack...";
 
-	return new Attack(name, effect, hpDamage * classMultiplier, hitProbability, attributeDamage * classMultiplier, statsLowMultiplier, statsHighMultiplier);
+	return std::shared_ptr<Attack>(new Attack(name, effect, hpDamage * classMultiplier, hitProbability, attributeDamage * classMultiplier, statsLowMultiplier, statsHighMultiplier));
 }
 
 bool AttackFactory::importConfig(const std::string& path)
@@ -285,11 +371,11 @@ bool AttackFactory::importConfig(const std::string& path)
 	return true;
 }
 
-Room* RoomTemplate::clone(float externMultiplier)
+std::shared_ptr<Room> RoomTemplate::clone(float externMultiplier)
 {
 	LOG(DEBUG) << "cloning Room...";
 
-	return new Room(name, description);
+	return std::shared_ptr<Room>(new Room(name, description));
 }
 
 bool RoomFactory::importConfig(const std::string& path)
@@ -313,9 +399,9 @@ bool RoomFactory::importConfig(const std::string& path)
 			const std::string& name = roomNode.child("Name").text().as_string();
 			const std::string& description = roomNode.child("Description").text().as_string();
 
-			pugi::xml_node doorPosNode = roomNode.child("Door_Positions").first_child();
-			pugi::xml_node monsterNode = roomNode.child("Monster").first_child();
-			pugi::xml_node findNode = roomNode.child("Find_Probabilities").first_child();
+			pugi::xml_node doorPosNode = roomNode.child("Door_Positions");
+			pugi::xml_node monsterNode = roomNode.child("Monster");
+			pugi::xml_node findNode = roomNode.child("Find_Probabilities");
 
 			const RoomTemplate::DoorPositions doorPositions = 
 			{
@@ -333,7 +419,7 @@ bool RoomFactory::importConfig(const std::string& path)
 				monsterNode.child("hard").text().as_float()
 			};
 
-			const RoomTemplate::FindProbabilities findProbabilities =
+			const RoomTemplate::ItemProbabilities findProbabilities =
 			{
 				findNode.child("none").text().as_float(),
 				findNode.child("weak").text().as_float(),
@@ -365,12 +451,12 @@ PrototypeStorage::PrototypeStorage(const std::string& templatePath_) :
 
 PrototypeStorage::~PrototypeStorage()
 {
-	delete armamentFactory;
+	/*delete armamentFactory;
 	delete monsterFactory;
 	delete potionFactory;
 	delete weaponFactory;
 	delete attackFactory;
-	delete roomFactory;
+	delete roomFactory;*/
 }
 
 void PrototypeStorage::testPrintGameObjects()
@@ -399,12 +485,12 @@ bool PrototypeStorage::initializeTemplates(const std::string& templatePath)
 {
 	LOG(INFO) << "initializing templates...";
 
-	armamentFactory = new ArmamentFactory();
-	monsterFactory = new MonsterFactory();
-	potionFactory = new PotionFactory();
-	weaponFactory = new WeaponFactory();
-	attackFactory = new AttackFactory();
-	roomFactory = new RoomFactory();
+	armamentFactory.reset(new ArmamentFactory());
+	monsterFactory.reset(new MonsterFactory());
+	potionFactory.reset(new PotionFactory());
+	weaponFactory.reset(new WeaponFactory());
+	attackFactory.reset(new AttackFactory());
+	roomFactory.reset(new RoomFactory());
 
 	if (!armamentFactory->importConfig(templatePath + "Armaments.xml"))
 	{
@@ -430,6 +516,60 @@ bool PrototypeStorage::initializeTemplates(const std::string& templatePath)
 	{
 		return false;
 	}
+
+	typedef std::pair<std::string, ItemType::Enum> itemPair;
+	std::list<itemPair> weaklist;
+	std::list<itemPair> mediumlist;
+	std::list<itemPair> stronglist;
+
+	// obtain all items classified
+	std::map<Classes::Enum, std::list<std::string>> armamentsClassified = getArmamentsClassified();
+	for (std::string itemName : armamentsClassified.at(Classes::WEAK))
+	{
+		weaklist.push_back(itemPair(itemName, ItemType::ARMAMENT));
+	}
+	for (std::string itemName : armamentsClassified.at(Classes::MEDIUM))
+	{
+		mediumlist.push_back(itemPair(itemName, ItemType::ARMAMENT));
+	}
+	for (std::string itemName : armamentsClassified.at(Classes::STRONG))
+	{
+		stronglist.push_back(itemPair(itemName, ItemType::ARMAMENT));
+	}
+
+	std::map<Classes::Enum, std::list<std::string>> potionsClassified = getPotionsClassified();
+	for (std::string itemName : potionsClassified.at(Classes::WEAK))
+	{
+		weaklist.push_back(itemPair(itemName, ItemType::POTION));
+	}
+	for (std::string itemName : potionsClassified.at(Classes::MEDIUM))
+	{
+		mediumlist.push_back(itemPair(itemName, ItemType::POTION));
+	}
+	for (std::string itemName : potionsClassified.at(Classes::STRONG))
+	{
+		stronglist.push_back(itemPair(itemName, ItemType::POTION));
+	}
+
+	std::map<Classes::Enum, std::list<std::string>> weaponsClassified = getWeaponsClassified();
+	for (std::string itemName : weaponsClassified.at(Classes::WEAK))
+	{
+		weaklist.push_back(itemPair(itemName, ItemType::WEAPON));
+	}
+	for (std::string itemName : weaponsClassified.at(Classes::MEDIUM))
+	{
+		mediumlist.push_back(itemPair(itemName, ItemType::WEAPON));
+	}
+	for (std::string itemName : weaponsClassified.at(Classes::STRONG))
+	{
+		stronglist.push_back(itemPair(itemName, ItemType::WEAPON));
+	}
+
+	typedef std::pair<Classes::Enum, std::list<std::pair<std::string, ItemType::Enum>>> itemClassListPair;
+
+	itemsClassList.insert(itemClassListPair(Classes::WEAK, weaklist));
+	itemsClassList.insert(itemClassListPair(Classes::MEDIUM, mediumlist));
+	itemsClassList.insert(itemClassListPair(Classes::STRONG, stronglist));
 
 	LOG(INFO) << "All templates initialized succesfully";
 

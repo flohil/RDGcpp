@@ -8,28 +8,42 @@
 #include <string>
 #include <memory>
 
-class NamedObject
+class GameObject
 {
 public:
 
-	NamedObject(const std::string& name_) : name(name_) {};
+	GameObject(const std::string& name_, const ObjectType::Enum objectType_) : name(name_), objectType(objectType_) {};
 
 	const std::string getName() const { return name; };
+	const ObjectType::Enum getObjectType() const { return objectType; };
 
 protected:
 
 	const std::string name;
+	const ObjectType::Enum objectType;
 };
 
 // public sf::Drawable, public sf::Transformable, 
-class RenderableObject : public NamedObject
+class RenderableObject : public GameObject
 {
 public:
 
-	RenderableObject(const std::string& name_) : NamedObject(name_) {}; // to be replaced with texture pointer
+	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_) : RenderableObject(name_, objectType_, 0.f) {};
+	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_, float angle_) : GameObject(name_, objectType_), visible(true)
+	{ 
+		obtainSprite(objectType_);
+		sf::FloatRect globalBounds = sprite.getGlobalBounds();
+		sprite.setOrigin(globalBounds.width / 2, globalBounds.height / 2); // we want to rotate sprites around their center generally
+		sprite.setRotation(angle_);
+	};
 
 	bool isVisible() const { return visible; };
-	void setVisible(bool visible_) { visible = visible_; };
+	void setVisible(const bool visible_) { visible = visible_; };
+	void setAngle(const float angle_) { sprite.setRotation(angle_); };
+	void setPosition(sf::Vector2f pos_) { sprite.setPosition(pos_.x + 16, pos_.y + 16); };
+	void setSize(const unsigned int width, const unsigned int height);
+	void setScale(const sf::Vector2f scale_) { sprite.setScale(scale_); };
+	void draw(sf::RenderWindow& window, float deltaTime);
 
 protected:
 
@@ -37,27 +51,7 @@ protected:
 
 private:
 
-	bool obtainTexture();
-
-	//virtual void draw(sf::RenderTarget& target_, sf::RenderStates states_) const
-	//{
-	//	// apply the entity's transform -- combine it with the one that was passed by the caller
-	//	states_.transform *= getTransform(); // getTransform() is defined by sf::Transformable
-
-	//	// apply the texture
-	//	states_.texture = &texture;
-
-	//	// you may also override states.shader or states.blendMode if you want
-
-	//	// draw the vertex array
-	//	target_.draw(vertices, states_);
-	//}
-
-	//sf::VertexArray vertices;
-
-	void draw(sf::RenderWindow& window, float deltaTime);
-
-	sf::Texture texture;
+	bool obtainSprite(ObjectType::Enum objectType);
 	sf::Sprite sprite;
 };
 
@@ -65,15 +59,17 @@ class Item : public RenderableObject
 {
 public:
 
-	class Item(const std::string& name_, const Classes::Enum itemClass_) : RenderableObject(name_), itemClass(itemClass_) {};
+	class Item(const std::string& name_, const ObjectType::Enum objectType_, const Classes::Enum itemClass_, const ItemType::Enum itemType_) : RenderableObject(name_, objectType_), itemClass(itemClass_), itemType(itemType_) {};
 
 	Classes::Enum getItemClass() const { return itemClass; };
+	ItemType::Enum getItemType() const { return itemType; };
+
+	virtual ~Item() = 0;
 
 protected:
 
 	const Classes::Enum itemClass;
-
-	virtual Item::~Item() = 0;
+	const ItemType::Enum itemType;
 };
 
 class Creature
@@ -97,7 +93,7 @@ class Armament : public Item, public DebugPrintObject
 public:
 
 	Armament(const std::string& name_, const Classes::Enum itemClass_, const std::string& type_, const float armor_, const float speed_, const float bonus_) :
-		Item(name_, itemClass_), type(type_), armor(armor_), speed(speed_), bonus(bonus_) {};
+		Item(name_, ObjectType::ITEM, itemClass_, ItemType::ARMAMENT), type(type_), armor(armor_), speed(speed_), bonus(bonus_) {};
 
 	std::string getType() const { return type; };
 	float getArmor() const { return armor; };
@@ -116,7 +112,7 @@ class Monster : public RenderableObject, public Creature, public DebugPrintObjec
 public:
 
 	Monster(const std::string& name_, const DifficultyLevel::Enum level_, const Attribute::Enum killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
-		RenderableObject(name_), Creature(hp_, strength_, speed_, accuracy_), level(level_), killBonusType(killBonusType_), killBonus(killBonus_) {};
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_), level(level_), killBonusType(killBonusType_), killBonus(killBonus_) {};
 
 	DifficultyLevel::Enum getLevel() const { return level; };
 	Attribute::Enum getKillBonusType() const { return killBonusType; };
@@ -135,7 +131,7 @@ class Potion : public Item, public DebugPrintObject
 public:
 
 	Potion(const std::string& name_, const Classes::Enum itemClass_, const std::string& description_, const Target::Enum target_, const Attribute::Enum effect_, const Mode::Enum mode_, const float strength_, const unsigned int duration_) :
-		Item(name_, itemClass_), description(description_), target(target_), effect(effect_), mode(mode_), strength(strength_), duration(duration_) {};
+		Item(name_, ObjectType::ITEM, itemClass_, ItemType::POTION), description(description_), target(target_), effect(effect_), mode(mode_), strength(strength_), duration(duration_) {};
 	
 	std::string getDescription() const { return description; };
 	Target::Enum getTarget() const { return target; };
@@ -160,7 +156,7 @@ class Weapon : public Item, public DebugPrintObject
 public:
 
 	Weapon::Weapon(const std::string& name_, const Classes::Enum itemClass_, const WeaponType::Enum type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
-		Item(name_, itemClass_), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), max(max_) {};
+		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_) {};
 
 	WeaponType::Enum getType() const { return type; };
 	float getAttack() const { return attack; };
@@ -168,22 +164,22 @@ public:
 	float getAccuracy() const { return accuracy; };
 	float getDefence() const { return defence; };
 	unsigned int getSlots() const { return slots; };
-	unsigned int getMax() const { return max; };
+	unsigned int getMaxWeapons() const { return maxWeapons; };
 	virtual void debugPrint() const;
 
 protected:
 
 	const WeaponType::Enum type;
 	const float attack, speed, accuracy, defence;
-	const unsigned int slots, max;
+	const unsigned int slots, maxWeapons;
 };
 
-class Attack : public NamedObject, public DebugPrintObject
+class Attack : public GameObject, public DebugPrintObject
 {
 public:
 
 	Attack(const std::string& name_, const Attribute::Enum effect_, const float hpDamageMultiplier_, const float hitProbability_, const float attributeDamageMultiplier_, const float attackStatsLowMultiplier_, const float attackStatsHighMultiplier_) :
-		NamedObject(name_), effect(effect_), hpDamageMultiplier(hpDamageMultiplier_), hitProbability(hitProbability_), attributeDamageMultiplier(attributeDamageMultiplier_), attackStatsHighMultiplier(attackStatsHighMultiplier_), attackStatsLowMultiplier(attackStatsLowMultiplier_) {};
+		GameObject(name_, ObjectType::ATTACK), effect(effect_), hpDamageMultiplier(hpDamageMultiplier_), hitProbability(hitProbability_), attributeDamageMultiplier(attributeDamageMultiplier_), attackStatsHighMultiplier(attackStatsHighMultiplier_), attackStatsLowMultiplier(attackStatsLowMultiplier_) {};
 	
 	Attribute::Enum getEffect() const { return effect; };
 	float getHpDamageMultiplier() const { return hpDamageMultiplier; };
@@ -203,14 +199,18 @@ private:
 	const float attackStatsLowMultiplier, attackStatsHighMultiplier;
 };
 
-class Room : public NamedObject, public DebugPrintObject
+class Room : public GameObject, public DebugPrintObject
 {
 public:
 
 	Room(const std::string& name_, const std::string& description_) :
-		NamedObject(name_), description(description_) {};
+		GameObject(name_, ObjectType::ROOM), description(description_) {};
+
+	std::vector<std::vector<std::shared_ptr<RenderableObject>>> background;
+	std::vector<std::vector<std::shared_ptr<RenderableObject>>> overlay;
 
 	std::string getDescription() const { return description; };
+	void initialize(unsigned int width, unsigned int height);
 	virtual void debugPrint() const;
 
 protected:

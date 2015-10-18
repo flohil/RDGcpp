@@ -17,7 +17,8 @@ public:
 
 	std::stack<GameState*> states;
 	sf::RenderWindow window;
-	sf::Sprite background;
+	std::shared_ptr<RenderableObject> background;
+	sf::Sprite backgroundSprite;
 
 	bool initializedSuccessfully() const { return successfullyInitialized; };
 	void pushState(GameState* state);
@@ -44,6 +45,7 @@ private:
 	sf::VideoMode desktopVmode;
 	sf::VideoMode vmode;
 	std::unique_ptr<Maze> maze;
+
 };
 
 #endif /* GAME_HPP */

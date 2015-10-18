@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "gameState.hpp"
+#include "map.hpp"
 
 class GameStateGame : public GameState
 {
@@ -11,6 +12,7 @@ private:
 
 	sf::View view;
 	sf::View guiView;
+	std::unique_ptr<Map> map;
 
 public:
 

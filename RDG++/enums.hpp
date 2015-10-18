@@ -3,9 +3,19 @@
 
 #include <string>
 
+struct ObjectType
+{
+	enum Enum { ITEM, CREATURE, ATTACK, ROOM, TILE, WALL, KEY, UNKNWON };
+};
+
+struct ItemType
+{
+	enum Enum { WEAPON, ARMAMENT, POTION, UNKNOWN };
+};
+
 struct ViewingDirections
 {
-	enum Enum { N, E, S, W };
+	enum Enum { N, E, S, W, UNKNOWN };
 };
 
 struct DifficultyLevel
@@ -48,6 +58,30 @@ struct Attacks
 	enum Enum { TORSO, HEAD, ARMS, LEGS, PARRY, SET, POTION, UNKNOWN };
 };
 
+
+struct Point {
+	unsigned int x;
+	unsigned int y;
+};
+
+struct ItemBalance
+{
+	ItemType::Enum itemType;
+	unsigned int balanceCount;
+};
+
+struct ItemTypeName
+{
+	std::string itemName;
+	ItemType::Enum itemType;
+};
+
+struct FoundPoint
+{
+	Point point;
+	bool found;
+};
+
 // maps strings to enums
 class EnumMapper
 {
@@ -60,6 +94,9 @@ public:
 	static Attribute::Enum mapAttribute(std::string input);
 	static Mode::Enum mapMode(std::string input);
 	static WeaponType::Enum mapWeaponType(std::string input);
+	static RoomTypes::Enum mapRoomTypes(std::string input);
+
+	static std::string mapRoomNames(RoomTypes::Enum input);
 };
 
 #endif // ENUMS_INCLUDE

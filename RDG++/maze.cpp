@@ -1,8 +1,10 @@
 #include "maze.hpp"
 #include <iostream>
 #include "random.hpp"
+#include "easylogging++.hpp"
+#include "chances.hpp"
 
-const std::set<ViewingDirections::Enum> MazeRoom::allDirs 
+const std::set<ViewingDirections::Enum> MazeRoom::allDirs
 {
 	ViewingDirections::N,
 	ViewingDirections::E,
@@ -12,12 +14,14 @@ const std::set<ViewingDirections::Enum> MazeRoom::allDirs
 
 void Maze::generate()
 {
+
 	for (unsigned int x = 0; x < size.x; x++)
 	{
+		std::vector<std::shared_ptr<MazeRoom>> row;
 		for (unsigned int y = 0; y < size.y; y++)
 		{
 			std::shared_ptr<MazeRoom> room(new MazeRoom(Point{ x, y }));
-			maze[x][y] = room;
+			row.push_back(room);
 
 			if (x == start.x && y == start.y)
 			{
@@ -34,6 +38,8 @@ void Maze::generate()
 				freeSet.insert(room);
 			}
 		}
+
+		maze.push_back(row);
 	}
 
 	if (treasureRoom)
@@ -91,10 +97,11 @@ void Maze::generate()
 
 	if (treasureRoom)
 	{
-		std::shared_ptr<MazeRoom> room (maze[treasure.x][treasure.y]);
-		room->openDoor(ViewingDirections::E, *this);
-		room->openDoor(ViewingDirections::W, *this);
+		std::shared_ptr<MazeRoom> room(maze[treasure.x][treasure.y]);
+		room->openDoor(Chances::randomViewingDirection(), *this);
 	}
+
+	LOG(INFO) << "successfully generated maze with size " << size.x;
 }
 
 void Maze::print() const
@@ -106,11 +113,11 @@ void Maze::print() const
 
 	std::string resStr = "";
 
-	for (unsigned int y = 0; y < maze[0].size(); y++)
+	for (unsigned int y = 0; y < maze[0].size(); y++) // column
 	{
-		for (unsigned int i = 0; i < 3; i++)
+		for (unsigned int i = 0; i < 3; i++) // room height
 		{
-			for (unsigned int x = 0; x < maze.size(); x++)
+			for (unsigned int x = 0; x < maze.size(); x++) // row
 			{
 				if (i == 0)
 				{
@@ -118,14 +125,14 @@ void Maze::print() const
 
 					if (maze[x][y]->isDoorOpen(ViewingDirections::N))
 					{
-						resStr.append(" ");
+						resStr.append("-");
 					}
 					else
 					{
 						resStr.append("#");
 					}
-					
-					if (x == maze.size() - 1)
+
+					if (x == (maze.size() - 1))
 					{
 						resStr.append("#");
 					}
@@ -134,7 +141,7 @@ void Maze::print() const
 				{
 					if (maze[x][y]->isDoorOpen(ViewingDirections::W))
 					{
-						resStr.append(" ");
+						resStr.append("|");
 					}
 					else
 					{
@@ -143,11 +150,11 @@ void Maze::print() const
 
 					resStr.append(" ");
 
-					if (maze.size() - 1)
+					if (x == (maze.size() - 1))
 					{
 						if (maze[x][y]->isDoorOpen(ViewingDirections::E))
 						{
-							resStr.append(" ");
+							resStr.append("|");
 						}
 						else
 						{
@@ -155,7 +162,7 @@ void Maze::print() const
 						}
 					}
 				}
-				else if (y != maze[0].size() - 1)
+				else if (y != (maze[0].size() - 1))
 				{
 					continue;
 				}
@@ -165,14 +172,14 @@ void Maze::print() const
 
 					if (maze[x][y]->isDoorOpen(ViewingDirections::S))
 					{
-						resStr.append(" ");
+						resStr.append("-");
 					}
 					else
 					{
 						resStr.append("#");
 					}
 
-					if (x == maze.size() - 1)
+					if (x == (maze.size() - 1))
 					{
 						resStr.append("#");
 					}
@@ -186,7 +193,8 @@ void Maze::print() const
 		}
 	}
 
-	std::cout << resStr << std::endl;
+	LOG(DEBUG) << std::endl << resStr;
+	//std::cout << resStr << std::endl;
 }
 
 std::shared_ptr<MazeRoom> Maze::getRoom(const Point pos) const
@@ -225,7 +233,7 @@ bool Maze::openRandomDoor(std::set<std::shared_ptr<MazeRoom>> &notFinished, std:
 	}
 
 	// get a random room
-	std::shared_ptr<MazeRoom> room(*select_randomly(rooms.begin(), rooms.end()));
+	std::shared_ptr<MazeRoom> room(*selectRandomly(rooms.begin(), rooms.end()));
 
 	// get all closed doors of that random room and if there are none remove the room from the not finished set and return false
 	std::vector<ViewingDirections::Enum> closedDoors = room->getClosedDoorsArray();
@@ -237,7 +245,7 @@ bool Maze::openRandomDoor(std::set<std::shared_ptr<MazeRoom>> &notFinished, std:
 	}
 
 	// get a random direction
-	ViewingDirections::Enum dir = *select_randomly(closedDoors.begin(), closedDoors.end());
+	ViewingDirections::Enum dir = *selectRandomly(closedDoors.begin(), closedDoors.end());
 
 	// open the door on that random direction
 	std::shared_ptr<MazeRoom> connectedRoom = room->openDoor(dir, *this);
@@ -296,32 +304,32 @@ std::shared_ptr<MazeRoom> MazeRoom::openDoor(ViewingDirections::Enum dir, Maze& 
 
 	switch (dir)
 	{
-		case ViewingDirections::N:
-			if ((room = maze.getRoom(Point{ pos.x, pos.y - 1 })) != nullptr)
-			{
-				room->_openDoor(ViewingDirections::S);
-			}
-			break;
-		case ViewingDirections::E:
-			if ((room = maze.getRoom(Point{ pos.x + 1, pos.y })) != nullptr)
-			{
-				room->_openDoor(ViewingDirections::W);
-			}
-			break;
-		case ViewingDirections::S:
-			if ((room = maze.getRoom(Point{ pos.x, pos.y + 1 })) != nullptr)
-			{
-				room->_openDoor(ViewingDirections::N);
-			}
-			break;
-		case ViewingDirections::W:
-			if ((room = maze.getRoom(Point{ pos.x - 1, pos.y })) != nullptr)
-			{
-				room->_openDoor(ViewingDirections::E);
-			}
-			break;
+	case ViewingDirections::N:
+		if ((room = maze.getRoom(Point{ pos.x, pos.y - 1 })) != nullptr)
+		{
+			room->_openDoor(ViewingDirections::S);
+		}
+		break;
+	case ViewingDirections::E:
+		if ((room = maze.getRoom(Point{ pos.x + 1, pos.y })) != nullptr)
+		{
+			room->_openDoor(ViewingDirections::W);
+		}
+		break;
+	case ViewingDirections::S:
+		if ((room = maze.getRoom(Point{ pos.x, pos.y + 1 })) != nullptr)
+		{
+			room->_openDoor(ViewingDirections::N);
+		}
+		break;
+	case ViewingDirections::W:
+		if ((room = maze.getRoom(Point{ pos.x - 1, pos.y })) != nullptr)
+		{
+			room->_openDoor(ViewingDirections::E);
+		}
+		break;
 	}
-	
+
 	return room;
 }
 
@@ -394,7 +402,7 @@ std::set<ViewingDirections::Enum> MazeRoom::getClosedDoors() const
 }
 
 std::vector<ViewingDirections::Enum> MazeRoom::getOpenDoorsArray() const
-{ 
+{
 	std::vector<ViewingDirections::Enum> openDoorsArray;
 
 	for (ViewingDirections::Enum dir : openDoors)

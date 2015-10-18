@@ -3,15 +3,8 @@
 #include <crtdbg.h>
 
 #include <SFML/Graphics.hpp>
-#include "settings.hpp"
-#include "prototypes.hpp"
-#include "enums.hpp"
-#include "gameObjects.hpp"
-#include "debugPrint.hpp"
-#include "resourceManager.hpp"
 #include <iostream>
 #include <fstream>
-#include <memory>
 #include "easylogging++.hpp"
 #include "game.hpp"
 #include "gameStateMainMenu.hpp"
@@ -23,6 +16,9 @@ int main()
 	// check for memory leaks
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+
+	// seet random number generator
+	srand((unsigned int)time(NULL));
 
 // initialize logging
 

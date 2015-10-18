@@ -8,7 +8,10 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	SETTINGS_FILE_PATH("settings.txt"),
 	CONFIG_PATH("config/"),
 	IMAGE_PATH("res/"),
-	COLOR_DEPTH(32)
+	COLOR_DEPTH(32), 
+	ROOM_WIDTH(8),
+	ROOM_HEIGHT(6),
+	MAX_TRIES(15)
 {
 
 	//set default values for variables
@@ -16,6 +19,8 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	width = desktopWidth;
 	height = desktopHeight;
 	mazeSize = 5;
+	tileSize = 32;
+	creatureSize = 128;
 
 	successfullyLoaded = loadSettings();
 }
@@ -34,6 +39,7 @@ void Settings::writeDefaultSettings()
 	outfile << "width = " << width << std::endl;
 	outfile << "height = " << height << std::endl;
 	outfile << "fullscreen = " << ((fullscreen == true) ? "TRUE" : "FALSE") << std::endl;
+	outfile << "mazeSize = " << mazeSize << std::endl;
 
 	// close settings file
 	outfile.close();
@@ -48,6 +54,7 @@ void Settings::saveSettings()
 	settingsParser.set("width", width);
 	settingsParser.set("height", height);
 	settingsParser.set("fullscreen", fullscreen);
+	settingsParser.set("mazeSize", mazeSize);
 
 	settingsParser.saveToFile();
 	settingsParser.print();
@@ -81,6 +88,17 @@ bool Settings::loadSettings()
 		settingsParser.get("width", width);
 		settingsParser.get("height", height);
 		settingsParser.get("fullscreen", fullscreen);
+		settingsParser.get("mazeSize", mazeSize);
+		settingsParser.get("tileSize", tileSize);
+
+		// mazeSize must be uneven number >= 3
+		if (mazeSize < 3 || (mazeSize % 2) != 1)
+		{
+			LOG(WARNING) << "mazeSize must be uneven number >= 3 but was " << mazeSize << ".";
+			LOG(INFO) << "Settings mazeSize to 3.";
+
+			mazeSize = 3;
+		}
 
 		settingsParser.print();
 	}

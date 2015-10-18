@@ -15,12 +15,17 @@ public:
 	const std::string CONFIG_PATH;
 	const std::string IMAGE_PATH;
 	const unsigned int COLOR_DEPTH;
+	const unsigned int ROOM_WIDTH; // in tiles excluding walls
+	const unsigned int ROOM_HEIGHT; // in tiles excluding walls
+	const unsigned int MAX_TRIES; // number of tries when looking for a free field in a room
 
 	// variables
 	unsigned int width;
 	unsigned int height;
 	bool fullscreen;
 	unsigned int mazeSize;
+	unsigned int tileSize;
+	unsigned int creatureSize;
 
 	// functions
 	Settings(unsigned int desktopWidth, unsigned int desktopHeight);

@@ -6,11 +6,6 @@
 #include <vector>
 #include <memory>
 
-struct Point {
-	unsigned int x;
-	unsigned int y;
-};
-
 class MazeRoom
 {
 public:
@@ -21,6 +16,11 @@ public:
 
 	MazeRoom(const Point pos_) : pos(pos_) {};
 
+	std::set<ViewingDirections::Enum> getOpenDoors() const;
+	std::set<ViewingDirections::Enum> getClosedDoors() const;
+	std::vector<ViewingDirections::Enum> getOpenDoorsArray() const;
+	std::vector<ViewingDirections::Enum> getClosedDoorsArray() const;
+	bool isDoorOpen(ViewingDirections::Enum dir) const;
 
 private:
 
@@ -31,11 +31,6 @@ private:
 	void _openDoor(ViewingDirections::Enum dir);
 	std::shared_ptr<MazeRoom> closeDoor(ViewingDirections::Enum dir, Maze& maze);
 	void _closeDoor(ViewingDirections::Enum dir);
-	bool isDoorOpen(ViewingDirections::Enum dir) const;
-	std::set<ViewingDirections::Enum> getOpenDoors() const;
-	std::set<ViewingDirections::Enum> getClosedDoors() const;
-	std::vector<ViewingDirections::Enum> getOpenDoorsArray() const;
-	std::vector<ViewingDirections::Enum> getClosedDoorsArray() const;
 	std::shared_ptr<MazeRoom> getAdjacentRoom(ViewingDirections::Enum dir, Maze& maze) const;
 };
 
@@ -47,12 +42,16 @@ public:
 	Maze(const Point size_) : Maze(size_, Point{ 0u, 0u }, Point{ size_.x - 1, size_.y - 1 }, true, 1u, Point{ size_.x / 2, size_.y / 2 }) {};
 	Maze(const Point size_, bool treasureRoom_, const unsigned int correctPaths_) : Maze(size_, Point{ 0u, 0u }, Point{ size_.x - 1, size_.y - 1 }, treasureRoom_, correctPaths_, Point{ size_.x / 2, size_.y / 2 }) {};
 	Maze(const Point size_, const Point start_, const Point end_, bool treasureRoom_, const unsigned int correctPaths_, const Point treasure_) :
-		size(size_), start(start_), end(end_), treasureRoom(treasureRoom_), correctPaths(correctPaths_), treasure(treasure_) {};
+		size(size_), start(start_), end(end_), treasureRoom(treasureRoom_), correctPaths(correctPaths_), treasure(treasure_) 
+	{
+		//maze(size_, std::vector<std::shared_ptr<MazeRoom>>(size_));
+	};
 
 	void generate();
 	void print() const;
 	std::shared_ptr<MazeRoom> getRoom(const Point pos) const;
 	Point getTreasurePos() const;
+	Point getSize() const { return size; };
 
 private:
 

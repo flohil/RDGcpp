@@ -4,19 +4,43 @@
 #include <iostream>
 #include <map>
 
-bool RenderableObject::obtainTexture() {
+bool RenderableObject::obtainSprite(ObjectType::Enum objectType) {
 
-	texture = ResourceManager::getInstance().getTexture(name);
+	if (objectType == ObjectType::TILE)
+	{
+		sprite = ResourceManager::getInstance().getRandomTile(name);
+	}
+	else
+	{
+		sprite.setTexture(ResourceManager::getInstance().getTexture(name));
+		sprite.setTextureRect(sf::IntRect(0, 0, ResourceManager::getInstance().getTexture(name).getSize().x, ResourceManager::getInstance().getTexture(name).getSize().y));
+	}
 	return false;
 }
 
-void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)
+void RenderableObject::setSize(const unsigned int width, const unsigned int height)
 {
+	sf::Vector2f scale;
+
+	if (objectType == ObjectType::TILE)
+	{
+		sf::Texture& tex = ResourceManager::getInstance().getTexture("tileset");
+		scale = sf::Vector2f(static_cast<float>(width) / tex.getSize().x * 10, static_cast<float>(height) / tex.getSize().y * 10); //tileset is 320x320 but tile is only 32x32
+	}
+	else
+	{
+		sf::Texture& tex = ResourceManager::getInstance().getTexture(name);
+		scale = sf::Vector2f(static_cast<float>(width) / tex.getSize().x, static_cast<float>(height) / tex.getSize().y);
+	}
+	sprite.setScale(scale);
+}
+
+void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)
+{	
 	window.draw(sprite);
 }
 
-Item::~Item()
-{
+Item::~Item() {
 
 }
 
@@ -71,7 +95,7 @@ void Weapon::debugPrint() const
 	std::cout << "accuracy = " << accuracy << std::endl;
 	std::cout << "defence = " << defence << std::endl;
 	std::cout << "slots = " << slots << std::endl;
-	std::cout << "max = " << max << std::endl;
+	std::cout << "max = " << maxWeapons << std::endl;
 	std::cout << std::endl;
 }
 
@@ -94,6 +118,23 @@ void Room::debugPrint() const
 	std::cout << "name = " << name << std::endl;
 	std::cout << "description = " << description << std::endl;
 	std::cout << std::endl;
+}
+
+void Room::initialize(unsigned int width, unsigned int height)
+{
+	// null-initialize overlay and background
+	for (unsigned int y = 0; y < height; y++) //rows
+	{
+		std::vector<std::shared_ptr<RenderableObject>> overlayRow;
+		std::vector<std::shared_ptr<RenderableObject>> backgroundRow;
+		for (unsigned int x = 0; x < width; x++) //cols
+		{
+			overlayRow.push_back(nullptr);
+			backgroundRow.push_back(nullptr);
+		}
+		overlay.push_back(overlayRow);
+		background.push_back(backgroundRow);
+	}
 }
 
 void Creature::resetOriginals()
