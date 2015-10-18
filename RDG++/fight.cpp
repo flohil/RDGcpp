@@ -1,4 +1,6 @@
 #include "fight.hpp"
+#include "minAvgMax.hpp"
+#include "chances.hpp"
 
 Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Creature> enemy_)
 	: player(player_)
@@ -9,6 +11,7 @@ Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Creature> enemy_)
 	selectedPotion = nullptr;
 	enemyAttackHealthDamage = 0;
 	enemyAttackAttributeDamage = 0;
+	enemyArmorSum = 0;
 	attackSet = false;
 
 	changeTabActive = false;
@@ -215,7 +218,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 		{
 			// when creature (player) parries successful, he deals x times the damage of a normal torso attack
 			parryMultiplier = 2.f;
-			*activeAttack = Attacks::TORSO;
+			*activeAttack->getName = Attacks::TORSO;
 		}
 		else
 		{
@@ -245,7 +248,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 
 void Fight::attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender)
 {
-	if (activeAttack == nullptr) return;
+	if (activeAttack.getName) return;
 
 	float healthDmg = 0.f;
 	float attributeDmg = 0.f;
@@ -296,7 +299,7 @@ float Fight::calcCreatureSpeed(std::shared_ptr<Creature> creature)
 	float speed = 0.f;
 
 	// get monster's speed value
-	if (creature == Monster)
+	if (creature instanceof Monster)
 	{
 		return creature->speed;
 	}
@@ -376,7 +379,7 @@ float Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<
 	}
 
 	//perform calculations
-	attackerAccuracyBase = activeAttack.hitPropability * (attacker->accuracy + calcCreatureAccuracy(attacker) / attacker->accuracy * accuracyBase));
+	attackerAccuracyBase = activeAttack.getHitProbability * (attacker->accuracy + calcCreatureAccuracy(attacker) / attacker->accuracy * accuracyBase);
 	//attackerAccuracy = new MinAvgMax(randAccuracyLow, randAccuracyHigh, attackerAccuracyBase);
 	//defenderSpeed = speedBasedSuccess(attacker, defender).defender;
 
@@ -415,14 +418,14 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	float baseDefense;
 
 	//variables
-	MinAvgMax attackDamage;
-	MinAvgMax attackerRawDamage;
+	MinAvgMax *attackDamage;
+	MinAvgMax *attackerRawDamage;
 	float defenderDefense;
-	MinAvgMax healthDamage;
+	MinAvgMax *healthDamage;
 	float finishedStagesMult;
 
 	//results
-	float randHealthDamage
+	float randHealthDamage;
 
 	// set parameters
 	if (attaker instaneof Monster)
@@ -440,9 +443,42 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	{
 		defenderArmor = 0;
 		finishedStagesMult = 1 + (finishedStages / finishedStagesDivisor);
-		if (((Monster) defender).level == DifficultyLevel::EASY 
+		if (defender.level == DifficultyLevel::EASY)
+		{
+			baseDefense = baseDefenseEasy;
+		}
+		else if (defender.DifficultyLevel::NORMAL)
+		{
+			baseDefense = baseDefenseNormal;
+		}
+		else
+		{
+			baseDefense = baseDefenseHard;
+		}
+	}
+	else if (defender == player)
+	{
+		defenderArmor = armorView.getStats(ArmorStatsTypes.ARMAMENT, ArmorStatsMode.SUM, ArmorStatsAttributes.ARMOR);
+		finishedStagesMult = 1;
+		baseDefense = baseDefensePlayer;
+	}
+	else
+	{
+		defenderArmor = enemyArmorSum;
+		finishedStagesMult = 1;
+		baseDefense = baseDefensePlayer;
 	}
 
+	// perform calculations
+	attackDamage = new MinAvgMax(activeAttack.getAttackStatsLowMultiplier, activeAttack.getAttackStatsHighMultiplier, activeAttack.getHpDamageMultiplier);
+	attackerRawDamage = new MinAvgMax(
+		parryMultiplier * attackerRawDamage->min / defenderDefense * damageMult,
+		parryMultiplier * attackerRawDamage->max / defenderDefense * damageMult);
+
+	// calculate a randomized result
+	randHealthDamage = Chances::randomFloat(healthDamage->min, healthDamage->max);
+
+	return randHealthDamage;
 }
 
 float Fight::calcAttributeDamage(std::shared_ptr<Creature> defender)

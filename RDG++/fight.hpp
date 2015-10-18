@@ -18,7 +18,7 @@ private:
 	// VARIABLES
 	bool activeFight;
 	Attacks::Enum attacks;
-	std::shared_ptr<Attacks::Enum> activeAttack;
+	std::shared_ptr<Attack> activeAttack;
 	float parryMultiplier;
 	//GameEnvironment gameEnvironment;
 	//Chat chat;
@@ -35,6 +35,7 @@ private:
 	std::shared_ptr<Potion> selectedPotion;
 	float enemyAttackHealthDamage;
 	float enemyAttackAttributeDamage;
+	float enemyArmorSum;
 	bool enemyFinished;
 
 	// METHODS

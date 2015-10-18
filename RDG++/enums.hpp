@@ -13,6 +13,11 @@ struct ItemType
 	enum Enum { WEAPON, ARMAMENT, POTION, UNKNOWN };
 };
 
+struct CreatureType
+{
+	enum Enum { CREATURE, PLAYER };
+};
+
 struct ViewingDirections
 {
 	enum Enum { N, E, S, W, UNKNOWN };
