@@ -189,7 +189,13 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1);
 		doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2);
 		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2) + 1;
-		angle = 0.0f;
+		if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y)
+		{
+			angle = 270.0f;
+		}
+		else {
+			angle = 0.0f;
+		}
 		break;
 	case ViewingDirections::E:
 		doorx1 = (roomIndizes.x + 1) * (settings->ROOM_WIDTH + 1);
@@ -198,14 +204,26 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
 		std::cout << "doorx1: " << doorx1 << ", doorx2: " << doorx2 << ", ";
 		std::cout << "doory1: " << doory1 << ", doory2: " << doory2 << std::endl;
-		angle = 90.0f;
+		if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y)
+		{
+			angle = 0.0f;
+		}
+		else {
+			angle = 90.0f;
+		}
 		break;
 	case ViewingDirections::S:
 		doory1 = (roomIndizes.y + 1) * (settings->ROOM_HEIGHT + 1);
 		doory2 = (roomIndizes.y + 1) * (settings->ROOM_HEIGHT + 1);
 		doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2);
 		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1) + (settings->ROOM_WIDTH / 2) + 1;
-		angle = 180.0f;
+		if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y)
+		{
+			angle = 270.0f;
+		}
+		else {
+			angle = 180.0f;
+		}
 		break;
 	case ViewingDirections::W:
 		doorx1 = roomIndizes.x * (settings->ROOM_WIDTH + 1);
@@ -214,19 +232,27 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
 		std::cout << "doorx1: " << doorx1 << ", doorx2: " << doorx2 << ", ";
 		std::cout << "doory1: " << doory1 << ", doory2: " << doory2 << std::endl;
-		angle = 270.0f;
+		if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y)
+		{
+			angle = 0.0f;
+		}
+		else {
+			angle = 270.0f;
+		}
 		break;
 	}
 
 	// treasure chamber
-	if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y) {
-		background[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle));
-		overlay[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle));
+	if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y) 
+	{
+		background[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f));
+		overlay[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f));
 		background[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
 		overlay[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
 	}
 	// normal door
-	else {
+	else 
+	{
 		background[doory1][doorx1].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
 		overlay[doory1][doorx1] = nullptr;
 		background[doory2][doorx2].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));

@@ -26,7 +26,7 @@ bool ResourceManager::loadTexture(const std::string& textureName, const std::str
 			textures[textureName] = texture;
 
 			sf::Sprite sprite;
-			sprite.setTexture(texture);
+			sf::Sprite(texture, sf::IntRect(0, 0, texture.getSize().x, texture.getSize().y));
 			sprites.insert(std::pair<const std::string, sf::Sprite>(textureName, sprite));
 
 			LOG(DEBUG) << "loaded " << settings->IMAGE_PATH + texturePath;
