@@ -21,6 +21,7 @@ GameState(game_)
 	map.reset(new Map(game));
 	map->init();
 
+	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName));
 }
 
 void GameStateGame::draw(const float deltaTime)

@@ -14,7 +14,8 @@ private:
 	sf::View messageView;
 	sf::View inventoryView;
 	sf::View playerView;
-	std::unique_ptr<Map> map;
+	std::shared_ptr<Map> map;
+	std::shared_ptr<Player> player;
 
 public:
 

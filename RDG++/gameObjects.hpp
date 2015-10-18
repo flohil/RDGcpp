@@ -87,12 +87,16 @@ private:
 	CreatureType::Enum creatureType;
 };
 
-class Player : public Creature
+class Player : public RenderableObject, public Creature
 {
 public:
 
-	Player(float hp_, float strength_, float speed_, float accuracy_) : Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER) {};
+	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_) : 
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_) {};
 
+private:
+
+	const std::string playerName;
 };
 
 class Armament : public Item, public DebugPrintObject
