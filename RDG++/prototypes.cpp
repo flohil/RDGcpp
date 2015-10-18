@@ -143,6 +143,7 @@ bool MonsterFactory::importConfig(const std::string& path)
 			}
 
 			ResourceManager::getInstance().loadTexture(name, image);
+			ResourceManager::getInstance().loadTexture(name + "_big", image.substr(0, image.find(".png")) + "_big.png");
 
 			std::shared_ptr<MonsterTemplate> monster(new MonsterTemplate(name, image, level, killBonusType, classMultiplier, statsLowMultiplier, statsHighMultiplier, killBonusLow, killBonusHigh, hp, strength, speed, accuracy));
 

@@ -15,6 +15,10 @@ GameStateMainMenu::GameStateMainMenu(Game& game_) :
 	size *= 0.5f; // for positioning view centrally
 	guiView.setCenter(size);
 	view.setCenter(size);
+
+	game.backgroundSprite.setTexture(ResourceManager::getInstance().getTexture("Frog"));
+	game.backgroundSprite.setTextureRect(sf::IntRect(0, 0, 64, 64));
+	game.backgroundSprite.setScale(sf::Vector2f(0.5f, 0.5f));
 }
 
 void GameStateMainMenu::draw(const float deltaTime)
@@ -22,7 +26,7 @@ void GameStateMainMenu::draw(const float deltaTime)
 	game.window.setView(view);
 
 	game.window.clear(sf::Color::Black);
-	game.window.draw(game.background);
+	game.window.draw(game.backgroundSprite);
 
 	return;
 }

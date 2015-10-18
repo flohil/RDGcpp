@@ -20,6 +20,8 @@ GameState(game_)
 
 void GameStateGame::draw(const float deltaTime)
 {
+	game.window.setView(view);
+
 	game.window.clear(sf::Color::Black);
 	map->draw(game.window, deltaTime);
 

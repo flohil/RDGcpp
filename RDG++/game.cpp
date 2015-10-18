@@ -50,9 +50,6 @@ Game::Game()
 
 	// create and print all game objects for test purposes
 	// prototypeStorage->testPrintGameObjects();
-
-	background.setTexture(resourceManager.getTexture("tileset"));
-	background.setTextureRect(sf::IntRect(1*32,0,32,32));
 }
 
 void Game::pushState(GameState* state)

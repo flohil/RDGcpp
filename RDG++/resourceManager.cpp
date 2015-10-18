@@ -24,11 +24,6 @@ bool ResourceManager::loadTexture(const std::string& textureName, const std::str
 		else
 		{
 			textures[textureName] = texture;
-
-			sf::Sprite sprite;
-			sf::Sprite(texture, sf::IntRect(0, 0, texture.getSize().x, texture.getSize().y));
-			sprites.insert(std::pair<const std::string, sf::Sprite>(textureName, sprite));
-
 			LOG(DEBUG) << "loaded " << settings->IMAGE_PATH + texturePath;
 		}
 	}
@@ -65,6 +60,7 @@ bool ResourceManager::loadAdditionalResources()
 void ResourceManager::loadTiles()
 {
 	sf::Texture& tileset = textures.at("tileset");
+	textures["tileset"] = tileset;
 	unsigned int ts = 32;
 	typedef std::pair<const std::string, std::list<sf::Sprite>> spritePair;
 

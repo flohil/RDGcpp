@@ -17,7 +17,8 @@ public:
 
 	std::stack<GameState*> states;
 	sf::RenderWindow window;
-	sf::Sprite background;
+	std::shared_ptr<RenderableObject> background;
+	sf::Sprite backgroundSprite;
 
 	bool initializedSuccessfully() const { return successfullyInitialized; };
 	void pushState(GameState* state);

@@ -12,9 +12,27 @@ bool RenderableObject::obtainSprite(ObjectType::Enum objectType) {
 	}
 	else
 	{
-		sprite = ResourceManager::getInstance().getSprite(name);
+		sprite.setTexture(ResourceManager::getInstance().getTexture(name));
+		sprite.setTextureRect(sf::IntRect(0, 0, ResourceManager::getInstance().getTexture(name).getSize().x, ResourceManager::getInstance().getTexture(name).getSize().y));
 	}
 	return false;
+}
+
+void RenderableObject::setSize(const unsigned int width, const unsigned int height)
+{
+	sf::Vector2f scale;
+
+	if (objectType == ObjectType::TILE)
+	{
+		sf::Texture& tex = ResourceManager::getInstance().getTexture("tileset");
+		scale = sf::Vector2f(static_cast<float>(width) / tex.getSize().x * 10, static_cast<float>(height) / tex.getSize().y * 10); //tileset is 320x320 but tile is only 32x32
+	}
+	else
+	{
+		sf::Texture& tex = ResourceManager::getInstance().getTexture(name);
+		scale = sf::Vector2f(static_cast<float>(width) / tex.getSize().x, static_cast<float>(height) / tex.getSize().y);
+	}
+	sprite.setScale(scale);
 }
 
 void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)

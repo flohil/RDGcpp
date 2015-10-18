@@ -40,7 +40,9 @@ public:
 	bool isVisible() const { return visible; };
 	void setVisible(const bool visible_) { visible = visible_; };
 	void setAngle(const float angle_) { sprite.setRotation(angle_); };
-	void setSpritePosition(sf::Vector2f pos_) { sprite.setPosition(pos_.x + 16, pos_.y + 16); };
+	void setPosition(sf::Vector2f pos_) { sprite.setPosition(pos_.x + 16, pos_.y + 16); };
+	void setSize(const unsigned int width, const unsigned int height);
+	void setScale(const sf::Vector2f scale_) { sprite.setScale(scale_); };
 	void draw(sf::RenderWindow& window, float deltaTime);
 
 protected:

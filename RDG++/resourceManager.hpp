@@ -22,7 +22,6 @@ public:
 	bool loadTexture(const std::string& textureName, const std::string& texturePath);
 	bool loadAdditionalResources();
 	sf::Texture& getTexture(const std::string& textureName) { return textures.at(textureName); };
-	sf::Sprite& getSprite(const std::string& spriteName) { return sprites.at(spriteName); };
 	sf::Sprite& getRandomTile(const std::string& tileName);
 
 private:

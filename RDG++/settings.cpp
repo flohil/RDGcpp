@@ -20,6 +20,7 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	height = desktopHeight;
 	mazeSize = 5;
 	tileSize = 32;
+	creatureSize = 128;
 
 	successfullyLoaded = loadSettings();
 }
@@ -39,7 +40,6 @@ void Settings::writeDefaultSettings()
 	outfile << "height = " << height << std::endl;
 	outfile << "fullscreen = " << ((fullscreen == true) ? "TRUE" : "FALSE") << std::endl;
 	outfile << "mazeSize = " << mazeSize << std::endl;
-	outfile << "tileSize = " << tileSize << std::endl;
 
 	// close settings file
 	outfile.close();
@@ -55,7 +55,6 @@ void Settings::saveSettings()
 	settingsParser.set("height", height);
 	settingsParser.set("fullscreen", fullscreen);
 	settingsParser.set("mazeSize", mazeSize);
-	settingsParser.set("tileSize", tileSize);
 
 	settingsParser.saveToFile();
 	settingsParser.print();

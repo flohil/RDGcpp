@@ -63,7 +63,7 @@ std::string Chances::randomMonster(RoomTemplate::MonsterProbabilities &monsterPr
 		balance = monsterBalance.at(DifficultyLevel::NORMAL);
 	}
 	else if (randFloat > normalThreshold && randFloat <= hardThreshold) {
-		DifficultyLevel::HARD;
+		monsterLevel = DifficultyLevel::HARD;
 		offset = monsterBalanceOffsets.at("hard");
 		balance = monsterBalance.at(DifficultyLevel::HARD);
 	}

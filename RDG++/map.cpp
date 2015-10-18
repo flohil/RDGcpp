@@ -104,6 +104,7 @@ void Map::fillWalls()
 			if (wallModX == 0 || wallModY == 0)
 			{
 				overlay[i][j].reset(new RenderableObject("darkGreyGround", ObjectType::TILE));
+				overlay[i][j]->setSize(settings->tileSize, settings->tileSize);
 			}
 		}
 	}
@@ -175,8 +176,6 @@ void Map::fillWithRooms()
 void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 {
 
-	std::cout << "roomIndizes: x = " << roomIndizes.x << ", y = " << roomIndizes.y << std::endl;
-
 	unsigned int doorx1 = 0;
 	unsigned int doorx2 = 0;
 	unsigned int doory1 = 0;
@@ -202,8 +201,6 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 		doorx2 = (roomIndizes.x + 1) * (settings->ROOM_WIDTH + 1);
 		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
 		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
-		std::cout << "doorx1: " << doorx1 << ", doorx2: " << doorx2 << ", ";
-		std::cout << "doory1: " << doory1 << ", doory2: " << doory2 << std::endl;
 		if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y)
 		{
 			angle = 0.0f;
@@ -230,8 +227,6 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1);
 		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
 		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
-		std::cout << "doorx1: " << doorx1 << ", doorx2: " << doorx2 << ", ";
-		std::cout << "doory1: " << doory1 << ", doory2: " << doory2 << std::endl;
 		if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y)
 		{
 			angle = 0.0f;
@@ -246,16 +241,22 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 	if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y) 
 	{
 		background[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f));
+		background[doory1][doorx1]->setSize(settings->tileSize, settings->tileSize);
 		overlay[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f));
+		overlay[doory1][doorx1]->setSize(settings->tileSize, settings->tileSize);
 		background[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
+		background[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
 		overlay[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
+		overlay[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
 	}
 	// normal door
 	else 
 	{
 		background[doory1][doorx1].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
+		background[doory1][doorx1]->setSize(settings->tileSize, settings->tileSize);
 		overlay[doory1][doorx1] = nullptr;
 		background[doory2][doorx2].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
+		background[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
 		overlay[doory2][doorx2] = nullptr;
 	}
 }
@@ -285,6 +286,7 @@ void Map::fillGround(std::shared_ptr<Room> room, RoomTypes::Enum type)
 				room->background[i][j].reset(new RenderableObject("brownGround", ObjectType::TILE));
 				break;
 			}
+			room->background[i][j]->setSize(settings->tileSize, settings->tileSize);
 		}
 	}
 }
@@ -389,6 +391,7 @@ void Map::addMonster(std::shared_ptr<Room> room, RoomTypes::Enum type)
 			if (monsterName != "") //no monster shall be placed
 			{
 				room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->monsterFactory->create(monsterName);
+				room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
 				increaseMonsterBalance(monsterName);
 			}
 		}
@@ -420,12 +423,15 @@ void Map::addItems(std::shared_ptr<Room> room, RoomTypes::Enum type)
 				{
 					case ItemType::ARMAMENT:
 						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->armamentFactory->create(item.itemName);
+						room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
 						break;
 					case ItemType::POTION:
 						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->potionFactory->create(item.itemName);
+						room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
 						break;
 					case ItemType::WEAPON:
 						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->weaponFactory->create(item.itemName);
+						room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
 						break;
 					default:
 						break;
@@ -460,6 +466,7 @@ void Map::placeKey()
 	} while (!placedKey);
 
 	rooms[randRoom.x][randRoom.y]->overlay[randTile.point.x][randTile.point.y].reset(new RenderableObject("key", ObjectType::KEY));
+	rooms[randRoom.x][randRoom.y]->overlay[randTile.point.x][randTile.point.y]->setSize(settings->tileSize, settings->tileSize);
 }
 
 // Increase the balance counter for added monster
@@ -514,13 +521,13 @@ void Map::draw(sf::RenderWindow& window, float deltaTime)
 
 			if (background[y][x] != nullptr)
 			{
-				background[y][x]->setSpritePosition(pos);
+				background[y][x]->setPosition(pos);
 				background[y][x]->draw(window, deltaTime);
 			}
 			
 			if (overlay[y][x] != nullptr)
 			{
-				overlay[y][x]->setSpritePosition(pos);
+				overlay[y][x]->setPosition(pos);
 				overlay[y][x]->draw(window, deltaTime);
 			}
 		}
