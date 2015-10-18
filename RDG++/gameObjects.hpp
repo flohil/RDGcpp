@@ -30,7 +30,7 @@ public:
 
 	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_) : RenderableObject(name_, objectType_, 0.f) {};
 	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_, float angle_) : GameObject(name_, objectType_), visible(true)
-	{ 
+	{
 		obtainSprite(objectType_);
 		sf::FloatRect globalBounds = sprite.getGlobalBounds();
 		sprite.setOrigin(globalBounds.width / 2, globalBounds.height / 2); // we want to rotate sprites around their center generally
@@ -89,7 +89,7 @@ private:
 
 class Player : public Creature
 {
-public: 
+public:
 
 	Player(float hp_, float strength_, float speed_, float accuracy_) : Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER) {};
 
@@ -139,7 +139,7 @@ public:
 
 	Potion(const std::string& name_, const Classes::Enum itemClass_, const std::string& description_, const Target::Enum target_, const Attribute::Enum effect_, const Mode::Enum mode_, const float strength_, const unsigned int duration_) :
 		Item(name_, ObjectType::ITEM, itemClass_, ItemType::POTION), description(description_), target(target_), effect(effect_), mode(mode_), strength(strength_), duration(duration_) {};
-	
+
 	std::string getDescription() const { return description; };
 	Target::Enum getTarget() const { return target; };
 	Attribute::Enum getEffect() const { return effect; };
@@ -187,7 +187,7 @@ public:
 
 	Attack(const std::string& name_, const Attribute::Enum effect_, const float hpDamageMultiplier_, const float hitProbability_, const float attributeDamageMultiplier_, const float attackStatsLowMultiplier_, const float attackStatsHighMultiplier_) :
 		GameObject(name_, ObjectType::ATTACK), effect(effect_), hpDamageMultiplier(hpDamageMultiplier_), hitProbability(hitProbability_), attributeDamageMultiplier(attributeDamageMultiplier_), attackStatsHighMultiplier(attackStatsHighMultiplier_), attackStatsLowMultiplier(attackStatsLowMultiplier_) {};
-	
+
 	Attribute::Enum getEffect() const { return effect; };
 	float getHpDamageMultiplier() const { return hpDamageMultiplier; };
 	float getHitProbability() const { return hitProbability; };
@@ -200,9 +200,9 @@ protected:
 
 	const Attribute::Enum effect;
 	const float hpDamageMultiplier, hitProbability, attributeDamageMultiplier;
-		
+
 private:
-	
+
 	const float attackStatsLowMultiplier, attackStatsHighMultiplier;
 };
 

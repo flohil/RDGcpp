@@ -8,19 +8,24 @@ GameState(game_)
 {
 	settings = game_.getSettings();
 	sf::Vector2f size = sf::Vector2f(game.window.getSize());
-	guiView.setSize(size);
-	view.setSize(size);
+	mapView.setSize(size);
+	messageView.setSize(size);
+	playerView.setSize(size);
+	inventoryView.setSize(size);
 	size *= 0.5f; // for positioning view centrally
-	guiView.setCenter(size);
-	view.setCenter(size);
+	mapView.setCenter(size);
+	messageView.setCenter(size);
+	playerView.setCenter(size);
+	inventoryView.setCenter(size);
 
 	map.reset(new Map(game));
 	map->init();
+
 }
 
 void GameStateGame::draw(const float deltaTime)
 {
-	game.window.setView(view);
+	game.window.setView(mapView);
 
 	game.window.clear(sf::Color::Black);
 	map->draw(game.window, deltaTime);
@@ -55,6 +60,10 @@ void GameStateGame::handleInput()
 			{
 				delete map.get();
 				game.window.close();
+			}
+			else
+			{
+
 			}
 
 			break;

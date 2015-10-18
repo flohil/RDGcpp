@@ -10,8 +10,10 @@ class GameStateGame : public GameState
 {
 private:
 
-	sf::View view;
-	sf::View guiView;
+	sf::View mapView;
+	sf::View messageView;
+	sf::View inventoryView;
+	sf::View playerView;
 	std::unique_ptr<Map> map;
 
 public:
