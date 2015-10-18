@@ -35,8 +35,8 @@ bool ResourceManager::loadAdditionalResources()
 {
 	std::map<std::string, std::string> textureNames;
 
-	textureNames.insert(std::pair<std::string, std::string>("player_big", "player.png"));
-	textureNames.insert(std::pair<std::string, std::string>("player", "player_big.png"));
+	textureNames.insert(std::pair<std::string, std::string>("player_big", "player_big.png"));
+	textureNames.insert(std::pair<std::string, std::string>("player", "player.png"));
 	textureNames.insert(std::pair<std::string, std::string>("armorBackground", "warrior_160x160.png"));
 	textureNames.insert(std::pair<std::string, std::string>("accuracyStats", "accuracy_stats.png"));
 	textureNames.insert(std::pair<std::string, std::string>("strengthStats", "strength_stats.png"));

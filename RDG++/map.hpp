@@ -16,18 +16,26 @@ public:
 		height((game_.getSettings()->ROOM_HEIGHT + 1) * game_.getSettings()->mazeSize + 1) {};
 
 	void init();
+	void update();
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> getBackround() const { return background; };
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> getOverlay() const { return overlay; };
 	std::shared_ptr<RenderableObject> getOverlayObject(Point pos) const { return overlay[pos.x][pos.y]; };
+	std::shared_ptr<Room> getRoom(Point pos) { return rooms[pos.x][pos.y]; };
 	void setOverlayObject(Point pos, std::shared_ptr<RenderableObject> obj) { overlay[pos.x][pos.y] = obj; };
 	bool isFieldPassable(Point fieldPos) const;
 	void draw(sf::RenderWindow& window, float deltaTime);
+	void setPlayer(std::shared_ptr<Player> player_) { player = player_; };
+	void handleInput(sf::Event event);
 
 private:
 
 	Game& game;
 	std::unique_ptr<Maze> maze;
 	std::shared_ptr<Settings> settings;
+	std::shared_ptr<Player> player;
+
+	Point prevPlayerPosition;
+	Point playerPosition;
 
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> background;
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> overlay;
@@ -59,6 +67,7 @@ private:
 	const unsigned int strongItemOffset = 1;
 
 	void fillWithRooms();
+	void initPlayerPosition();
 	RoomTypes::Enum detectRoomType(Point indizes) const;
 	void loadRooms();
 	void fillWalls();

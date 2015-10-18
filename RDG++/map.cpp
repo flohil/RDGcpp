@@ -84,6 +84,7 @@ void Map::init()
 
 	fillWalls();
 	loadRooms();
+	initPlayerPosition();
 	fillWithRooms();
 
 	LOG(INFO) << "successfully initialized map";
@@ -533,4 +534,23 @@ void Map::draw(sf::RenderWindow& window, float deltaTime)
 		}
 	}
 	return;
+}
+
+void Map::initPlayerPosition()
+{
+	FoundPoint randPoint = Chances::randomFreeTile(rooms[0][0]->overlay, settings->MAX_TRIES);
+
+	prevPlayerPosition = randPoint.point;
+	playerPosition = randPoint.point;
+}
+
+void Map::handleInput(sf::Event event)
+{
+
+}
+
+void Map::update()
+{
+	overlay[prevPlayerPosition.x][prevPlayerPosition.y] = nullptr;
+	overlay[playerPosition.x][playerPosition.y] = player;
 }

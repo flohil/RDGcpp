@@ -8,6 +8,8 @@
 #include <string>
 #include <memory>
 
+class Map;
+
 class GameObject
 {
 public:

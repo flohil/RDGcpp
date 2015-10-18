@@ -2,6 +2,7 @@
 
 #include "gameStateGame.hpp"
 #include "gameState.hpp"
+#include "chances.hpp"
 
 GameStateGame::GameStateGame(Game& game_) :
 GameState(game_)
@@ -18,10 +19,12 @@ GameState(game_)
 	playerView.setCenter(size);
 	inventoryView.setCenter(size);
 
+	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName));
+	player->setSize(settings->tileSize, settings->tileSize);
+
 	map.reset(new Map(game));
 	map->init();
-
-	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName));
+	map->setPlayer(player);
 }
 
 void GameStateGame::draw(const float deltaTime)
@@ -36,6 +39,7 @@ void GameStateGame::draw(const float deltaTime)
 
 void GameStateGame::update(const float deltaTime)
 {
+	map->update();
 	return;
 }
 
@@ -63,7 +67,7 @@ void GameStateGame::handleInput()
 			}
 			else
 			{
-
+				map->handleInput(event);
 			}
 
 			break;
