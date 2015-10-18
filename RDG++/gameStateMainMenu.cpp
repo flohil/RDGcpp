@@ -1,7 +1,9 @@
 #include <SFML/Graphics.hpp>
 
 #include "gameStateMainMenu.hpp"
+#include "gameStateGame.hpp"
 #include "gameState.hpp"
+#include "easylogging++.hpp"
 
 GameStateMainMenu::GameStateMainMenu(Game& game_) : 
 	GameState(game_)
@@ -48,7 +50,14 @@ void GameStateMainMenu::handleInput()
 			case sf::Event::KeyPressed:
 			{
 				// just sample code - remove later on
-				if (event.key.code == sf::Keyboard::Escape) game.window.close();
+				if (event.key.code == sf::Keyboard::Escape)
+				{
+					game.window.close();
+				}
+				if (event.key.code == sf::Keyboard::Return)
+				{
+					loadgame();
+				}
 				break;
 			}
 			default: break;
@@ -56,19 +65,28 @@ void GameStateMainMenu::handleInput()
 	}
 
 	// check all the window's events that were triggered since the last iteration of the loop
-	while (game.window.pollEvent(event))
-	{
-		// "close requested" event: we close the window
-		if (event.type == sf::Event::Closed) {
-			game.window.close();
-		}
-		else if (event.type == sf::Event::KeyPressed) {
-			settings->fullscreen = settings->fullscreen;
-			game.window.create(sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH), settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+	//while (game.window.pollEvent(event))
+	//{
+	//	// "close requested" event: we close the window
+	//	if (event.type == sf::Event::Closed) {
+	//		game.window.close();
+	//	}
+	//	else if (event.type == sf::Event::KeyPressed) {
+	//		settings->fullscreen = settings->fullscreen;
+	//		game.window.create(sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH), settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
 
-			settings->saveSettings();
-		}
+	//		settings->saveSettings();
+	//	}
 
-		return;
-	}
+	//	return;
+	//}
+}
+
+void GameStateMainMenu::loadgame()
+{
+	LOG(INFO) << "Loading game world...";
+
+	game.pushState(new GameStateGame(game));
+
+	return;
 }

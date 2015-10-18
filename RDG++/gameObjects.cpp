@@ -18,13 +18,8 @@ bool RenderableObject::obtainSprite(ObjectType::Enum objectType) {
 }
 
 void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)
-{
+{	
 	window.draw(sprite);
-}
-
-void RenderableObject::setRotation(const float angle)
-{
-	sprite.setRotation(angle);
 }
 
 Item::~Item() {
@@ -82,7 +77,7 @@ void Weapon::debugPrint() const
 	std::cout << "accuracy = " << accuracy << std::endl;
 	std::cout << "defence = " << defence << std::endl;
 	std::cout << "slots = " << slots << std::endl;
-	std::cout << "max = " << max << std::endl;
+	std::cout << "max = " << maxWeapons << std::endl;
 	std::cout << std::endl;
 }
 

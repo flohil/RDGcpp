@@ -21,6 +21,7 @@ public:
 	std::shared_ptr<RenderableObject> getOverlayObject(Point pos) const { return overlay[pos.x][pos.y]; };
 	void setOverlayObject(Point pos, std::shared_ptr<RenderableObject> obj) { overlay[pos.x][pos.y] = obj; };
 	bool isFieldPassable(Point fieldPos) const;
+	void draw(sf::RenderWindow& window, float deltaTime);
 
 private:
 

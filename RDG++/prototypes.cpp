@@ -243,7 +243,7 @@ std::shared_ptr<Weapon> WeaponTemplate::clone(float externMultiplier)
 	return std::shared_ptr<Weapon>(new Weapon(name, itemClass, type, attack * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
 		speed * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
 		accuracy * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		defence * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), slots, max));
+		defence * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), slots, maxWeapons));
 }
 
 bool WeaponFactory::importConfig(const std::string& path)

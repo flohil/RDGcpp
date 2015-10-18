@@ -19,6 +19,7 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	width = desktopWidth;
 	height = desktopHeight;
 	mazeSize = 5;
+	tileSize = 32;
 
 	successfullyLoaded = loadSettings();
 }
@@ -38,6 +39,7 @@ void Settings::writeDefaultSettings()
 	outfile << "height = " << height << std::endl;
 	outfile << "fullscreen = " << ((fullscreen == true) ? "TRUE" : "FALSE") << std::endl;
 	outfile << "mazeSize = " << mazeSize << std::endl;
+	outfile << "tileSize = " << tileSize << std::endl;
 
 	// close settings file
 	outfile.close();
@@ -53,6 +55,7 @@ void Settings::saveSettings()
 	settingsParser.set("height", height);
 	settingsParser.set("fullscreen", fullscreen);
 	settingsParser.set("mazeSize", mazeSize);
+	settingsParser.set("tileSize", tileSize);
 
 	settingsParser.saveToFile();
 	settingsParser.print();
@@ -87,6 +90,7 @@ bool Settings::loadSettings()
 		settingsParser.get("height", height);
 		settingsParser.get("fullscreen", fullscreen);
 		settingsParser.get("mazeSize", mazeSize);
+		settingsParser.get("tileSize", tileSize);
 
 		// mazeSize must be uneven number >= 3
 		if (mazeSize < 3 || (mazeSize % 2) != 1)

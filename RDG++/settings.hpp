@@ -24,6 +24,7 @@ public:
 	unsigned int height;
 	bool fullscreen;
 	unsigned int mazeSize;
+	unsigned int tileSize;
 
 	// functions
 	Settings(unsigned int desktopWidth, unsigned int desktopHeight);

@@ -28,12 +28,20 @@ class RenderableObject : public GameObject
 {
 public:
 
-	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_) : GameObject(name_, objectType_), visible(true) { obtainSprite(objectType_); }; // to be replaced with texture pointer
-	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_, float angle_) : GameObject(name_, objectType_), visible(true) { obtainSprite(objectType_); setRotation(angle_); }; // to be replaced with texture pointer
+	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_) : RenderableObject(name_, objectType_, 0.f) {};
+	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_, float angle_) : GameObject(name_, objectType_), visible(true)
+	{ 
+		obtainSprite(objectType_);
+		sf::FloatRect globalBounds = sprite.getGlobalBounds();
+		sprite.setOrigin(globalBounds.width / 2, globalBounds.height / 2); // we want to rotate sprites around their center generally
+		sprite.setRotation(angle_);
+	};
 
 	bool isVisible() const { return visible; };
 	void setVisible(const bool visible_) { visible = visible_; };
-	void setRotation(const float angle);
+	void setAngle(const float angle_) { sprite.setRotation(angle_); };
+	void setSpritePosition(sf::Vector2f pos_) { sprite.setPosition(pos_.x + 16, pos_.y + 16); };
+	void draw(sf::RenderWindow& window, float deltaTime);
 
 protected:
 
@@ -42,25 +50,6 @@ protected:
 private:
 
 	bool obtainSprite(ObjectType::Enum objectType);
-
-	//virtual void draw(sf::RenderTarget& target_, sf::RenderStates states_) const
-	//{
-	//	// apply the entity's transform -- combine it with the one that was passed by the caller
-	//	states_.transform *= getTransform(); // getTransform() is defined by sf::Transformable
-
-	//	// apply the texture
-	//	states_.texture = &texture;
-
-	//	// you may also override states.shader or states.blendMode if you want
-
-	//	// draw the vertex array
-	//	target_.draw(vertices, states_);
-	//}
-
-	//sf::VertexArray vertices;
-
-	void draw(sf::RenderWindow& window, float deltaTime);
-
 	sf::Sprite sprite;
 };
 
@@ -158,7 +147,7 @@ class Weapon : public Item, public DebugPrintObject
 public:
 
 	Weapon::Weapon(const std::string& name_, const Classes::Enum itemClass_, const WeaponType::Enum type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
-		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), max(max_) {};
+		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_) {};
 
 	WeaponType::Enum getType() const { return type; };
 	float getAttack() const { return attack; };
@@ -166,14 +155,14 @@ public:
 	float getAccuracy() const { return accuracy; };
 	float getDefence() const { return defence; };
 	unsigned int getSlots() const { return slots; };
-	unsigned int getMax() const { return max; };
+	unsigned int getMaxWeapons() const { return maxWeapons; };
 	virtual void debugPrint() const;
 
 protected:
 
 	const WeaponType::Enum type;
 	const float attack, speed, accuracy, defence;
-	const unsigned int slots, max;
+	const unsigned int slots, maxWeapons;
 };
 
 class Attack : public GameObject, public DebugPrintObject

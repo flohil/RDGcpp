@@ -84,7 +84,7 @@ void ResourceManager::loadTiles()
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(3 * ts, 4 * ts, ts, ts)));
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(3 * ts, 5 * ts, ts, ts)));
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(3 * ts, 6 * ts, ts, ts)));
-	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(4 * ts, 3, ts, ts)));
+	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(4 * ts, 3 * ts, ts, ts)));
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(4 * ts, 4 * ts, ts, ts)));
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(4 * ts, 5 * ts, ts, ts)));
 	darkGreyGrounds.push_back(sf::Sprite(tileset, sf::IntRect(4 * ts, 6 * ts, ts, ts)));
@@ -144,7 +144,6 @@ void ResourceManager::loadTiles()
 
 	std::list<sf::Sprite> doorGroundTwo;
 	sf::Sprite doorGroundFlipped = sf::Sprite(tileset, sf::IntRect(5 * ts, 3 * ts, ts, ts));
-	doorGroundFlipped.setRotation(180.0f);
 	doorGroundTwo.push_back(doorGroundFlipped);
 	tiles.insert(spritePair("doorGroundTwo", doorGroundTwo));
 }

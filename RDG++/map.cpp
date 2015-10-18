@@ -174,6 +174,9 @@ void Map::fillWithRooms()
 
 void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 {
+
+	std::cout << "roomIndizes: x = " << roomIndizes.x << ", y = " << roomIndizes.y << std::endl;
+
 	unsigned int doorx1 = 0;
 	unsigned int doorx2 = 0;
 	unsigned int doory1 = 0;
@@ -193,6 +196,8 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 		doorx2 = (roomIndizes.x + 1) * (settings->ROOM_WIDTH + 1);
 		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
 		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
+		std::cout << "doorx1: " << doorx1 << ", doorx2: " << doorx2 << ", ";
+		std::cout << "doory1: " << doory1 << ", doory2: " << doory2 << std::endl;
 		angle = 90.0f;
 		break;
 	case ViewingDirections::S:
@@ -207,6 +212,8 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 		doorx2 = roomIndizes.x * (settings->ROOM_WIDTH + 1);
 		doory1 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2);
 		doory2 = roomIndizes.y * (settings->ROOM_HEIGHT + 1) + (settings->ROOM_HEIGHT / 2) + 1;
+		std::cout << "doorx1: " << doorx1 << ", doorx2: " << doorx2 << ", ";
+		std::cout << "doory1: " << doory1 << ", doory2: " << doory2 << std::endl;
 		angle = 270.0f;
 		break;
 	}
@@ -466,4 +473,31 @@ bool Map::isFieldPassable(Point fieldPos) const
 		return false;
 	}
 	return true;
+}
+
+void Map::draw(sf::RenderWindow& window, float deltaTime)
+{
+	for (unsigned int y = 0; y < height; y++)
+	{
+		for (unsigned int x = 0; x < width; x++)
+		{
+			// Set the position of the tile in the 2d world
+			sf::Vector2f pos;
+			pos.x = static_cast<float>(x * settings->tileSize);
+			pos.y = static_cast<float>(y * settings->tileSize);
+
+			if (background[y][x] != nullptr)
+			{
+				background[y][x]->setSpritePosition(pos);
+				background[y][x]->draw(window, deltaTime);
+			}
+			
+			if (overlay[y][x] != nullptr)
+			{
+				overlay[y][x]->setSpritePosition(pos);
+				overlay[y][x]->draw(window, deltaTime);
+			}
+		}
+	}
+	return;
 }

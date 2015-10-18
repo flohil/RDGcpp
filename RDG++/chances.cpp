@@ -230,6 +230,12 @@ Attacks::Enum Chances::randomAttackType() {
 	return static_cast<Attacks::Enum>(randomUInt(3)); // 0: TORSO, 1: HEAD, 2: ARMS, 3: LEGS
 }
 
+// returns a random monster attack
+ViewingDirections::Enum Chances::randomViewingDirection() {
+
+	return static_cast<ViewingDirections::Enum>(randomUInt(3)); // 0: N, 1: E, 2: S, 3: W
+}
+
 // returns Point for a random Room on the map, excluding the treasure Chamber
 Point Chances::randomRoom(unsigned int roomsX, unsigned int roomsY) {
 

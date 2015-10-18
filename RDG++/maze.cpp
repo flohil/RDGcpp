@@ -2,6 +2,7 @@
 #include <iostream>
 #include "random.hpp"
 #include "easylogging++.hpp"
+#include "chances.hpp"
 
 const std::set<ViewingDirections::Enum> MazeRoom::allDirs
 {
@@ -97,8 +98,7 @@ void Maze::generate()
 	if (treasureRoom)
 	{
 		std::shared_ptr<MazeRoom> room(maze[treasure.x][treasure.y]);
-		room->openDoor(ViewingDirections::E, *this);
-		room->openDoor(ViewingDirections::W, *this);
+		room->openDoor(Chances::randomViewingDirection(), *this);
 	}
 
 	LOG(INFO) << "successfully generated maze with size " << size.x;

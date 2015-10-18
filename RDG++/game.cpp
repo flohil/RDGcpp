@@ -6,7 +6,6 @@
 #include "game.hpp"
 #include "gameState.hpp"
 #include "easylogging++.hpp"
-#include "map.hpp"
 
 Game::Game()
 {
@@ -93,9 +92,6 @@ GameState* Game::peekState()
 
 void Game::gameLoop()
 {
-	Map map(*this);
-	map.init();
-
 	sf::Clock clock;
 
 	while (window.isOpen())
@@ -107,10 +103,10 @@ void Game::gameLoop()
 		{
 			continue;
 		}
-		peekState()->handleInput();
-		peekState()->update(deltaTime);
 		window.clear(sf::Color::Black);
 		peekState()->draw(deltaTime);
+		peekState()->handleInput();
+		peekState()->update(deltaTime);
 		window.display();
 	}
 }

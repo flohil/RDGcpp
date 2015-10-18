@@ -17,6 +17,7 @@ public:
 	static FoundPoint randomFreeTile(std::vector<std::vector<std::shared_ptr<RenderableObject>>> &tilemap, unsigned int maxIterations);
 	static Point randomRoom(unsigned int roomsX, unsigned int roomsY);
 	static Attacks::Enum Chances::randomAttackType();
+	static ViewingDirections::Enum Chances::randomViewingDirection();
 	static std::string randomMonster(RoomTemplate::MonsterProbabilities &monsterProbabilities, std::map<DifficultyLevel::Enum, 
 		std::map<std::string, unsigned int>> &monsterBalance, std::map<std::string, unsigned int> &monsterBalanceOffsets, std::map<DifficultyLevel::Enum, std::list<std::string>> &monstersLeveled);
 	static ItemTypeName randomItem(RoomTemplate::ItemProbabilities itemProbabilities, std::map<Classes::Enum, std::map<std::string, ItemBalance>> &itemsBalance,
