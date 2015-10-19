@@ -70,17 +70,27 @@ struct Point {
 
 	Point getDirPoint(ViewingDirections::Enum dir)
 	{
+		Point retPoint;
 		switch (dir)
 		{
 			case ViewingDirections::N:
-				return Point{ x, y - 1 };
+				retPoint = Point{ x, y - 1 };
+				break;
 			case ViewingDirections::E:
-				return Point{ x + 1, y };
+				retPoint = Point{ x + 1, y };
+				break;
 			case ViewingDirections::S:
-				return Point{ x, y + 1 };
+				retPoint = Point{ x, y + 1 };
+				break;
 			case ViewingDirections::W:
-				return Point{ x - 1, y };
+				retPoint = Point{ x - 1, y };
+				break;
+			default:
+				retPoint = Point{ x, y };
+				break;
 		}
+
+		return retPoint;
 	}
 };
 

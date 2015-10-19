@@ -112,11 +112,14 @@ private:
 	unsigned int tileSize;
 	float accumulatedTime = 0;
 	const float updateInterval = 0.05f;
+	const float moveDelay = 0.01f;
 	float vFactor = 100.f;
 	float velocity = 0.f;
 	float toMove = 0.f;
 	float moveDistance;
 	ViewingDirections::Enum movDir = ViewingDirections::UNKNOWN;
+	ViewingDirections::Enum intendedMovDir = ViewingDirections::UNKNOWN;
+	bool stillMovesSameDir = false;
 	bool finishedMove = true; // make sure a move finishes
 
 	void setPosition(Point position_);

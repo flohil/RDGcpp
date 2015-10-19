@@ -156,8 +156,9 @@ void Player::init(Map* map_, const unsigned int tileSize_)
 // player may only move on tiles, but for smooth movements, player is moved in between tiles
 void Player::update(const float deltaTime)
 {
-	accumulatedTime += deltaTime;
+	accumulatedTime += deltaTime; 
 
+	// only update every accumulatedTime
 	if (accumulatedTime > updateInterval)
 	{
 		unsigned int nbrKeysPressed = 0;
