@@ -149,179 +149,194 @@ void Player::init(Map* map_, const unsigned int tileSize_)
 	Point point = map->initPlayerPosition();
 	prevPlayerPosition = point;
 	playerPosition = prevPlayerPosition;
-
-	std::cout << playerPosition.x << ", " << playerPosition.y << std::endl;
+	RenderableObject::setPosition(sf::Vector2f(static_cast<float>(playerPosition.x * tileSize), static_cast<float>(playerPosition.y * tileSize)));
 }
 
 // player may only move on tiles, but for smooth movements, player is moved in between tiles
 void Player::update(const float deltaTime)
 {
-	accumulatedTimeMove += deltaTime; 
-	accumulatedTimeMoveDelay += deltaTime;
+	accumulatedTime += deltaTime;
 
-	// only update every accumulatedTime
-	if (accumulatedTimeMove > moveInterval)
+	// preMove stage: turn player, but do not yet move
+	if (accumulatedTime > moveInterval)
 	{
-		ViewingDirections::Enum tempMovDir = ViewingDirections::UNKNOWN;
-		unsigned int nbrKeysPressed = 0;
+		preMove();
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		if (sameDirCtr == sameDirInterval)
 		{
-			nbrKeysPressed++;
-			tempMovDir = ViewingDirections::N;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		{
-			nbrKeysPressed++;
-			tempMovDir = ViewingDirections::E;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		{
-			nbrKeysPressed++;
-			tempMovDir = ViewingDirections::S;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		{
-			nbrKeysPressed++;
-			tempMovDir = ViewingDirections::W;
+			sameDirCtr = 0;
+			stillMovesSameDir = true;
 		}
 
-		if (nbrKeysPressed == 1)
-		{
-			intendedMovDir = tempMovDir;
+		//std::cout << "stillMovesSameDir: " << stillMovesSameDir << std::endl;
 
-			switch (movDir) //check for obstacles here
+		// only move if movDir equals intendedMovDir - only if leaving from rest state
+		if (moveState == MoveState::RESTING)
+		{
+			if (lastDir != ViewingDirections::UNKNOWN)
 			{
-				case ViewingDirections::N:
-					picAngle = 0.f;
-					break;
-				case ViewingDirections::E:
-					picAngle = 90.f;
-					break;
-				case ViewingDirections::S:
-					picAngle = 180.f;
-					break;
-				case ViewingDirections::W:
-					picAngle = 270.f;
-					break;
-				default:
-					break;
+				if (lastDir != intendedMovDir)
+				{
+					stillMovesSameDir = false;
+				}
 			}
+			else {
+				stillMovesSameDir = false;
+			}
+		} 
+		
+		if (stillMovesSameDir)
+		{
 
-			setRotation(picAngle);
+			if (moveState == MoveState::RESTING)
+			{
+
+				//std::cout << "resting " << std::endl;
+
+				Point target = playerPosition.getDirPoint(lastDir);
+				bool passable = map->isFieldPassable(target);
+
+				if (passable)
+				{
+					//std::cout << "triggered passable move" << std::endl;
+					toMove = moveDistance;
+					velocity = vFactor;
+					moveState = MoveState::MOVING;
+					movDir = lastDir;
+				}
+				else
+				{
+					toMove = 0;
+					velocity = 0;
+					lastDir = ViewingDirections::UNKNOWN;
+				}
+					//std::cout << "toMove: " << toMove << std::endl;
+			}
 		}
 
-		accumulatedTimeMove = 0;
+		// only move if same direction key has been pressed for a while
+		
+
+		lastDir = intendedMovDir;
+
+		accumulatedTime = 0;
+		sameDirCtr++;
 	}
-	
-	//if (accumulatedTimeMoveDelay > moveInterval)
-	//	unsigned int nbrKeysPressed = 0;
 
-	//	if (finishedMove)
-	//	{
-	//		ViewingDirections::Enum tempMovDir = ViewingDirections::UNKNOWN;
+	move(deltaTime);
+}
 
-	//		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-	//		{
-	//			nbrKeysPressed++;
-	//			tempMovDir = ViewingDirections::N;
-	//		}
-	//		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	//		{
-	//			nbrKeysPressed++;
-	//			tempMovDir = ViewingDirections::E;
-	//		}
-	//		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-	//		{
-	//			nbrKeysPressed++;
-	//			tempMovDir = ViewingDirections::S;
-	//		}
-	//		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-	//		{
-	//			nbrKeysPressed++;
-	//			tempMovDir = ViewingDirections::W;
-	//		}
+void Player::preMove()
+{
+	ViewingDirections::Enum tempMovDir = ViewingDirections::UNKNOWN;
+	unsigned int nbrKeysPressed = 0;
 
-	//		bool passable = false;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	{
+		nbrKeysPressed++;
+		tempMovDir = ViewingDirections::N;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		nbrKeysPressed++;
+		tempMovDir = ViewingDirections::E;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	{
+		nbrKeysPressed++;
+		tempMovDir = ViewingDirections::S;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	{
+		nbrKeysPressed++;
+		tempMovDir = ViewingDirections::W;
+	}
 
-	//		// trigger movement per tilesize
-	//		if (nbrKeysPressed == 1)
-	//		{
-	//			movDir = tempMovDir;
+	if (nbrKeysPressed == 1)
+	{
+		intendedMovDir = tempMovDir;
 
-	//			
+		switch (intendedMovDir)
+		{
+		case ViewingDirections::N:
+			picAngle = 0.f;
+			break;
+		case ViewingDirections::E:
+			picAngle = 90.f;
+			break;
+		case ViewingDirections::S:
+			picAngle = 180.f;
+			break;
+		case ViewingDirections::W:
+			picAngle = 270.f;
+			break;
+		default:
+			break;
+		}
 
-	//			Point target = playerPosition.getDirPoint(movDir);
-	//			bool passable = map->isFieldPassable(target);
+		setRotation(picAngle);
+	} 
+	else
+	{
+		intendedMovDir = ViewingDirections::UNKNOWN;
+	}
+}
 
-	//			if (passable)
-	//			{
-	//				toMove = moveDistance;
-	//				velocity = vFactor;
-	//				finishedMove = false;
-	//			}
-	//			else
-	//			{
-	//				toMove = 0;
-	//				velocity = 0;
-	//				movDir = ViewingDirections::UNKNOWN;
-	//			}
-	//			
-	//			//std::cout << "toMove: " << toMove << std::endl;
-	//		}
-	//	}
+void Player::move(const float deltaTime)
+{
+	float distance = velocity * deltaTime;
 
-	//	accumulatedTimeMoveDelay = 0; // reset accumulated Time
-	//}
+	if (distance > toMove)
+	{
+		distance = toMove;
+		toMove = 0;
+		velocity = 0;
+		moveState = MoveState::ARRIVED;
+		//std::cout << "finished movement at: x = " << offset.x << ", " << offset.y << " with distance " << distance << std::endl;
+	}
+	else
+	{
+		toMove -= distance;
+		/*if (toMove > 0)
+		std::cout << "movement left: " << toMove << std::endl;*/
+	}
 
-	//float distance = velocity * deltaTime;
+	switch (movDir)
+	{
+		case ViewingDirections::N:
+			offset.y -= distance;
+			break;
+		case ViewingDirections::E:
+			offset.x += distance;
+			break;
+		case ViewingDirections::S:
+			offset.y += distance;
+			break;
+		case ViewingDirections::W:
+			offset.x -= distance;
+			break;
+	}
 
-	//if (distance > toMove)
-	//{
-	//	distance = toMove;
-	//	toMove = 0;
-	//	velocity = 0;
-	//	finishedMove = true;
-	//	//std::cout << "finished movement at: x = " << offset.x << ", " << offset.y << " with distance " << distance << std::endl;
-	//}
-	//else
-	//{
-	//	toMove -= distance;
-	//	/*if (toMove > 0)
-	//		std::cout << "movement left: " << toMove << std::endl;*/
-	//}
-
-	//switch (movDir)
-	//{
-	//	case ViewingDirections::N:
-	//		offset.y -= distance;
-	//		break;
-	//	case ViewingDirections::E:
-	//		offset.x += distance;
-	//		break;
-	//	case ViewingDirections::S:
-	//		offset.y += distance;
-	//		break;
-	//	case ViewingDirections::W:
-	//		offset.x -= distance;
-	//		break;
-	//}
-
+	// std::cout << "moveState: " << moveState << std::endl;
+		
 	//if (movDir != ViewingDirections::UNKNOWN && finishedMove)
-	//{
-	//	setPosition(playerPosition.getDirPoint(movDir));
-	//}
+	if (moveState == MoveState::ARRIVED)
+	{
+		//std::cout << "playerPosition: x = " << playerPosition.x << ", y = " <<  playerPosition.y << std::endl;
+		setPosition(playerPosition.getDirPoint(movDir));
+		//std::cout << "after playerPosition: x = " << playerPosition.x << ", y = " << playerPosition.y << std::endl;
+		offset.x = 0;
+		offset.y = 0;
+		moveState = MoveState::RESTING;
+	}
 
-	//if (finishedMove)
-	//{
-	//	movDir = ViewingDirections::UNKNOWN;
-	//	offset.x = 0;
-	//	offset.y = 0;
-	//}
-
-	float x = playerPosition.x * tileSize + offset.x;
-	float y = playerPosition.y * tileSize + offset.y;
-	RenderableObject::setPosition(sf::Vector2f(x,y));
+	if (moveState == MoveState::MOVING)
+	{
+		// std::cout << "offset: x = " << offset.x << ", y = " << offset.y << std::endl;
+		float x = playerPosition.x * tileSize + offset.x;
+		float y = playerPosition.y * tileSize + offset.y;
+		RenderableObject::setPosition(sf::Vector2f(x, y));
+	}
 }
 
 void Player::handleInput(sf::Event event)

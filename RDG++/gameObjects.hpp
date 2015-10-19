@@ -110,20 +110,23 @@ private:
 	sf::Vector2f offset = sf::Vector2f(0.f, 0.f); //used for smooth movement between tiles - in pixels
 	float picAngle = 0.f;
 	unsigned int tileSize;
-	float accumulatedTimeMoveDelay = 0;
-	float accumulatedTimeMove = 0;
-	const float moveInterval = 0.025f;
-	const float moveDelayInterval = 0.05f;
+	float accumulatedTime = 0;
+	const float moveInterval = 0.05f;
 	float vFactor = 100.f;
 	float velocity = 0.f;
 	float toMove = 0.f;
+	const unsigned sameDirInterval = 10u;
+	unsigned int sameDirCtr = 0;
 	float moveDistance;
 	ViewingDirections::Enum movDir = ViewingDirections::UNKNOWN;
+	ViewingDirections::Enum lastDir = ViewingDirections::UNKNOWN;
 	ViewingDirections::Enum intendedMovDir = ViewingDirections::UNKNOWN;
 	bool stillMovesSameDir = false;
-	bool finishedMove = true; // make sure a move finishes
+	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 
 	void setPosition(Point position_);
+	void preMove();
+	void move(const float deltaTime);
 };
 
 class Armament : public Item, public DebugPrintObject

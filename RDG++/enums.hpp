@@ -3,6 +3,11 @@
 
 #include <string>
 
+struct MoveState
+{
+	enum Enum { ARRIVED, MOVING, RESTING };
+};
+
 struct ObjectType
 {
 	enum Enum { ITEM, CREATURE, ATTACK, ROOM, TILE, WALL, KEY, UNKNWON };
