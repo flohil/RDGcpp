@@ -99,17 +99,15 @@ public:
 
 	void init(Map* map_, const unsigned int tileSize_);
 	void update(const float deltaTime);
-	void setPosition(sf::Vector2f position_);
-	sf::Vector2f getPosition() const { return playerPosition; };
-	sf::Vector2f getPrevPosition() const { return prevPlayerPosition; };
 	void handleInput(sf::Event event);
 
 private:
 
 	const std::string playerName;
 	Map* map;
-	sf::Vector2f prevPlayerPosition;
-	sf::Vector2f playerPosition;
+	Point prevPlayerPosition; // in tiles
+	Point playerPosition; // in tiles
+	sf::Vector2f offset = sf::Vector2f(0.f, 0.f); //used for smooth movement between tiles - in pixels
 	float picAngle = 0.f;
 	unsigned int tileSize;
 	float accumulatedTime = 0;
@@ -119,6 +117,8 @@ private:
 	float toMove = 0.f;
 	float moveDistance;
 	ViewingDirections::Enum movDir = ViewingDirections::UNKNOWN;
+
+	void setPosition(Point position_);
 };
 
 class Armament : public Item, public DebugPrintObject

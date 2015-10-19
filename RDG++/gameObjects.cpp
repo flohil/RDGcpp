@@ -38,7 +38,10 @@ void RenderableObject::setSize(const unsigned int width, const unsigned int heig
 
 void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)
 {	
-	window.draw(sprite);
+	if (visible)
+	{
+		window.draw(sprite);
+	}
 }
 
 Item::~Item() {
@@ -144,7 +147,7 @@ void Player::init(Map* map_, const unsigned int tileSize_)
 	tileSize = tileSize_;
 
 	Point point = map->initPlayerPosition();
-	prevPlayerPosition = sf::Vector2f(static_cast<float>(point.x * tileSize), static_cast<float>(point.y * tileSize));
+	prevPlayerPosition = point;
 	playerPosition = prevPlayerPosition;
 
 	std::cout << playerPosition.x << ", " << playerPosition.y << std::endl;
@@ -214,39 +217,66 @@ void Player::update(const float deltaTime)
 		accumulatedTime = 0; // reset accumulated Time
 	}
 
-	sf::Vector2f curPos = getPosition();
 	float distance = velocity * deltaTime;
+	bool finishedMove = false;
 
 	if (distance > toMove)
 	{
 		distance = toMove;
 		toMove = 0;
 		velocity = 0;
-		movDir = ViewingDirections::UNKNOWN;
-		std::cout << "finished movement at: x = " << curPos.x << ", " << curPos.y << std::endl;
+		finishedMove = true;
+		std::cout << "finished movement at: x = " << offset.x << ", " << offset.y << " with distance " << distance << std::endl;
 	}
 	else
 	{
 		toMove -= distance;
+		if (toMove > 0)
+		std::cout << "movement left: " << toMove << std::endl;
 	}
 
 	switch (movDir)
 	{
 		case ViewingDirections::N:
-			curPos.y -= distance;
+			offset.y -= distance;
+			if (finishedMove)
+			{
+				setPosition(Point{ playerPosition.x, playerPosition.y - 1 });
+			}
 			break;
 		case ViewingDirections::E:
-			curPos.x += distance;
+			offset.x += distance;
+			if (finishedMove)
+			{
+				setPosition(Point{ playerPosition.x + 1, playerPosition.y });
+			}
 			break;
 		case ViewingDirections::S:
-			curPos.y += distance;
+			offset.y += distance;
+			if (finishedMove)
+			{
+				setPosition(Point{ playerPosition.x, playerPosition.y + 1 });
+			}
 			break;
 		case ViewingDirections::W:
-			curPos.x -= distance;
+			offset.x -= distance;
+			if (finishedMove)
+			{
+				setPosition(Point{ playerPosition.x - 1, playerPosition.y });
+			}
 			break;
 	}
 
-	setPosition(curPos);
+	if (finishedMove)
+	{
+		movDir = ViewingDirections::UNKNOWN;
+		offset.x = 0;
+		offset.y = 0;
+	}
+
+	float x = playerPosition.x * tileSize + offset.x;
+	float y = playerPosition.y * tileSize + offset.y;
+	RenderableObject::setPosition(sf::Vector2f(x,y));
 }
 
 void Player::handleInput(sf::Event event)
@@ -257,10 +287,8 @@ void Player::handleInput(sf::Event event)
 	}
 }
 
-void Player::setPosition(sf::Vector2f position_)
+void Player::setPosition(Point position_)
 {
 	prevPlayerPosition = playerPosition;
 	playerPosition = position_;
-
-	RenderableObject::setPosition(playerPosition);
 }
