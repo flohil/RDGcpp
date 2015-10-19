@@ -115,14 +115,15 @@ private:
 	float vFactor = 110.f;
 	float velocity = 0.f;
 	float toMove = 0.f;
-	const unsigned sameDirInterval = 1u;
-	unsigned int sameDirCtr = 0;
+	const unsigned int initialDelaySpan = 50u;
+	const unsigned int waitTillStandingSpan = 5u;
+	unsigned int initialDelayCtr = 0;
+	unsigned int waitTillStandingCtr = 0;
+	bool initialWait = true;
 	float moveDistance;
 	ViewingDirections::Enum movDir = ViewingDirections::UNKNOWN;
 	ViewingDirections::Enum lastDir = ViewingDirections::UNKNOWN;
 	ViewingDirections::Enum intendedMovDir = ViewingDirections::UNKNOWN;
-	bool stillMovesSameDir = false;
-	bool recentlyMoved = false;
 
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 

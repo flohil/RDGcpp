@@ -162,30 +162,18 @@ void Player::update(const float deltaTime)
 	{
 		preMove();
 
-		if (sameDirCtr == sameDirInterval)
+		if (initialWait && intendedMovDir != ViewingDirections::UNKNOWN)
 		{
-			sameDirCtr = 0;
-			stillMovesSameDir = true;
-		}
+			initialDelayCtr++;
 
-		//std::cout << "stillMovesSameDir: " << stillMovesSameDir << std::endl;
-
-		// only move if movDir equals intendedMovDir - only if leaving from rest state
-		if (moveState == MoveState::RESTING)
-		{
-			if (lastDir != ViewingDirections::UNKNOWN)
+			if (initialDelayCtr == initialDelaySpan)
 			{
-				if (lastDir != intendedMovDir)
-				{
-					stillMovesSameDir = false;
-				}
+				initialDelayCtr = 0;
+				initialWait = false;
 			}
-			else {
-				stillMovesSameDir = false;
-			}
-		} 
+		}
 		
-		if (stillMovesSameDir)
+		if (!initialWait)
 		{
 
 			if (moveState == MoveState::RESTING)
@@ -220,7 +208,6 @@ void Player::update(const float deltaTime)
 		lastDir = intendedMovDir;
 
 		accumulatedTime = 0;
-		sameDirCtr++;
 	}
 
 	move(deltaTime);
@@ -252,8 +239,13 @@ void Player::preMove()
 		tempMovDir = ViewingDirections::W;
 	}
 
-	if (nbrKeysPressed == 1)
+	if (nbrKeysPressed == 0)
 	{
+		waitTillStandingCtr++;
+	}
+	else if (nbrKeysPressed == 1)
+	{
+		waitTillStandingCtr = 0;
 		intendedMovDir = tempMovDir;
 
 		switch (intendedMovDir)
@@ -278,8 +270,16 @@ void Player::preMove()
 	} 
 	else
 	{
+		waitTillStandingCtr++;
+		//intendedMovDir = ViewingDirections::UNKNOWN;
+		intendedMovDir = movDir;
+	}
+
+	if (waitTillStandingCtr >= waitTillStandingSpan)
+	{
+		waitTillStandingCtr = waitTillStandingSpan;
 		intendedMovDir = ViewingDirections::UNKNOWN;
-		recentlyMoved = false;
+		initialWait = true;
 	}
 }
 
