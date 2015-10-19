@@ -117,6 +117,7 @@ private:
 	float toMove = 0.f;
 	float moveDistance;
 	ViewingDirections::Enum movDir = ViewingDirections::UNKNOWN;
+	bool finishedMove = true; // make sure a move finishes
 
 	void setPosition(Point position_);
 };

@@ -67,6 +67,21 @@ struct Attacks
 struct Point {
 	unsigned int x;
 	unsigned int y;
+
+	Point getDirPoint(ViewingDirections::Enum dir)
+	{
+		switch (dir)
+		{
+			case ViewingDirections::N:
+				return Point{ x, y - 1 };
+			case ViewingDirections::E:
+				return Point{ x + 1, y };
+			case ViewingDirections::S:
+				return Point{ x, y + 1 };
+			case ViewingDirections::W:
+				return Point{ x - 1, y };
+		}
+	}
 };
 
 struct ItemBalance

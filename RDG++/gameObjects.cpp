@@ -162,53 +162,62 @@ void Player::update(const float deltaTime)
 	{
 		unsigned int nbrKeysPressed = 0;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		if (finishedMove)
 		{
-			nbrKeysPressed++;
-			movDir = ViewingDirections::N;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		{
-			nbrKeysPressed++;
-			movDir = ViewingDirections::E;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		{
-			nbrKeysPressed++;
-			movDir = ViewingDirections::S;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		{
-			nbrKeysPressed++;
-			movDir = ViewingDirections::W;
-		}
+			ViewingDirections::Enum tempMovDir = ViewingDirections::UNKNOWN;
 
-		// trigger movement per tilesize
-		if (nbrKeysPressed == 1)
-		{
-			switch (movDir)
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 			{
-			case ViewingDirections::N:
-				picAngle = 0.f;
-				break;
-			case ViewingDirections::E:
-				picAngle = 90.f;
-				break;
-			case ViewingDirections::S:
-				picAngle = 180.f;
-				break;
-			case ViewingDirections::W:
-				picAngle = 270.f;
-				break;
-			default:
-				break;
+				nbrKeysPressed++;
+				tempMovDir = ViewingDirections::N;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			{
+				nbrKeysPressed++;
+				tempMovDir = ViewingDirections::E;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			{
+				nbrKeysPressed++;
+				tempMovDir = ViewingDirections::S;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			{
+				nbrKeysPressed++;
+				tempMovDir = ViewingDirections::W;
 			}
 
-			if (toMove == 0)
+			std::cout << "keysPressed: " << nbrKeysPressed << std::endl;
+
+			bool passable = false;
+
+			// trigger movement per tilesize
+			if (nbrKeysPressed == 1)
 			{
+				movDir = tempMovDir;
+
+				switch (movDir) //check for obstacles here
+				{
+				case ViewingDirections::N:
+					picAngle = 0.f;
+					break;
+				case ViewingDirections::E:
+					picAngle = 90.f;
+					break;
+				case ViewingDirections::S:
+					picAngle = 180.f;
+					break;
+				case ViewingDirections::W:
+					picAngle = 270.f;
+					break;
+				default:
+					break;
+				}
+
 				toMove = moveDistance;
 				velocity = vFactor;
-				std::cout << "toMove: " << toMove << std::endl;
+				finishedMove = false;
+				//std::cout << "toMove: " << toMove << std::endl;
 			}
 		}
 
@@ -218,7 +227,6 @@ void Player::update(const float deltaTime)
 	}
 
 	float distance = velocity * deltaTime;
-	bool finishedMove = false;
 
 	if (distance > toMove)
 	{
@@ -226,45 +234,34 @@ void Player::update(const float deltaTime)
 		toMove = 0;
 		velocity = 0;
 		finishedMove = true;
-		std::cout << "finished movement at: x = " << offset.x << ", " << offset.y << " with distance " << distance << std::endl;
+		//std::cout << "finished movement at: x = " << offset.x << ", " << offset.y << " with distance " << distance << std::endl;
 	}
 	else
 	{
 		toMove -= distance;
-		if (toMove > 0)
-		std::cout << "movement left: " << toMove << std::endl;
+		/*if (toMove > 0)
+			std::cout << "movement left: " << toMove << std::endl;*/
 	}
 
 	switch (movDir)
 	{
 		case ViewingDirections::N:
 			offset.y -= distance;
-			if (finishedMove)
-			{
-				setPosition(Point{ playerPosition.x, playerPosition.y - 1 });
-			}
 			break;
 		case ViewingDirections::E:
 			offset.x += distance;
-			if (finishedMove)
-			{
-				setPosition(Point{ playerPosition.x + 1, playerPosition.y });
-			}
 			break;
 		case ViewingDirections::S:
 			offset.y += distance;
-			if (finishedMove)
-			{
-				setPosition(Point{ playerPosition.x, playerPosition.y + 1 });
-			}
 			break;
 		case ViewingDirections::W:
 			offset.x -= distance;
-			if (finishedMove)
-			{
-				setPosition(Point{ playerPosition.x - 1, playerPosition.y });
-			}
 			break;
+	}
+
+	if (movDir != ViewingDirections::UNKNOWN && finishedMove)
+	{
+		setPosition(playerPosition.getDirPoint(movDir));
 	}
 
 	if (finishedMove)
