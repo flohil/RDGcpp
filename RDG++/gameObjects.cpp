@@ -138,78 +138,129 @@ void Room::initialize(unsigned int width, unsigned int height)
 	}
 }
 
-void Player::init(Map* map_)
+void Player::init(Map* map_, const unsigned int tileSize_)
 {
 	map = map_;
+	tileSize = tileSize_;
 
 	Point point = map->initPlayerPosition();
-	prevPlayerPosition = point;
-	playerPosition = point;
+	prevPlayerPosition = sf::Vector2f(static_cast<float>(point.x * tileSize), static_cast<float>(point.y * tileSize));
+	playerPosition = prevPlayerPosition;
+
+	std::cout << playerPosition.x << ", " << playerPosition.y << std::endl;
 }
 
+// player may only move on tiles, but for smooth movements, player is moved in between tiles
 void Player::update(const float deltaTime)
 {
-	// velocity
-	float vx = 0.f;
-	float vy = 0.f;
+	accumulatedTime += deltaTime;
 
-	std::cout << movingDirection << std::endl;
+	if (accumulatedTime > updateInterval)
+	{
+		unsigned int nbrKeysPressed = 0;
 
-	switch (movingDirection)
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		{
+			nbrKeysPressed++;
+			movDir = ViewingDirections::N;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		{
+			nbrKeysPressed++;
+			movDir = ViewingDirections::E;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+			nbrKeysPressed++;
+			movDir = ViewingDirections::S;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			nbrKeysPressed++;
+			movDir = ViewingDirections::W;
+		}
+
+		// trigger movement per tilesize
+		if (nbrKeysPressed == 1)
+		{
+			switch (movDir)
+			{
+			case ViewingDirections::N:
+				picAngle = 0.f;
+				break;
+			case ViewingDirections::E:
+				picAngle = 90.f;
+				break;
+			case ViewingDirections::S:
+				picAngle = 180.f;
+				break;
+			case ViewingDirections::W:
+				picAngle = 270.f;
+				break;
+			default:
+				break;
+			}
+
+			if (toMove == 0)
+			{
+				toMove = moveDistance;
+				velocity = vFactor;
+				std::cout << "toMove: " << toMove << std::endl;
+			}
+		}
+
+		setRotation(picAngle);
+
+		accumulatedTime = 0; // reset accumulated Time
+	}
+
+	sf::Vector2f curPos = getPosition();
+	float distance = velocity * deltaTime;
+
+	if (distance > toMove)
+	{
+		distance = toMove;
+		toMove = 0;
+		velocity = 0;
+		movDir = ViewingDirections::UNKNOWN;
+		std::cout << "finished movement at: x = " << curPos.x << ", " << curPos.y << std::endl;
+	}
+	else
+	{
+		toMove -= distance;
+	}
+
+	switch (movDir)
 	{
 		case ViewingDirections::N:
-			vy = -10.f;
+			curPos.y -= distance;
 			break;
 		case ViewingDirections::E:
-			vx = 10.f;
+			curPos.x += distance;
 			break;
 		case ViewingDirections::S:
-			vy = 10.f;
+			curPos.y += distance;
 			break;
 		case ViewingDirections::W:
-			vx = -10.f;
-			break;
-		default:
+			curPos.x -= distance;
 			break;
 	}
 
-	Point curPos = getPosition();
-	curPos.x += vx * deltaTime;
-	curPos.y += vy * deltaTime;
-
 	setPosition(curPos);
-
-	movingDirection = ViewingDirections::UNKNOWN;
-
-	setRotation(picAngle);
 }
 
 void Player::handleInput(sf::Event event)
 {
-	if (event.key.code == sf::Keyboard::Up)
+	if (event.key.code == sf::Keyboard::E)
 	{
-		picAngle = 0.f;
-		movingDirection = ViewingDirections::N;
-	}
-	else if (event.key.code == sf::Keyboard::Right)
-	{
-		picAngle = 90.f;
-		movingDirection = ViewingDirections::E;
-	}
-	else if (event.key.code == sf::Keyboard::Down)
-	{
-		picAngle = 180.f;
-		movingDirection = ViewingDirections::S;
-	}
-	else if (event.key.code == sf::Keyboard::Left)
-	{
-		picAngle = 270.f;
-		movingDirection = ViewingDirections::W;
+
 	}
 }
 
-void Player::setPosition(Point position_)
+void Player::setPosition(sf::Vector2f position_)
 {
 	prevPlayerPosition = playerPosition;
 	playerPosition = position_;
+
+	RenderableObject::setPosition(playerPosition);
 }

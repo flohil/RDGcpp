@@ -546,6 +546,6 @@ Point Map::initPlayerPosition()
 
 void Map::update(const float deltaTime)
 {
-	overlay[player->getPrevPosition().x][player->getPrevPosition().y] = nullptr;
-	overlay[player->getPosition().x][player->getPosition().y] = player;
+	/*overlay[player->getPrevPosition().x][player->getPrevPosition().y] = nullptr;
+	overlay[player->getPosition().x][player->getPosition().y] = player;*/
 }

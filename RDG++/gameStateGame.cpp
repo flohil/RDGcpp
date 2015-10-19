@@ -19,13 +19,13 @@ GameState(game_)
 	playerView.setCenter(size);
 	inventoryView.setCenter(size);
 
-	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName));
+	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize)));
 	player->setSize(settings->tileSize, settings->tileSize);
 
 	map = new Map(game);
 	map->init(player);
 	
-	player->init(map);
+	player->init(map, settings->tileSize);
 }
 
 void GameStateGame::draw(const float deltaTime)
@@ -34,6 +34,7 @@ void GameStateGame::draw(const float deltaTime)
 
 	game.window.clear(sf::Color::Black);
 	map->draw(game.window, deltaTime);
+	player->draw(game.window, deltaTime);
 
 	return;
 }

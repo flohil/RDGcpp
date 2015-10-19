@@ -5,6 +5,7 @@
 #include <SFML\Graphics.hpp>
 #include "enums.hpp"
 #include <map>
+#include <set>
 #include <string>
 #include <memory>
 
@@ -93,24 +94,31 @@ class Player : public RenderableObject, public Creature
 {
 public:
 
-	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_) : 
-		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_) {};
+	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_, float moveDistance_) : 
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_), moveDistance(moveDistance_) {};
 
-	void init(Map* map_);
+	void init(Map* map_, const unsigned int tileSize_);
 	void update(const float deltaTime);
-	void setPosition(Point position_);
-	Point getPosition() const { return playerPosition; };
-	Point getPrevPosition() const { return prevPlayerPosition; };
+	void setPosition(sf::Vector2f position_);
+	sf::Vector2f getPosition() const { return playerPosition; };
+	sf::Vector2f getPrevPosition() const { return prevPlayerPosition; };
 	void handleInput(sf::Event event);
 
 private:
 
 	const std::string playerName;
 	Map* map;
-	Point prevPlayerPosition;
-	Point playerPosition;
-	ViewingDirections::Enum movingDirection;
+	sf::Vector2f prevPlayerPosition;
+	sf::Vector2f playerPosition;
 	float picAngle = 0.f;
+	unsigned int tileSize;
+	float accumulatedTime = 0;
+	const float updateInterval = 0.05f;
+	float vFactor = 100.f;
+	float velocity = 0.f;
+	float toMove = 0.f;
+	float moveDistance;
+	ViewingDirections::Enum movDir = ViewingDirections::UNKNOWN;
 };
 
 class Armament : public Item, public DebugPrintObject
