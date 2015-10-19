@@ -111,17 +111,19 @@ private:
 	float picAngle = 0.f;
 	unsigned int tileSize;
 	float accumulatedTime = 0;
-	const float moveInterval = 0.05f;
-	float vFactor = 100.f;
+	const float moveInterval = 0.01f;
+	float vFactor = 110.f;
 	float velocity = 0.f;
 	float toMove = 0.f;
-	const unsigned sameDirInterval = 10u;
+	const unsigned sameDirInterval = 1u;
 	unsigned int sameDirCtr = 0;
 	float moveDistance;
 	ViewingDirections::Enum movDir = ViewingDirections::UNKNOWN;
 	ViewingDirections::Enum lastDir = ViewingDirections::UNKNOWN;
 	ViewingDirections::Enum intendedMovDir = ViewingDirections::UNKNOWN;
 	bool stillMovesSameDir = false;
+	bool recentlyMoved = false;
+
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 
 	void setPosition(Point position_);

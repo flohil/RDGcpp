@@ -279,6 +279,7 @@ void Player::preMove()
 	else
 	{
 		intendedMovDir = ViewingDirections::UNKNOWN;
+		recentlyMoved = false;
 	}
 }
 
