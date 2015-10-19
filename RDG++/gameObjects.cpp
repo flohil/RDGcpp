@@ -184,6 +184,26 @@ void Player::update(const float deltaTime)
 				Point target = playerPosition.getDirPoint(lastDir);
 				bool passable = map->isFieldPassable(target);
 
+				switch (lastDir)
+				{
+				case ViewingDirections::N:
+					picAngle = 0.f;
+					break;
+				case ViewingDirections::E:
+					picAngle = 90.f;
+					break;
+				case ViewingDirections::S:
+					picAngle = 180.f;
+					break;
+				case ViewingDirections::W:
+					picAngle = 270.f;
+					break;
+				default:
+					break;
+				}
+
+				setRotation(picAngle);
+
 				if (passable)
 				{
 					//std::cout << "triggered passable move" << std::endl;
@@ -191,6 +211,7 @@ void Player::update(const float deltaTime)
 					velocity = vFactor;
 					moveState = MoveState::MOVING;
 					movDir = lastDir;
+
 				}
 				else
 				{
@@ -248,25 +269,28 @@ void Player::preMove()
 		waitTillStandingCtr = 0;
 		intendedMovDir = tempMovDir;
 
-		switch (intendedMovDir)
+		if (initialWait)
 		{
-		case ViewingDirections::N:
-			picAngle = 0.f;
-			break;
-		case ViewingDirections::E:
-			picAngle = 90.f;
-			break;
-		case ViewingDirections::S:
-			picAngle = 180.f;
-			break;
-		case ViewingDirections::W:
-			picAngle = 270.f;
-			break;
-		default:
-			break;
-		}
+			switch (intendedMovDir)
+			{
+			case ViewingDirections::N:
+				picAngle = 0.f;
+				break;
+			case ViewingDirections::E:
+				picAngle = 90.f;
+				break;
+			case ViewingDirections::S:
+				picAngle = 180.f;
+				break;
+			case ViewingDirections::W:
+				picAngle = 270.f;
+				break;
+			default:
+				break;
+			}
 
-		setRotation(picAngle);
+			setRotation(picAngle);
+		}
 	} 
 	else
 	{
