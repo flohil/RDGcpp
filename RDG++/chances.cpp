@@ -265,10 +265,10 @@ FoundPoint Chances::randomFreeTile(std::vector<std::vector<std::shared_ptr<Rende
 	unsigned int ctr = 0;
 
 	do {
-		randY = randomUInt(width - 1);
-		randX = randomUInt(height - 1);
+		randY = randomUInt(height - 1);
+		randX = randomUInt(width - 1);
 
-		if (tilemap[randX][randY] == nullptr) {
+		if (tilemap[randY][randX] == nullptr) {
 			found = true;
 		}
 		ctr++;

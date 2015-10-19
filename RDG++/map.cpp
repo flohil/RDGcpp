@@ -392,8 +392,8 @@ void Map::addMonster(std::shared_ptr<Room> room, RoomTypes::Enum type)
 
 			if (monsterName != "") //no monster shall be placed
 			{
-				room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->monsterFactory->create(monsterName);
-				room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
+				room->overlay[randPoint.point.y][randPoint.point.x] = game.getPrototypeStorage()->monsterFactory->create(monsterName);
+				room->overlay[randPoint.point.y][randPoint.point.x]->setSize(settings->tileSize, settings->tileSize);
 				increaseMonsterBalance(monsterName);
 			}
 		}
@@ -424,16 +424,16 @@ void Map::addItems(std::shared_ptr<Room> room, RoomTypes::Enum type)
 				switch (item.itemType)
 				{
 					case ItemType::ARMAMENT:
-						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->armamentFactory->create(item.itemName);
-						room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
+						room->overlay[randPoint.point.y][randPoint.point.x] = game.getPrototypeStorage()->armamentFactory->create(item.itemName);
+						room->overlay[randPoint.point.y][randPoint.point.x]->setSize(settings->tileSize, settings->tileSize);
 						break;
 					case ItemType::POTION:
-						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->potionFactory->create(item.itemName);
-						room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
+						room->overlay[randPoint.point.y][randPoint.point.x] = game.getPrototypeStorage()->potionFactory->create(item.itemName);
+						room->overlay[randPoint.point.y][randPoint.point.x]->setSize(settings->tileSize, settings->tileSize);
 						break;
 					case ItemType::WEAPON:
-						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->weaponFactory->create(item.itemName);
-						room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
+						room->overlay[randPoint.point.y][randPoint.point.x] = game.getPrototypeStorage()->weaponFactory->create(item.itemName);
+						room->overlay[randPoint.point.y][randPoint.point.x]->setSize(settings->tileSize, settings->tileSize);
 						break;
 					default:
 						break;
@@ -458,7 +458,7 @@ void Map::placeKey()
 	{
 		randRoom = Chances::randomRoom(settings->mazeSize, settings->mazeSize);
 
-		randTile = Chances::randomFreeTile(rooms[randRoom.x][randRoom.y]->overlay, settings->MAX_TRIES);
+		randTile = Chances::randomFreeTile(rooms[randRoom.y][randRoom.x]->overlay, settings->MAX_TRIES);
 
 		if (randTile.found)
 		{
@@ -467,8 +467,8 @@ void Map::placeKey()
 
 	} while (!placedKey);
 
-	rooms[randRoom.x][randRoom.y]->overlay[randTile.point.x][randTile.point.y].reset(new RenderableObject("key", ObjectType::KEY));
-	rooms[randRoom.x][randRoom.y]->overlay[randTile.point.x][randTile.point.y]->setSize(settings->tileSize, settings->tileSize);
+	rooms[randRoom.y][randRoom.x]->overlay[randTile.point.y][randTile.point.x].reset(new RenderableObject("key", ObjectType::KEY));
+	rooms[randRoom.y][randRoom.x]->overlay[randTile.point.y][randTile.point.x]->setSize(settings->tileSize, settings->tileSize);
 }
 
 // Increase the balance counter for added monster

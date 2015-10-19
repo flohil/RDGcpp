@@ -110,9 +110,10 @@ private:
 	sf::Vector2f offset = sf::Vector2f(0.f, 0.f); //used for smooth movement between tiles - in pixels
 	float picAngle = 0.f;
 	unsigned int tileSize;
-	float accumulatedTime = 0;
-	const float updateInterval = 0.05f;
-	const float moveDelay = 0.01f;
+	float accumulatedTimeMoveDelay = 0;
+	float accumulatedTimeMove = 0;
+	const float moveInterval = 0.025f;
+	const float moveDelayInterval = 0.05f;
 	float vFactor = 100.f;
 	float velocity = 0.f;
 	float toMove = 0.f;
