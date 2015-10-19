@@ -76,17 +76,27 @@ class Creature
 {
 public:
 
-	Creature(float hp_, float strength_, float speed_, float accuracy_, CreatureType::Enum creatureType_)
-		: orHp(hp_), orStrength(strength_), orSpeed(speed_), orAccuracy(accuracy_), hp(hp_), strength(strength_), speed(speed_), accuracy(accuracy_), creatureType(creatureType_) {};
+	Creature(float hp_, float strength_, float speed_, float accuracy_, CreatureType::Enum creatureType_, DifficultyLevel::Enum level_)
+		: orHp(hp_), orStrength(strength_), orSpeed(speed_), orAccuracy(accuracy_), hp(hp_), strength(strength_), speed(speed_), accuracy(accuracy_), creatureType(creatureType_), difficultyLevel(level_) {};
 
 	float hp, strength, speed, accuracy;
 
+	unsigned int getOrHP() { return orHp; };
+	unsigned int getOrSpeed() { return orSpeed; };
+	unsigned int getOrAccuracy() { return orAccuracy; };
+	unsigned int getOrStrength() { return orStrength; };
+	DifficultyLevel::Enum getLevel() const { return difficultyLevel; };
 	void resetOriginals();
 	CreatureType::Enum getCreatureType() { return creatureType; };
+	std::vector<Potion> activePotions;
+	void removeActivePotions(Potion potion);
+	void addActivePotion(Potion potion);
 
 private:
 
+	float const orHp, orStrength, orSpeed, orAccuracy;
 	CreatureType::Enum creatureType;
+	DifficultyLevel::Enum difficultyLevel;
 };
 
 class Player : public Creature
@@ -121,9 +131,8 @@ class Monster : public RenderableObject, public Creature, public DebugPrintObjec
 public:
 
 	Monster(const std::string& name_, const DifficultyLevel::Enum level_, const Attribute::Enum killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
-		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER), level(level_), killBonusType(killBonusType_), killBonus(killBonus_) {};
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER, level(level_)), killBonusType(killBonusType_), killBonus(killBonus_) {};
 
-	DifficultyLevel::Enum getLevel() const { return level; };
 	Attribute::Enum getKillBonusType() const { return killBonusType; };
 	float getKillBonus() const { return killBonus; };
 	virtual void debugPrint() const;
@@ -148,6 +157,7 @@ public:
 	Mode::Enum getMode() const { return mode; };
 	float getStrength() const { return strength; };
 	unsigned int getDuration() const { return duration; };
+	void setDuration(unsigned int decrease) { duration = duration - decrease; };
 	virtual void debugPrint() const;
 
 protected:
@@ -157,7 +167,7 @@ protected:
 	const Attribute::Enum effect;
 	const Mode::Enum mode;
 	const float strength;
-	const unsigned int duration;
+	unsigned int duration;
 };
 
 class Weapon : public Item, public DebugPrintObject

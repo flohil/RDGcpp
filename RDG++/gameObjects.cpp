@@ -144,3 +144,13 @@ void Creature::resetOriginals()
 	this->speed = this->orSpeed;
 	this->strength = this->orStrength;
 }
+
+void Creature::removeActivePotions(Potion potion_)
+{
+	activePotions.erase(std::remove(activePotions.begin(), activePotions.end(), potion_), activePotions.end));
+}
+
+void Creature::addActivePotion(Potion potion_)
+{
+	activePotions.push_back(potion_);
+}
