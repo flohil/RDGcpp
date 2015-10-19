@@ -14,7 +14,7 @@ private:
 	sf::View messageView;
 	sf::View inventoryView;
 	sf::View playerView;
-	std::shared_ptr<Map> map;
+	Map* map;
 	std::shared_ptr<Player> player;
 
 public:
@@ -24,6 +24,7 @@ public:
 	virtual void handleInput();
 
 	GameStateGame(Game& game);
+	GameStateGame::~GameStateGame();
 };
 
 #endif /* GAME_STATE_GAME */

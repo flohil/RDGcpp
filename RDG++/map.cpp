@@ -2,8 +2,10 @@
 #include "easylogging++.hpp"
 #include "chances.hpp"
 
-void Map::init()
+void Map::init(std::shared_ptr<Player> player_)
 {
+	player = player_;
+
 	// construct maze
 	maze.reset(new Maze(settings->mazeSize));
 	maze->generate();
@@ -84,7 +86,6 @@ void Map::init()
 
 	fillWalls();
 	loadRooms();
-	initPlayerPosition();
 	fillWithRooms();
 
 	LOG(INFO) << "successfully initialized map";
@@ -536,21 +537,15 @@ void Map::draw(sf::RenderWindow& window, float deltaTime)
 	return;
 }
 
-void Map::initPlayerPosition()
+Point Map::initPlayerPosition()
 {
-	FoundPoint randPoint = Chances::randomFreeTile(rooms[0][0]->overlay, settings->MAX_TRIES);
+	Point randPoint = Chances::randomFreeTile(rooms[0][0]->overlay, settings->MAX_TRIES).point;
 
-	prevPlayerPosition = randPoint.point;
-	playerPosition = randPoint.point;
+	return Point{ randPoint.x + 1, randPoint.y + 1 }; // consider wall 
 }
 
-void Map::handleInput(sf::Event event)
+void Map::update(const float deltaTime)
 {
-
-}
-
-void Map::update()
-{
-	overlay[prevPlayerPosition.x][prevPlayerPosition.y] = nullptr;
-	overlay[playerPosition.x][playerPosition.y] = player;
+	overlay[player->getPrevPosition().x][player->getPrevPosition().y] = nullptr;
+	overlay[player->getPosition().x][player->getPosition().y] = player;
 }

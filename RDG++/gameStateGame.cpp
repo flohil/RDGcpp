@@ -22,9 +22,10 @@ GameState(game_)
 	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName));
 	player->setSize(settings->tileSize, settings->tileSize);
 
-	map.reset(new Map(game));
-	map->init();
-	map->setPlayer(player);
+	map = new Map(game);
+	map->init(player);
+	
+	player->init(map);
 }
 
 void GameStateGame::draw(const float deltaTime)
@@ -39,7 +40,8 @@ void GameStateGame::draw(const float deltaTime)
 
 void GameStateGame::update(const float deltaTime)
 {
-	map->update();
+	player->update(deltaTime);
+	map->update(deltaTime);
 	return;
 }
 
@@ -54,6 +56,7 @@ void GameStateGame::handleInput()
 			/* Close the window */
 		case sf::Event::Closed:
 		{
+
 			game.window.close();
 			break;
 		}
@@ -67,7 +70,7 @@ void GameStateGame::handleInput()
 			}
 			else
 			{
-				map->handleInput(event);
+				player->handleInput(event);
 			}
 
 			break;
@@ -92,4 +95,9 @@ void GameStateGame::handleInput()
 
 	//	return;
 	//}
+}
+
+GameStateGame::~GameStateGame()
+{
+	delete map;
 }

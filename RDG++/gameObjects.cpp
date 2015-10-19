@@ -1,6 +1,7 @@
 #include "gameObjects.hpp"
 #include "enums.hpp"
 #include "resourceManager.hpp"
+#include "map.hpp"
 #include <iostream>
 #include <map>
 
@@ -135,4 +136,80 @@ void Room::initialize(unsigned int width, unsigned int height)
 		overlay.push_back(overlayRow);
 		background.push_back(backgroundRow);
 	}
+}
+
+void Player::init(Map* map_)
+{
+	map = map_;
+
+	Point point = map->initPlayerPosition();
+	prevPlayerPosition = point;
+	playerPosition = point;
+}
+
+void Player::update(const float deltaTime)
+{
+	// velocity
+	float vx = 0.f;
+	float vy = 0.f;
+
+	std::cout << movingDirection << std::endl;
+
+	switch (movingDirection)
+	{
+		case ViewingDirections::N:
+			vy = -10.f;
+			break;
+		case ViewingDirections::E:
+			vx = 10.f;
+			break;
+		case ViewingDirections::S:
+			vy = 10.f;
+			break;
+		case ViewingDirections::W:
+			vx = -10.f;
+			break;
+		default:
+			break;
+	}
+
+	Point curPos = getPosition();
+	curPos.x += vx * deltaTime;
+	curPos.y += vy * deltaTime;
+
+	setPosition(curPos);
+
+	movingDirection = ViewingDirections::UNKNOWN;
+
+	setRotation(picAngle);
+}
+
+void Player::handleInput(sf::Event event)
+{
+	if (event.key.code == sf::Keyboard::Up)
+	{
+		picAngle = 0.f;
+		movingDirection = ViewingDirections::N;
+	}
+	else if (event.key.code == sf::Keyboard::Right)
+	{
+		picAngle = 90.f;
+		movingDirection = ViewingDirections::E;
+	}
+	else if (event.key.code == sf::Keyboard::Down)
+	{
+		picAngle = 180.f;
+		movingDirection = ViewingDirections::S;
+	}
+	else if (event.key.code == sf::Keyboard::Left)
+	{
+		picAngle = 270.f;
+		movingDirection = ViewingDirections::W;
+	}
+}
+
+void Player::setPosition(Point position_)
+{
+	prevPlayerPosition = playerPosition;
+	playerPosition = position_;
 }

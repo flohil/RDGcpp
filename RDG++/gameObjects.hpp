@@ -41,7 +41,7 @@ public:
 
 	bool isVisible() const { return visible; };
 	void setVisible(const bool visible_) { visible = visible_; };
-	void setAngle(const float angle_) { sprite.setRotation(angle_); };
+	void setRotation(const float angle_) { sprite.setRotation(angle_); };
 	void setPosition(sf::Vector2f pos_) { sprite.setPosition(pos_.x + 16, pos_.y + 16); };
 	void setSize(const unsigned int width, const unsigned int height);
 	void setScale(const sf::Vector2f scale_) { sprite.setScale(scale_); };
@@ -96,9 +96,21 @@ public:
 	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_) : 
 		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_) {};
 
+	void init(Map* map_);
+	void update(const float deltaTime);
+	void setPosition(Point position_);
+	Point getPosition() const { return playerPosition; };
+	Point getPrevPosition() const { return prevPlayerPosition; };
+	void handleInput(sf::Event event);
+
 private:
 
 	const std::string playerName;
+	Map* map;
+	Point prevPlayerPosition;
+	Point playerPosition;
+	ViewingDirections::Enum movingDirection;
+	float picAngle = 0.f;
 };
 
 class Armament : public Item, public DebugPrintObject
