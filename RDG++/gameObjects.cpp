@@ -187,8 +187,6 @@ void Player::update(const float deltaTime)
 				tempMovDir = ViewingDirections::W;
 			}
 
-			std::cout << "keysPressed: " << nbrKeysPressed << std::endl;
-
 			bool passable = false;
 
 			// trigger movement per tilesize
@@ -214,9 +212,22 @@ void Player::update(const float deltaTime)
 					break;
 				}
 
-				toMove = moveDistance;
-				velocity = vFactor;
-				finishedMove = false;
+				Point target = playerPosition.getDirPoint(movDir);
+				bool passable = map->isFieldPassable(target);
+
+				if (passable)
+				{
+					toMove = moveDistance;
+					velocity = vFactor;
+					finishedMove = false;
+				}
+				else
+				{
+					toMove = 0;
+					velocity = 0;
+					movDir = ViewingDirections::UNKNOWN;
+				}
+				
 				//std::cout << "toMove: " << toMove << std::endl;
 			}
 		}

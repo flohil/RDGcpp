@@ -503,7 +503,7 @@ void Map::increaseItemBalance(std::string name)
 
 bool Map::isFieldPassable(Point fieldPos) const
 {
-	if (overlay[fieldPos.x][fieldPos.y] != nullptr)
+	if (overlay[fieldPos.y][fieldPos.x] != nullptr)
 	{
 		return false;
 	}
