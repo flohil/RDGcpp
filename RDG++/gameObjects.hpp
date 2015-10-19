@@ -111,11 +111,11 @@ private:
 	float picAngle = 0.f;
 	unsigned int tileSize;
 	float accumulatedTime = 0;
-	const float moveInterval = 0.01f;
+	const float moveInterval = 0.015f;
 	float vFactor = 110.f;
 	float velocity = 0.f;
 	float toMove = 0.f;
-	const unsigned int initialDelaySpan = 50u;
+	const unsigned int initialDelaySpan = 30u;
 	const unsigned int waitTillStandingSpan = 5u;
 	unsigned int initialDelayCtr = 0;
 	unsigned int waitTillStandingCtr = 0;
