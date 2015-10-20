@@ -19,7 +19,7 @@ GameState(game_)
 	playerView.setCenter(size);
 	inventoryView.setCenter(size);
 
-	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize)));
+	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize));
 	player->setSize(settings->tileSize, settings->tileSize);
 
 	map = new Map(game);
@@ -67,7 +67,7 @@ void GameStateGame::handleInput()
 			// just sample code - remove later on
 			if (event.key.code == sf::Keyboard::Escape)
 			{
-				game.window.close();
+				game.window.close(); // turn to pause menu state
 			}
 			else
 			{

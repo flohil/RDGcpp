@@ -94,16 +94,18 @@ class Player : public RenderableObject, public Creature
 {
 public:
 
-	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_, float moveDistance_) : 
-		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_), moveDistance(moveDistance_) {};
+	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_, float moveDistance_, unsigned int maxInventorySize_) : 
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_), moveDistance(moveDistance_), maxInventorySize(maxInventorySize_) {};
 
 	void init(Map* map_, const unsigned int tileSize_);
 	void update(const float deltaTime);
 	void handleInput(sf::Event event);
+	bool putInInventar(std::shared_ptr<RenderableObject> object);
 
 private:
 
 	const std::string playerName;
+	const unsigned int maxInventorySize;
 	Map* map;
 	Point prevPlayerPosition; // in tiles
 	Point playerPosition; // in tiles
@@ -124,8 +126,9 @@ private:
 	ViewingDirections::Enum movDir = ViewingDirections::UNKNOWN;
 	ViewingDirections::Enum lastDir = ViewingDirections::UNKNOWN;
 	ViewingDirections::Enum intendedMovDir = ViewingDirections::UNKNOWN;
-
+	ViewingDirections::Enum facingDir = ViewingDirections::N;
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
+	std::vector<std::shared_ptr<RenderableObject>> inventory;
 
 	void setPosition(Point position_);
 	void preMove();

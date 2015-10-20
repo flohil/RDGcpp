@@ -267,15 +267,19 @@ void Player::preMove()
 		{
 		case ViewingDirections::N:
 			picAngle = 0.f;
+			facingDir = ViewingDirections::N;
 			break;
 		case ViewingDirections::E:
 			picAngle = 90.f;
+			facingDir = ViewingDirections::E;
 			break;
 		case ViewingDirections::S:
 			picAngle = 180.f;
+			facingDir = ViewingDirections::S;
 			break;
 		case ViewingDirections::W:
 			picAngle = 270.f;
+			facingDir = ViewingDirections::W;
 			break;
 		default:
 			break;
@@ -380,9 +384,55 @@ void Player::move(const float deltaTime)
 
 void Player::handleInput(sf::Event event)
 {
+
 	if (event.key.code == sf::Keyboard::E)
 	{
+		Point facingPoint = playerPosition.getDirPoint(facingDir);
+		std::shared_ptr<RenderableObject> object = map->getOverlayObject(facingPoint);
+		
+		if (object != nullptr)
+		{
+			std::cout << "in front of player: " << object->getName() << std::endl;
 
+			switch (object->getObjectType())
+			{
+				case ObjectType::KEY:
+					std::cout << "found treasure chamber key " << object->getName() << std::endl;
+					if (putInInventar(object))
+					{
+						map->setOverlayObject(facingPoint, nullptr);
+					};
+					map->openTreasureChamber();
+					break;
+				case ObjectType::ITEM:
+					std::cout << "putting into inventary " << object->getName() << std::endl;
+					if (putInInventar(object))
+					{
+						map->setOverlayObject(facingPoint, nullptr);
+					};
+					break;
+				case ObjectType::CREATURE:
+					std::cout << "starting fight against " << object->getName() << std::endl;
+					//startFight(this, std::dynamic_pointer_cast<Creature>(object));
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}
+
+bool Player::putInInventar(std::shared_ptr<RenderableObject> object)
+{
+	if (inventory.size() > maxInventorySize - 1)
+	{
+		return false;
+	}
+	else
+	{
+		inventory.push_back(object);
+		std::cout << "inventory now contains " << inventory.size() << " objects " << std::endl;
+		return true;
 	}
 }
 

@@ -250,6 +250,9 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 		background[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
 		overlay[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
 		overlay[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
+
+		treasureDoorOne = Point{ doorx1, doory1 };
+		treasureDoorTwo = Point{ doorx2, doory2 };
 	}
 	// normal door
 	else 
@@ -548,4 +551,15 @@ void Map::update(const float deltaTime)
 {
 	/*overlay[player->getPrevPosition().x][player->getPrevPosition().y] = nullptr;
 	overlay[player->getPosition().x][player->getPosition().y] = player;*/
+}
+
+void Map::openTreasureChamber()
+{
+	if (!treasureDoorOpened)
+	{
+		overlay[treasureDoorOne.y][treasureDoorOne.x] = nullptr;
+		overlay[treasureDoorTwo.y][treasureDoorTwo.x] = nullptr;
+
+		treasureDoorOpened = true;
+	}
 }

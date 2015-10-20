@@ -3,6 +3,7 @@
 	<Armament>
 		<Name>Leather Helmet</Name>
 		<Item_Class>weak</Item_Class>
+		<Armament_Type>helmet</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -15,6 +16,7 @@
 	<Armament>
 		<Name>Leather Harness</Name>
 		<Item_Class>weak</Item_Class>
+		<Armament_Type>harness</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -27,6 +29,7 @@
 	<Armament>
 		<Name>Leather Gauntlets</Name>
 		<Item_Class>weak</Item_Class>
+		<Armament_Type>gauntlets</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -39,6 +42,7 @@
 	<Armament>
 		<Name>Leather Cuisse</Name>
 		<Item_Class>weak</Item_Class>
+		<Armament_Type>cuisse</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -51,6 +55,7 @@
 	<Armament>
 		<Name>Leather Boots</Name>
 		<Item_Class>weak</Item_Class>
+		<Armament_Type>boots</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -63,6 +68,7 @@
 	<Armament>
 		<Name>Habergeon Helmet</Name>
 		<Item_Class>medium</Item_Class>
+		<Armament_Type>helmet</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -75,6 +81,7 @@
 	<Armament>
 		<Name>Habergeon Harness</Name>
 		<Item_Class>medium</Item_Class>
+		<Armament_Type>harness</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -87,6 +94,7 @@
 	<Armament>
 		<Name>Habergeon Gauntlets</Name>
 		<Item_Class>medium</Item_Class>
+		<Armament_Type>gauntlets</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -99,6 +107,7 @@
 	<Armament>
 		<Name>Habergeon Cuisse</Name>
 		<Item_Class>medium</Item_Class>
+		<Armament_Type>cuisse</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -111,6 +120,7 @@
 	<Armament>
 		<Name>Habergeon Boots</Name>
 		<Item_Class>medium</Item_Class>
+		<Armament_Type>boots</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -123,6 +133,7 @@
 	<Armament>
 		<Name>Plate Helmet</Name>
 		<Item_Class>strong</Item_Class>
+		<Armament_Type>helmet</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -135,6 +146,7 @@
 	<Armament>
 		<Name>Plate Harness</Name>
 		<Item_Class>strong</Item_Class>
+		<Armament_Type>harness</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -147,6 +159,7 @@
 	<Armament>
 		<Name>Plate Gauntlets</Name>
 		<Item_Class>strong</Item_Class>
+		<Armament_Type>gauntlets</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -159,6 +172,7 @@
 	<Armament>
 		<Name>Plate Cuisse</Name>
 		<Item_Class>strong</Item_Class>
+		<Armament_Type>cuisse</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
@@ -171,6 +185,7 @@
 	<Armament>
 		<Name>Plate Boots</Name>
 		<Item_Class>strong</Item_Class>
+		<Armament_Type>boots</Armament_Type>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>

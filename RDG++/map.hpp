@@ -20,11 +20,12 @@ public:
 	Point initPlayerPosition();
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> getBackround() const { return background; };
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> getOverlay() const { return overlay; };
-	std::shared_ptr<RenderableObject> getOverlayObject(Point pos) const { return overlay[pos.x][pos.y]; };
-	std::shared_ptr<Room> getRoom(Point pos) { return rooms[pos.x][pos.y]; };
-	void setOverlayObject(Point pos, std::shared_ptr<RenderableObject> obj) { overlay[pos.x][pos.y] = obj; };
+	std::shared_ptr<RenderableObject> getOverlayObject(Point pos) const { return overlay[pos.y][pos.x]; };
+	std::shared_ptr<Room> getRoom(Point pos) { return rooms[pos.y][pos.x]; };
+	void setOverlayObject(Point pos, std::shared_ptr<RenderableObject> obj) { overlay[pos.y][pos.x] = obj; };
 	bool isFieldPassable(Point fieldPos) const;
 	void draw(sf::RenderWindow& window, float deltaTime);
+	void openTreasureChamber();
 
 private:
 
@@ -61,6 +62,11 @@ private:
 	const unsigned int weakItemOffset = 1;
 	const unsigned int mediumItemOffset = 1;
 	const unsigned int strongItemOffset = 1;
+
+	// treasure chamber open doors positions
+	Point treasureDoorOne;
+	Point treasureDoorTwo;
+	bool treasureDoorOpened = false;
 
 	void fillWithRooms();
 	RoomTypes::Enum detectRoomType(Point indizes) const;

@@ -27,6 +27,7 @@ public:
 	unsigned int tileSize;
 	unsigned int creatureSize;
 	std::string playerName;
+	unsigned int maxInventorySize;
 
 	// functions
 	Settings(unsigned int desktopWidth, unsigned int desktopHeight);

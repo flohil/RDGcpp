@@ -18,6 +18,11 @@ struct ItemType
 	enum Enum { WEAPON, ARMAMENT, POTION, UNKNOWN };
 };
 
+struct ArmamentType
+{
+	enum Enum { HELMET, HARNESS, GAUNTLETS, CUISSE, BOOTS, UNKNOWN };
+};
+
 struct CreatureType
 {
 	enum Enum { MONSTER, PLAYER, UNKNOWN };
@@ -130,8 +135,16 @@ public:
 	static Mode::Enum mapMode(std::string input);
 	static WeaponType::Enum mapWeaponType(std::string input);
 	static RoomTypes::Enum mapRoomTypes(std::string input);
+	static ArmamentType::Enum mapArmamentType(std::string input);
 
 	static std::string mapRoomNames(RoomTypes::Enum input);
+	static std::string mapArmamentTypeNames(ArmamentType::Enum input);
+	static std::string mapLevelName(Classes::Enum input);
+	static std::string mapTargetName(Target::Enum input);
+	static std::string mapAttributeName(Attribute::Enum input);
+	static std::string mapModeName(Mode::Enum input);
+	static std::string mapWeaponTypeName(WeaponType::Enum input);
+	static std::string mapAttackName(Attacks::Enum input);
 };
 
 #endif // ENUMS_INCLUDE
