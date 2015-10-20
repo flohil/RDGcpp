@@ -53,10 +53,11 @@ void Armament::debugPrint() const
 	std::cout << "Armament: " << std::endl;
 	std::cout << "name = " << name << std::endl;
 	std::cout << "itemClass = " << itemClass << std::endl;
-	std::cout << "type = " << type << std::endl;
+	std::cout << "material = " << material << std::endl;
 	std::cout << "armor = " << armor << std::endl;
 	std::cout << "speed = " << speed << std::endl;
 	std::cout << "bonus = " << bonus << std::endl;
+	std::cout << "armamentType = " << EnumMapper::mapArmamentTypeNames(armamentType) << std::endl;
 	std::cout << std::endl;
 }
 

@@ -78,8 +78,8 @@ class ArmamentTemplate : public Armament, public TexturedTemplate, public Variab
 {
 public:
 
-	ArmamentTemplate(const std::string& name_, const std::string& textureName_, const Classes::Enum itemClass_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const std::string& type_, const float armor_, const float speed_, const float bonus_) :
-		Armament(name_, itemClass_, type_, armor_, speed_, bonus_), TexturedTemplate(textureName_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
+	ArmamentTemplate(const std::string& name_, const std::string& textureName_, const Classes::Enum itemClass_, const ArmamentType::Enum armamentType_, const float classMultiplier_, const float statsLowMultiplier_, const float statsHighMultiplier_, const std::string& type_, const float armor_, const float speed_, const float bonus_) :
+		Armament(name_, itemClass_, type_, armor_, speed_, bonus_, armamentType_), TexturedTemplate(textureName_), VariableTemplate(classMultiplier_, statsLowMultiplier_, statsHighMultiplier_) {};
 
 	virtual std::shared_ptr<Armament> clone(float externMultiplier);
 };

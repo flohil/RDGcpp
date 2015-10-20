@@ -9,8 +9,8 @@
 
 std::shared_ptr<Armament> ArmamentTemplate::clone(float externMultiplier)
 {
-	return std::shared_ptr<Armament>(new Armament(name, itemClass, type, armor * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
-		speed * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus));
+	return std::shared_ptr<Armament>(new Armament(name, itemClass, material, armor * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier),
+		speed * externMultiplier * classMultiplier * Chances::randomFloat(statsLowMultiplier, statsHighMultiplier), bonus, armamentType));
 }
 
 bool ArmamentFactory::importConfig(const std::string& path)
@@ -34,6 +34,7 @@ bool ArmamentFactory::importConfig(const std::string& path)
 
 			const std::string& name = armamentNode.child("Name").text().as_string();
 			const std::string& image = armamentNode.child("Image").text().as_string();
+			const ArmamentType::Enum armamentType = EnumMapper::mapArmamentType(armamentNode.child("Armament_Type").text().as_string());
 			const Classes::Enum itemClass = EnumMapper::mapClasses(armamentNode.child("Item_Class").text().as_string());
 			const float classMultiplier = armamentNode.child("Class_Multiplier").text().as_float();
 			const float statsLowMultiplier = armamentNode.child("Stats_Low_Multiplier").text().as_float();
@@ -65,7 +66,7 @@ bool ArmamentFactory::importConfig(const std::string& path)
 
 			ResourceManager::getInstance().loadTexture(name, image);
 
-			std::shared_ptr<ArmamentTemplate> armament(new ArmamentTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus));
+			std::shared_ptr<ArmamentTemplate> armament(new ArmamentTemplate(name, image, itemClass, armamentType, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus));
 
 			objects[armament->getName()] = armament;
 		}

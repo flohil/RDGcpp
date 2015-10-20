@@ -11,6 +11,17 @@
 
 class Map;
 
+struct EquipmentSet
+{
+	std::shared_ptr<Weapon> primaryWeapon;
+	std::shared_ptr<Weapon> secondaryWeapon;
+	std::shared_ptr<Armament> helmet;
+	std::shared_ptr<Armament> harness;
+	std::shared_ptr<Armament> cuisse;
+	std::shared_ptr<Armament> gauntlets;
+	std::shared_ptr<Armament> boots;
+};
+
 class GameObject
 {
 public:
@@ -129,6 +140,8 @@ private:
 	ViewingDirections::Enum facingDir = ViewingDirections::N;
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 	std::vector<std::shared_ptr<RenderableObject>> inventory;
+	EquipmentSet setOne;
+	EquipmentSet setTwo;
 
 	void setPosition(Point position_);
 	void preMove();
@@ -139,10 +152,11 @@ class Armament : public Item, public DebugPrintObject
 {
 public:
 
-	Armament(const std::string& name_, const Classes::Enum itemClass_, const std::string& type_, const float armor_, const float speed_, const float bonus_) :
-		Item(name_, ObjectType::ITEM, itemClass_, ItemType::ARMAMENT), type(type_), armor(armor_), speed(speed_), bonus(bonus_) {};
+	Armament(const std::string& name_, const Classes::Enum itemClass_, const std::string& material_, const float armor_, const float speed_, const float bonus_, const ArmamentType::Enum armamentType_) :
+		Item(name_, ObjectType::ITEM, itemClass_, ItemType::ARMAMENT), material(material_), armamentType(armamentType_), armor(armor_), speed(speed_), bonus(bonus_) {};
 
-	std::string getType() const { return type; };
+	std::string getMaterial() const { return material; };
+	ArmamentType::Enum getArmamentType() const { return armamentType; };
 	float getArmor() const { return armor; };
 	float getSpeed() const { return speed; };
 	float getBonus() const { return bonus; };
@@ -150,7 +164,8 @@ public:
 
 protected:
 
-	const std::string type;
+	const std::string material; // leather, 
+	const ArmamentType::Enum armamentType; // helmet, harness, cuisse, gauntlets, boots
 	const float armor, speed, bonus;
 };
 
