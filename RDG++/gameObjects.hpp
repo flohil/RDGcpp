@@ -60,6 +60,7 @@ public:
 	void setSize(const unsigned int width, const unsigned int height);
 	void setScale(const sf::Vector2f scale_) { sprite.setScale(scale_); };
 	void draw(sf::RenderWindow& window, float deltaTime);
+	sf::Vector2f getPosition() const { return sprite.getPosition(); };
 
 protected:
 

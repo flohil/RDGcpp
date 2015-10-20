@@ -46,7 +46,9 @@ void GameStateGame::update(const float deltaTime)
 
 	// adapt viewport of map to playerPosition
 	Point& playerPos = player->getPlayerPosition();
-	std::cout << "player at x = " << playerPos.x << ", y = " << playerPos.y << std::endl;
+	std::shared_ptr<RenderableObject> playerRend = std::dynamic_pointer_cast<RenderableObject>(player);
+
+	mapView.setCenter(playerRend->getPosition());
 
 	return;
 }
