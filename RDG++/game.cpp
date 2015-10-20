@@ -1,6 +1,6 @@
 #include <stack>
 
-#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 #include <SFML/System.hpp>
 
 #include "game.hpp"
@@ -41,7 +41,7 @@ Game::Game()
 
 	// create video mode and window
 	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);
-	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Close));
 
 	window.setFramerateLimit(60); //limit fps to 60 
 
