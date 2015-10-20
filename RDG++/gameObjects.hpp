@@ -10,6 +10,8 @@
 #include <memory>
 
 class Map;
+class Weapon;
+class Armament;
 
 struct EquipmentSet
 {
@@ -112,6 +114,7 @@ public:
 	void update(const float deltaTime);
 	void handleInput(sf::Event event);
 	bool putInInventar(std::shared_ptr<RenderableObject> object);
+	Point getPlayerPosition() const { return playerPosition; };
 
 private:
 
@@ -140,8 +143,8 @@ private:
 	ViewingDirections::Enum facingDir = ViewingDirections::N;
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 	std::vector<std::shared_ptr<RenderableObject>> inventory;
-	EquipmentSet setOne;
-	EquipmentSet setTwo;
+	EquipmentSet setOne = EquipmentSet{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	EquipmentSet setTwo = EquipmentSet{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 	void setPosition(Point position_);
 	void preMove();

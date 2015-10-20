@@ -43,6 +43,11 @@ void GameStateGame::update(const float deltaTime)
 {
 	player->update(deltaTime);
 	map->update(deltaTime);
+
+	// adapt viewport of map to playerPosition
+	Point& playerPos = player->getPlayerPosition();
+	std::cout << "player at x = " << playerPos.x << ", y = " << playerPos.y << std::endl;
+
 	return;
 }
 
