@@ -101,57 +101,50 @@ void GameStateGame::adaptMapViewport()
 	//do not adapt viewport center if that would move the viewport beyond the map's borders
 	const sf::Vector2f& center = mapView.getCenter();
 
-	/*std::cout << "vp: left = " << vp.left << ", top = " << vp.top << ", width = " << vp.width << ", height = " << vp.height << std::endl;
-	std::cout << "view size: " << mapView.getSize().x << " x " << mapView.getSize().y << std::endl;
-	std::cout << "view center: " << mapView.getCenter().x << " x " << mapView.getCenter().y << std::endl;*/
-
-
 	float viewportTop = center.y - viewportSize.y * 0.5f;
 	float viewportBottom = center.y + viewportSize.y * 0.5f;
 	float viewportLeft = center.x - viewportSize.x * 0.5f;
 	float viewportRight = center.x + viewportSize.x * 0.5f;
 
-	std::cout << "vp: left = " << viewportLeft << ", top = " << viewportTop << ", right = " << viewportRight << ", bottom = " << viewportBottom << std::endl;
-
 	// scroll to bottom
 	float scrollBottom = playerPos.y - (viewportBottom - borderMargin.y);
-	/*if (scrollBottom > 0 && viewportBottom < maxBottom)*/
 	if (scrollBottom > 0)
 	{
-		mapView.setCenter(center.x, center.y + scrollBottom);
+		if (playerPos.y < maxBottom)
+		{
+			mapView.setCenter(center.x, center.y + scrollBottom);
+		}
 	}
-
-	std::cout << "scrollBottom: " << scrollBottom << std::endl;
 
 	// scroll to right
 	float scrollRight = playerPos.x - (viewportRight - borderMargin.x);
-	//if (scrollRight > 0 && viewportRight < maxRight)
 	if (scrollRight > 0)
 	{
-		mapView.setCenter(center.x + scrollRight, center.y);
+		if (playerPos.x < maxRight)
+		{
+			mapView.setCenter(center.x + scrollRight, center.y);
+		}
 	}
-
-	std::cout << "scrollRight: " << scrollRight << std::endl;
 
 	// scroll to top
 	float scrollTop = (viewportTop + borderMargin.y) - playerPos.y;
-	// if (scrollTop > 0 && viewportTop > minTop)
 	if (scrollTop > 0)
 	{
-		mapView.setCenter(center.x, center.y - scrollTop);
+		if (playerPos.y > minTop)
+		{
+			mapView.setCenter(center.x, center.y - scrollTop);
+		}
 	}
-
-	std::cout << "scrollTop: " << scrollTop << std::endl;
 
 	// scroll to left
 	float scrollLeft = (viewportLeft + borderMargin.x) - playerPos.x;
-	/*if (scrollLeft > 0 && viewportLeft > minLeft)*/
 	if (scrollLeft > 0)
 	{
-		mapView.setCenter(center.x - scrollLeft, center.y);
+		if (playerPos.x > minLeft)
+		{
+			mapView.setCenter(center.x - scrollLeft, center.y);
+		}
 	}
-
-	std::cout << "scrollLeft: " << scrollLeft << std::endl;
 }
 
 void GameStateGame::handleInput()
