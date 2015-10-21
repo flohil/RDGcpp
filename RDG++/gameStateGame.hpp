@@ -31,6 +31,7 @@ public:
 	virtual void update(const float deltaTime);
 	virtual void handleInput();
 	void adaptMapViewport();
+	void pauseGame();
 
 	GameStateGame(Game& game);
 	GameStateGame::~GameStateGame();

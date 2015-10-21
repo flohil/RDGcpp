@@ -1,8 +1,10 @@
 #include <SFML/Graphics.hpp>
 
 #include "gameStateGame.hpp"
+#include "gameStatePauseMenu.hpp"
 #include "gameState.hpp"
 #include "chances.hpp"
+#include "easylogging++.hpp"
 
 GameStateGame::GameStateGame(Game& game_) :
 GameState(game_)
@@ -166,9 +168,13 @@ void GameStateGame::handleInput()
 		case sf::Event::KeyPressed:
 		{
 			// just sample code - remove later on
-			if (event.key.code == sf::Keyboard::Escape)
+			if (event.key.code == sf::Keyboard::Delete)
 			{
-				game.window.close(); // turn to pause menu state
+				game.window.close();
+			}
+			else if (event.key.code == sf::Keyboard::Escape)
+			{
+				pauseGame();
 			}
 			else
 			{
@@ -197,6 +203,15 @@ void GameStateGame::handleInput()
 
 	//	return;
 	//}
+}
+
+void GameStateGame::pauseGame()
+{
+	LOG(INFO) << "Pausing game";
+
+	game.pushState(std::shared_ptr<GameState>(new GameStatePauseMenu(game)));
+
+	return;
 }
 
 GameStateGame::~GameStateGame()

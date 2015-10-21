@@ -17,6 +17,7 @@ public:
 	virtual void draw(const float deltaTime);
 	virtual void update(const float deltaTime);
 	virtual void handleInput();
+	void returnToGame();
 
 	GameStatePauseMenu(Game& game);
 };
