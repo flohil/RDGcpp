@@ -214,6 +214,11 @@ void GameStateGame::pauseGame()
 	return;
 }
 
+void GameStateGame::loadGui()
+{
+	// gui loading
+}
+
 GameStateGame::~GameStateGame()
 {
 	delete map;

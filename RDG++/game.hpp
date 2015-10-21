@@ -30,7 +30,7 @@ public:
 	std::shared_ptr<Settings> getSettings() const { return settings; };
 	std::shared_ptr<PrototypeStorage> getPrototypeStorage() const { return prototypeStorage; };
 	ResourceManager& getResourceManager() const { return resourceManager; };
-	std::vector<sf::VideoMode> getVModes() const { return vmodes; };
+	void reloadGuis();
 
 	Game();
 	~Game();

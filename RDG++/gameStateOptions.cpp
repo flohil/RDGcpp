@@ -16,6 +16,8 @@ GameState(game_)
 	guiView.setCenter(size);
 	view.setCenter(size);
 
+	status = "";
+
 	background.setTexture(ResourceManager::getInstance().getTexture("background"));
 	background.setTextureRect(sf::IntRect(0, 0, settings->width, settings->height));
 
@@ -87,7 +89,7 @@ void GameStateOptions::saveSettings()
 	unsigned int oldWidth = settings->width;
 	unsigned int oldHeight = settings->height;
 	
-	// std::string playerName = playerNameEditbox->getText().toAnsiString();
+	std::string playerName = playerNameEditbox->getText().toAnsiString();
 	std::string selectedItemId = mazeSizeCombobox->getSelectedItemId();
 	std::string resolutionStr = resolutionsCombobox->getSelectedItem();
 	sf::Vector2u resolution = GameStateOptions::guiStrCrossPairToUi(resolutionStr);
@@ -99,11 +101,18 @@ void GameStateOptions::saveSettings()
 
 	settings->saveSettings();
 
-	statusLabel->setText("Settings have been saved!");
+	status = "Settings have been saved!";
+
+	statusLabel->setText(status);
 
 	if (oldFullScreen != settings->fullscreen || oldWidth != settings->width || oldHeight != settings->height)
 	{
 		game.window.create(sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH), settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+
+		if (oldWidth != settings->width || oldHeight != settings->height)
+		{
+			game.reloadGuis();
+		}
 	}
 
 	return;
@@ -111,7 +120,30 @@ void GameStateOptions::saveSettings()
 
 void GameStateOptions::loadGui()
 {
+	gui.removeAllWidgets();
 	gui.setWindow(game.window);
+
+	//obtain possible resolutions
+	std::vector<sf::VideoMode> availiableVideoModes;
+	availiableVideoModes = sf::VideoMode::getFullscreenModes();
+	sf::VideoMode desktopVideoMode = sf::VideoMode::getDesktopMode();
+
+	float aspectRatio = static_cast<float>(desktopVideoMode.width) / static_cast<float>(desktopVideoMode.height);
+
+	std::vector<sf::VideoMode>::iterator it = availiableVideoModes.begin();
+
+	while (it != availiableVideoModes.end()) 
+	{
+		if ((static_cast<float>(it->width) / static_cast<float>(it->height)) != aspectRatio || it->bitsPerPixel != 32u)
+		{
+			it = availiableVideoModes.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
 
 	// set global font that all widgets can use by default
 	gui.setFont("res/fonts/DejaVuSans.ttf");
@@ -183,13 +215,16 @@ void GameStateOptions::loadGui()
 
 	resolutionsCombobox = std::make_shared<tgui::ComboBox>();
 	resolutionsCombobox->setOpacity(0.9f);
-	resolutionsCombobox->addItem(GameStateOptions::uiToGuiStrCrossPair(settings->width, settings->height));
+	for (sf::VideoMode vMode : availiableVideoModes)
+	{
+		resolutionsCombobox->addItem(GameStateOptions::uiToGuiStrCrossPair(vMode.width, vMode.height));
+	}
 	resolutionsCombobox->setSelectedItem(GameStateOptions::uiToGuiStrCrossPair(settings->width, settings->height));
 	resolutionsCombobox->setTextSize(settings->labelBigTextSize);
 	resolutionsCombobox->setSize(settings->defWidgetWidth * 0.5f - horSpace * 0.5f, settings->labelBigHeight);
 
 	statusLabel = std::make_shared<tgui::Label>();
-	statusLabel->setText("");
+	statusLabel->setText(status);
 	statusLabel->setTextColor(sf::Color::Black);
 	statusLabel->setTextSize(settings->labelSmallTextSize);
 	statusLabel->setSize(settings->defWidgetWidth, settings->labelSmallHeight);

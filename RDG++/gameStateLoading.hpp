@@ -26,8 +26,8 @@ public:
 	virtual void draw(const float deltaTime);
 	virtual void update(const float deltaTime);
 	virtual void handleInput();
+	virtual void loadGui();
 	void triggerLoading();
-	void loadGui();
 
 	GameStateLoading(Game& game);
 };

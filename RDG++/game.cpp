@@ -111,6 +111,24 @@ void Game::gameLoop()
 	}
 }
 
+void Game::reloadGuis()
+{
+	std::stack<std::shared_ptr<GameState>> oldStates;
+
+	while (!states.empty())
+	{
+		oldStates.push(peekState());
+		peekState()->loadGui();
+		popState();
+	}
+	
+	while (!oldStates.empty())
+	{
+		states.push(oldStates.top());
+		oldStates.pop();
+	}
+}
+
 Game::~Game()
 {
 	while (!states.empty())

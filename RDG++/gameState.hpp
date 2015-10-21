@@ -15,6 +15,7 @@ public:
 	virtual void draw(const float deltaTime) = 0;
 	virtual void update(const float deltaTime) = 0;
 	virtual void handleInput() = 0;
+	virtual void loadGui() = 0;
 };
 
 #endif /* GAME_STATE_HPP */

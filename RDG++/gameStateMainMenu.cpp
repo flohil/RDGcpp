@@ -92,6 +92,7 @@ void GameStateMainMenu::openSettings()
 
 void GameStateMainMenu::loadGui()
 {
+	gui.removeAllWidgets();
 	gui.setWindow(game.window);
 
 	// set global font that all widgets can use by default

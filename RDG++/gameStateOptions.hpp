@@ -19,6 +19,7 @@ private:
 	float layoutHeight;
 	float layoutCenterX;
 	float layoutCenterY;
+	std::string status;
 
 	// gui elements
 	tgui::EditBox::Ptr playerNameEditbox;
@@ -32,9 +33,9 @@ public:
 	virtual void draw(const float deltaTime);
 	virtual void update(const float deltaTime);
 	virtual void handleInput();
+	virtual void loadGui();
 	void returnToMainMenu();
 	void saveSettings();
-	void loadGui();
 	static std::string uiToGuiStrCrossPair(unsigned int nbr1, unsigned int nbr2);
 	static sf::Vector2u guiStrCrossPairToUi(std::string guiCrossPairStr);
 

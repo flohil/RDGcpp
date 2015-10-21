@@ -65,6 +65,7 @@ void GameStateLoading::triggerLoading()
 
 void GameStateLoading::loadGui()
 {
+	gui.removeAllWidgets();
 	gui.setWindow(game.window);
 
 	// set global font that all widgets can use by default
