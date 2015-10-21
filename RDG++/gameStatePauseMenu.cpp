@@ -85,9 +85,13 @@ void GameStatePauseMenu::quitToMainMenu()
 {
 	LOG(INFO) << "Quitting to main menu";
 
-	game.popState();
-	game.popState();
-
+	if (!quit)
+	{
+		quit = true;
+		game.popState();
+		game.popState();
+	}
+	
 	return;
 }
 

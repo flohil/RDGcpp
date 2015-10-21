@@ -14,6 +14,8 @@ private:
 	sf::Sprite background;
 	tgui::Gui gui;
 
+	bool quit = false;
+
 	// gui measures
 	float layoutWidth;
 	float layoutHeight;
