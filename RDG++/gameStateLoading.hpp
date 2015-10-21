@@ -1,16 +1,15 @@
-#ifndef GAME_STATE_MAIN_MENU
-#define GAME_STATE_MAIN_MENU
+#ifndef GAME_STATE_LOADING
+#define GAME_STATE_LOADING
 
 #include <SFML/Graphics.hpp>
 
 #include "gameState.hpp"
 
-class GameStateMainMenu : public GameState
+class GameStateLoading : public GameState
 {
 private:
 
 	sf::View view;
-	sf::View guiView;
 	sf::Sprite background;
 	tgui::Gui gui;
 
@@ -20,17 +19,17 @@ private:
 	float layoutCenterX;
 	float layoutCenterY;
 
+	unsigned int triggeredLoadingCountdown = 10;
+
 public:
 
 	virtual void draw(const float deltaTime);
 	virtual void update(const float deltaTime);
 	virtual void handleInput();
+	void triggerLoading();
 	void loadGui();
-	void startGame();
-	void quit();
-	void save();
 
-	GameStateMainMenu(Game& game);
+	GameStateLoading(Game& game);
 };
 
-#endif /* GAME_STATE_MAIN_MENU */
+#endif /* GAME_STATE_LOADING */
