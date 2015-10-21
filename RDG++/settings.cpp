@@ -23,6 +23,14 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	creatureSize = 128;
 	playerName = "Player";
 	maxInventorySize = 15;
+	buttonTextSize = 32u;
+	labelBigTextSize = 24u;
+	labelSmallTextSize = 22u;
+	widgetHeight = 60u;
+	defWidgetWidth = 450u;
+	labelPaddingX = 8.f;
+	labelBigHeight = 36.f;
+	labelSmallHeight = 34.f;
 
 	successfullyLoaded = loadSettings();
 }
@@ -41,9 +49,10 @@ void Settings::writeDefaultSettings()
 	outfile << "width = " << width << std::endl;
 	outfile << "height = " << height << std::endl;
 	outfile << "fullscreen = " << ((fullscreen == true) ? "TRUE" : "FALSE") << std::endl;
+	outfile << std::endl;
+	outfile << "# Game Settings" << std::endl;
 	outfile << "mazeSize = " << mazeSize << std::endl;
 	outfile << "playerName = " << playerName << std::endl;
-	outfile << "maxInventorySize = " << maxInventorySize << std::endl;
 
 	// close settings file
 	outfile.close();
@@ -60,7 +69,6 @@ void Settings::saveSettings()
 	settingsParser.set("fullscreen", fullscreen);
 	settingsParser.set("mazeSize", mazeSize);
 	settingsParser.set("playerName", playerName);
-	settingsParser.set("maxInventorySize", maxInventorySize);
 
 	settingsParser.saveToFile();
 	settingsParser.print();
@@ -97,7 +105,6 @@ bool Settings::loadSettings()
 		settingsParser.get("mazeSize", mazeSize);
 		settingsParser.get("tileSize", tileSize);
 		settingsParser.get("playerName", playerName);
-		settingsParser.get("maxInventorySize", maxInventorySize);
 
 		// mazeSize must be uneven number >= 3
 		if (mazeSize < 3 || (mazeSize % 2) != 1)

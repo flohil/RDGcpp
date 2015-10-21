@@ -28,6 +28,14 @@ public:
 	unsigned int creatureSize;
 	std::string playerName;
 	unsigned int maxInventorySize;
+	unsigned int buttonTextSize;
+	unsigned int labelBigTextSize;
+	unsigned int labelSmallTextSize;
+	unsigned int widgetHeight;
+	float defWidgetWidth;
+	float labelPaddingX;
+	float labelBigHeight;
+	float labelSmallHeight;
 
 	// functions
 	Settings(unsigned int desktopWidth, unsigned int desktopHeight);

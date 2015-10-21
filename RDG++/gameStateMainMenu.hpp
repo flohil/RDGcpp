@@ -28,7 +28,7 @@ public:
 	void loadGui();
 	void startGame();
 	void quit();
-	void save();
+	void openSettings();
 
 	GameStateMainMenu(Game& game);
 };

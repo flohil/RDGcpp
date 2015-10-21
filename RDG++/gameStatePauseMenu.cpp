@@ -53,7 +53,6 @@ void GameStatePauseMenu::handleInput()
 				game.window.close();
 				break;
 			}
-			/* Resize the window */
 			case sf::Event::KeyPressed:
 			{
 				// just sample code - remove later on
@@ -104,8 +103,8 @@ void GameStatePauseMenu::loadGui()
 
 	tgui::VerticalLayout::Ptr layout = std::make_shared<tgui::VerticalLayout>();
 
-	layoutWidth = 300;
-	layoutHeight = 130;
+	layoutWidth = static_cast<float>(settings->defWidgetWidth);
+	layoutHeight = static_cast<float>(settings->widgetHeight * 2.25);
 	layoutCenterX = static_cast<unsigned int>(settings->width) * 0.5f;
 	layoutCenterY = static_cast<unsigned int>(settings->height) * 0.5f;
 
@@ -117,13 +116,11 @@ void GameStatePauseMenu::loadGui()
 	tgui::Button::Ptr returnButton = std::make_shared<tgui::Button>();
 	tgui::Button::Ptr quitButton = std::make_shared<tgui::Button>();
 
-	layout->add(returnButton, "ReturnToGame_Button");
-	layout->add(quitButton, "QuitToMainMenu_Button");
-
-	layout->insertSpace(1, 0.5);
-
 	returnButton->setText("Return to Game");
 	quitButton->setText("Quit to Main Menu");
+
+	returnButton->setTextSize(settings->buttonTextSize);
+	quitButton->setTextSize(settings->buttonTextSize);
 
 	std::cout << "text: " << returnButton->getText().toAnsiString() << std::endl;
 
@@ -132,4 +129,9 @@ void GameStatePauseMenu::loadGui()
 	returnButton->connect("pressed", [&](){ returnToGame(); }); // more beautiful lambda expression
 	// returnButton->connect("pressed", &GameStatePauseMenu::returnToGame, *this); // ugly variant: 1st arg: function pointer, 2nd arg: instance -> value for this
 	quitButton->connect("pressed", [&](){ quitToMainMenu(); }); // more beautiful lambda expression
+
+	layout->add(returnButton);
+	layout->add(quitButton);
+
+	layout->insertSpace(1, 0.25);
 }
