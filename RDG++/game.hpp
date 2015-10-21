@@ -2,7 +2,7 @@
 #define GAME_HPP
 
 #include <stack>
-#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 #include "settings.hpp"
 #include "prototypes.hpp"
 #include "resourceManager.hpp"
@@ -17,8 +17,8 @@ public:
 
 	std::stack<std::shared_ptr<GameState>> states;
 	sf::RenderWindow window;
+	std::shared_ptr<tgui::Theme> theme;
 	std::shared_ptr<RenderableObject> background;
-	sf::Sprite backgroundSprite;
 
 	bool initializedSuccessfully() const { return successfullyInitialized; };
 	void pushState(std::shared_ptr<GameState> state);

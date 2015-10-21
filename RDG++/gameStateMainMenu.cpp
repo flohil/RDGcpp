@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "gameStateMainMenu.hpp"
+#include "gameStateLoading.hpp"
 #include "gameStateGame.hpp"
 #include "gameState.hpp"
 #include "easylogging++.hpp"
@@ -16,9 +17,8 @@ GameStateMainMenu::GameStateMainMenu(Game& game_) :
 	guiView.setCenter(size);
 	view.setCenter(size);
 
-	game.backgroundSprite.setTexture(ResourceManager::getInstance().getTexture("Frog"));
-	game.backgroundSprite.setTextureRect(sf::IntRect(0, 0, 64, 64));
-	game.backgroundSprite.setScale(sf::Vector2f(0.5f, 0.5f));
+	background.setTexture(ResourceManager::getInstance().getTexture("background"));
+	background.setTextureRect(sf::IntRect(0, 0, settings->width, settings->height));
 }
 
 void GameStateMainMenu::draw(const float deltaTime)
@@ -26,7 +26,7 @@ void GameStateMainMenu::draw(const float deltaTime)
 	game.window.setView(view);
 
 	game.window.clear(sf::Color::Black);
-	game.window.draw(game.backgroundSprite);
+	game.window.draw(background);
 
 	return;
 }
@@ -64,7 +64,10 @@ void GameStateMainMenu::handleInput()
 				}
 				break;
 			}
-			default: break;
+			default:
+			{
+				break;
+			}
 		}
 	}
 
@@ -88,9 +91,9 @@ void GameStateMainMenu::handleInput()
 
 void GameStateMainMenu::loadgame()
 {
-	LOG(INFO) << "Loading game world...";
+	LOG(INFO) << "Switching to loading screen...";
 
-	game.pushState(std::shared_ptr<GameState>(new GameStateGame(game)));
+	game.pushState(std::shared_ptr<GameState>(new GameStateLoading(game)));
 
 	return;
 }

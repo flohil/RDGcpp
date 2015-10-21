@@ -11,6 +11,14 @@ private:
 
 	sf::View view;
 	sf::View guiView;
+	sf::Sprite background;
+	tgui::Gui gui;
+
+	// gui measures
+	float layoutWidth;
+	float layoutHeight;
+	float layoutCenterX;
+	float layoutCenterY;
 
 public:
 
@@ -18,6 +26,8 @@ public:
 	virtual void update(const float deltaTime);
 	virtual void handleInput();
 	void returnToGame();
+	void quitToMainMenu();
+	void loadGui();
 
 	GameStatePauseMenu(Game& game);
 };

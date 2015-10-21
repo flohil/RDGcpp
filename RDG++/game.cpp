@@ -1,6 +1,5 @@
 #include <stack>
 
-#include <TGUI/TGUI.hpp>
 #include <SFML/System.hpp>
 
 #include "game.hpp"
@@ -44,6 +43,9 @@ Game::Game()
 	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Close));
 
 	window.setFramerateLimit(60); //limit fps to 60 
+
+	// Load the black theme
+	// theme = std::make_shared<tgui::Theme>("res/widgets/black.txt");
 
 	// retrieve a list of all possible fullscreen video modes
 	std::vector<sf::VideoMode> vmodes = sf::VideoMode::getFullscreenModes();

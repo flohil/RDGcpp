@@ -43,6 +43,8 @@ bool ResourceManager::loadAdditionalResources()
 	textureNames.insert(std::pair<std::string, std::string>("speedStats", "speed_stats.png"));
 	textureNames.insert(std::pair<std::string, std::string>("key", "key.png"));
 	textureNames.insert(std::pair<std::string, std::string>("tileset", "rooms/tileset.png"));
+	textureNames.insert(std::pair<std::string, std::string>("icon", "icon.png"));
+	textureNames.insert(std::pair<std::string, std::string>("background", "background.png"));
 
 	// load single textures
 	for (std::map<std::string, std::string>::iterator it = textureNames.begin(); it != textureNames.end(); ++it)

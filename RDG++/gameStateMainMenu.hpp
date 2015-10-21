@@ -11,6 +11,10 @@ private:
 
 	sf::View view;
 	sf::View guiView;
+	sf::Sprite background;
+
+	// gui elements
+
 
 public:
 
