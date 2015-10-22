@@ -19,7 +19,6 @@ GameStateMainMenu::GameStateMainMenu(Game& game_) :
 	view.setCenter(size);
 
 	background.setTexture(ResourceManager::getInstance().getTexture("background"));
-	background.setTextureRect(sf::IntRect(0, 0, settings->width, settings->height));
 
 	loadGui();
 }
@@ -84,6 +83,10 @@ void GameStateMainMenu::openSettings()
 
 void GameStateMainMenu::loadGui()
 {
+	background.setScale(static_cast<float>(settings->width) / static_cast<float>(background.getTexture()->getSize().x), static_cast<float>(settings->height) / static_cast<float>(background.getTexture()->getSize().y));
+	view.setSize(static_cast<float>(settings->width), static_cast<float>(settings->height));
+	view.setCenter(static_cast<float>(settings->width) * 0.5f, static_cast<float>(settings->height) * 0.5f);
+
 	gui.removeAllWidgets();
 	gui.setWindow(game.window);
 

@@ -23,6 +23,7 @@ bool ResourceManager::loadTexture(const std::string& textureName, const std::str
 		}
 		else
 		{
+			texture.setSmooth(true);
 			textures[textureName] = texture;
 			LOG(DEBUG) << "loaded " << settings->IMAGE_PATH + texturePath;
 		}

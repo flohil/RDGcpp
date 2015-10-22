@@ -19,7 +19,6 @@ GameState(game_)
 	status = "";
 
 	background.setTexture(ResourceManager::getInstance().getTexture("background"));
-	background.setTextureRect(sf::IntRect(0, 0, settings->width, settings->height));
 
 	loadGui();
 }
@@ -113,6 +112,10 @@ void GameStateOptions::saveSettings()
 
 void GameStateOptions::loadGui()
 {
+	background.setScale(static_cast<float>(settings->width) / static_cast<float>(background.getTexture()->getSize().x), static_cast<float>(settings->height) / static_cast<float>(background.getTexture()->getSize().y));
+	view.setSize(static_cast<float>(settings->width), static_cast<float>(settings->height));
+	view.setCenter(static_cast<float>(settings->width) * 0.5f, static_cast<float>(settings->height) * 0.5f);
+
 	gui.removeAllWidgets();
 	gui.setWindow(game.window);
 
@@ -136,7 +139,6 @@ void GameStateOptions::loadGui()
 			++it;
 		}
 	}
-
 
 	// set global font that all widgets can use by default
 	gui.setFont("res/fonts/DejaVuSans.ttf");

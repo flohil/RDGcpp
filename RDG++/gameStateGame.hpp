@@ -25,6 +25,9 @@ private:
 	float minLeft;
 	float maxRight;
 
+	// gui
+	tgui::Gui chatGui;
+
 public:
 
 	virtual void draw(const float deltaTime);
