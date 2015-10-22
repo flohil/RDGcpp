@@ -363,8 +363,8 @@ float Fight::determineFirstAttack()
 
 	// perform randomizing alculations
 	speedBasedSuccessRetVal = speedBasedSuccess(player, enemy);
-	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker.min, speedBasedSuccessRetVal.attacker.min);
-	randDefenderSpeed = Chances::randomFloat(speedBasedSuccessRetVal.defender.min, speedBasedSuccessRetVal.defender.max);
+	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker->min, speedBasedSuccessRetVal.attacker->min);
+	randDefenderSpeed = Chances::randomFloat(speedBasedSuccessRetVal.defender->min, speedBasedSuccessRetVal.defender->max);
 
 	// determine which player comes first
 	if (randAttackerSpeed >= randDefenderSpeed)	return 1.f;
@@ -381,8 +381,8 @@ bool Fight::parrySuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Cre
 
 	// perform randomizng calculations
 	speedBasedSuccessRetVal = speedBasedSuccess(player, enemy);
-	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker.min, speedBasedSuccessRetVal.attacker.max);
-	randDefenderSpeed = Chances::randomFloat(speedBasedSuccessRetVal.defender.min, speedBasedSuccessRetVal.defender.max);
+	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker->min, speedBasedSuccessRetVal.attacker->max);
+	randDefenderSpeed = Chances::randomFloat(speedBasedSuccessRetVal.defender->min, speedBasedSuccessRetVal.defender->max);
 
 	//determine which player comes first
 	if (randAttackerSpeed >= randDefenderSpeed)
