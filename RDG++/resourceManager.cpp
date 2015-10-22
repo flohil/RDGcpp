@@ -35,14 +35,16 @@ bool ResourceManager::loadAdditionalResources()
 {
 	std::map<std::string, std::string> textureNames;
 
-	textureNames.insert(std::pair<std::string, std::string>("playerBig", "soldier_64x64.png"));
-	textureNames.insert(std::pair<std::string, std::string>("playerSmall", "soldier_32x32.png"));
+	textureNames.insert(std::pair<std::string, std::string>("player_big", "player_big.png"));
+	textureNames.insert(std::pair<std::string, std::string>("player", "player.png"));
 	textureNames.insert(std::pair<std::string, std::string>("armorBackground", "warrior_160x160.png"));
 	textureNames.insert(std::pair<std::string, std::string>("accuracyStats", "accuracy_stats.png"));
 	textureNames.insert(std::pair<std::string, std::string>("strengthStats", "strength_stats.png"));
 	textureNames.insert(std::pair<std::string, std::string>("speedStats", "speed_stats.png"));
 	textureNames.insert(std::pair<std::string, std::string>("key", "key.png"));
 	textureNames.insert(std::pair<std::string, std::string>("tileset", "rooms/tileset.png"));
+	textureNames.insert(std::pair<std::string, std::string>("icon", "icon.png"));
+	textureNames.insert(std::pair<std::string, std::string>("background", "background.png"));
 
 	// load single textures
 	for (std::map<std::string, std::string>::iterator it = textureNames.begin(); it != textureNames.end(); ++it)

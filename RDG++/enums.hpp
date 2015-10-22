@@ -3,6 +3,11 @@
 
 #include <string>
 
+struct MoveState
+{
+	enum Enum { ARRIVED, MOVING, RESTING };
+};
+
 struct ObjectType
 {
 	enum Enum { ITEM, CREATURE, ATTACK, ROOM, TILE, WALL, KEY, UNKNWON };
@@ -11,6 +16,11 @@ struct ObjectType
 struct ItemType
 {
 	enum Enum { WEAPON, ARMAMENT, POTION, UNKNOWN };
+};
+
+struct ArmamentType
+{
+	enum Enum { HELMET, HARNESS, GAUNTLETS, CUISSE, BOOTS, UNKNOWN };
 };
 
 struct CreatureType
@@ -67,6 +77,31 @@ struct Attacks
 struct Point {
 	unsigned int x;
 	unsigned int y;
+
+	Point getDirPoint(ViewingDirections::Enum dir)
+	{
+		Point retPoint;
+		switch (dir)
+		{
+			case ViewingDirections::N:
+				retPoint = Point{ x, y - 1 };
+				break;
+			case ViewingDirections::E:
+				retPoint = Point{ x + 1, y };
+				break;
+			case ViewingDirections::S:
+				retPoint = Point{ x, y + 1 };
+				break;
+			case ViewingDirections::W:
+				retPoint = Point{ x - 1, y };
+				break;
+			default:
+				retPoint = Point{ x, y };
+				break;
+		}
+
+		return retPoint;
+	}
 };
 
 struct ItemBalance
@@ -100,8 +135,16 @@ public:
 	static Mode::Enum mapMode(std::string input);
 	static WeaponType::Enum mapWeaponType(std::string input);
 	static RoomTypes::Enum mapRoomTypes(std::string input);
+	static ArmamentType::Enum mapArmamentType(std::string input);
 
 	static std::string mapRoomNames(RoomTypes::Enum input);
+	static std::string mapArmamentTypeNames(ArmamentType::Enum input);
+	static std::string mapLevelName(Classes::Enum input);
+	static std::string mapTargetName(Target::Enum input);
+	static std::string mapAttributeName(Attribute::Enum input);
+	static std::string mapModeName(Mode::Enum input);
+	static std::string mapWeaponTypeName(WeaponType::Enum input);
+	static std::string mapAttackName(Attacks::Enum input);
 };
 
 #endif // ENUMS_INCLUDE

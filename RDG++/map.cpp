@@ -2,8 +2,10 @@
 #include "easylogging++.hpp"
 #include "chances.hpp"
 
-void Map::init()
+void Map::init(std::shared_ptr<Player> player_)
 {
+	player = player_;
+
 	// construct maze
 	maze.reset(new Maze(settings->mazeSize));
 	maze->generate();
@@ -248,6 +250,9 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 		background[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
 		overlay[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
 		overlay[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
+
+		treasureDoorOne = Point{ doorx1, doory1 };
+		treasureDoorTwo = Point{ doorx2, doory2 };
 	}
 	// normal door
 	else 
@@ -390,8 +395,8 @@ void Map::addMonster(std::shared_ptr<Room> room, RoomTypes::Enum type)
 
 			if (monsterName != "") //no monster shall be placed
 			{
-				room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->monsterFactory->create(monsterName);
-				room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
+				room->overlay[randPoint.point.y][randPoint.point.x] = game.getPrototypeStorage()->monsterFactory->create(monsterName);
+				room->overlay[randPoint.point.y][randPoint.point.x]->setSize(settings->tileSize, settings->tileSize);
 				increaseMonsterBalance(monsterName);
 			}
 		}
@@ -422,16 +427,16 @@ void Map::addItems(std::shared_ptr<Room> room, RoomTypes::Enum type)
 				switch (item.itemType)
 				{
 					case ItemType::ARMAMENT:
-						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->armamentFactory->create(item.itemName);
-						room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
+						room->overlay[randPoint.point.y][randPoint.point.x] = game.getPrototypeStorage()->armamentFactory->create(item.itemName);
+						room->overlay[randPoint.point.y][randPoint.point.x]->setSize(settings->tileSize, settings->tileSize);
 						break;
 					case ItemType::POTION:
-						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->potionFactory->create(item.itemName);
-						room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
+						room->overlay[randPoint.point.y][randPoint.point.x] = game.getPrototypeStorage()->potionFactory->create(item.itemName);
+						room->overlay[randPoint.point.y][randPoint.point.x]->setSize(settings->tileSize, settings->tileSize);
 						break;
 					case ItemType::WEAPON:
-						room->overlay[randPoint.point.x][randPoint.point.y] = game.getPrototypeStorage()->weaponFactory->create(item.itemName);
-						room->overlay[randPoint.point.x][randPoint.point.y]->setSize(settings->tileSize, settings->tileSize);
+						room->overlay[randPoint.point.y][randPoint.point.x] = game.getPrototypeStorage()->weaponFactory->create(item.itemName);
+						room->overlay[randPoint.point.y][randPoint.point.x]->setSize(settings->tileSize, settings->tileSize);
 						break;
 					default:
 						break;
@@ -456,7 +461,7 @@ void Map::placeKey()
 	{
 		randRoom = Chances::randomRoom(settings->mazeSize, settings->mazeSize);
 
-		randTile = Chances::randomFreeTile(rooms[randRoom.x][randRoom.y]->overlay, settings->MAX_TRIES);
+		randTile = Chances::randomFreeTile(rooms[randRoom.y][randRoom.x]->overlay, settings->MAX_TRIES);
 
 		if (randTile.found)
 		{
@@ -465,8 +470,8 @@ void Map::placeKey()
 
 	} while (!placedKey);
 
-	rooms[randRoom.x][randRoom.y]->overlay[randTile.point.x][randTile.point.y].reset(new RenderableObject("key", ObjectType::KEY));
-	rooms[randRoom.x][randRoom.y]->overlay[randTile.point.x][randTile.point.y]->setSize(settings->tileSize, settings->tileSize);
+	rooms[randRoom.y][randRoom.x]->overlay[randTile.point.y][randTile.point.x].reset(new RenderableObject("key", ObjectType::KEY));
+	rooms[randRoom.y][randRoom.x]->overlay[randTile.point.y][randTile.point.x]->setSize(settings->tileSize, settings->tileSize);
 }
 
 // Increase the balance counter for added monster
@@ -501,7 +506,7 @@ void Map::increaseItemBalance(std::string name)
 
 bool Map::isFieldPassable(Point fieldPos) const
 {
-	if (overlay[fieldPos.x][fieldPos.y] != nullptr)
+	if (overlay[fieldPos.y][fieldPos.x] != nullptr)
 	{
 		return false;
 	}
@@ -533,4 +538,28 @@ void Map::draw(sf::RenderWindow& window, float deltaTime)
 		}
 	}
 	return;
+}
+
+Point Map::initPlayerPosition()
+{
+	Point randPoint = Chances::randomFreeTile(rooms[0][0]->overlay, settings->MAX_TRIES).point;
+
+	return Point{ randPoint.x + 1, randPoint.y + 1 }; // consider wall 
+}
+
+void Map::update(const float deltaTime)
+{
+	/*overlay[player->getPrevPosition().x][player->getPrevPosition().y] = nullptr;
+	overlay[player->getPosition().x][player->getPosition().y] = player;*/
+}
+
+void Map::openTreasureChamber()
+{
+	if (!treasureDoorOpened)
+	{
+		overlay[treasureDoorOne.y][treasureDoorOne.x] = nullptr;
+		overlay[treasureDoorTwo.y][treasureDoorTwo.x] = nullptr;
+
+		treasureDoorOpened = true;
+	}
 }

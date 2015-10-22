@@ -2,7 +2,7 @@
 #define GAME_HPP
 
 #include <stack>
-#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 #include "settings.hpp"
 #include "prototypes.hpp"
 #include "resourceManager.hpp"
@@ -15,22 +15,22 @@ class Game
 {
 public:
 
-	std::stack<GameState*> states;
+	std::stack<std::shared_ptr<GameState>> states;
 	sf::RenderWindow window;
+	std::shared_ptr<tgui::Theme> theme;
 	std::shared_ptr<RenderableObject> background;
-	sf::Sprite backgroundSprite;
 
 	bool initializedSuccessfully() const { return successfullyInitialized; };
-	void pushState(GameState* state);
+	void pushState(std::shared_ptr<GameState> state);
 	void popState();
-	void changeState(GameState* state);
-	GameState* peekState();
+	void changeState(std::shared_ptr<GameState> state);
+	std::shared_ptr<GameState> peekState();
 
 	void gameLoop();
 	std::shared_ptr<Settings> getSettings() const { return settings; };
 	std::shared_ptr<PrototypeStorage> getPrototypeStorage() const { return prototypeStorage; };
 	ResourceManager& getResourceManager() const { return resourceManager; };
-	std::vector<sf::VideoMode> getVModes() const { return vmodes; };
+	void reloadGuis();
 
 	Game();
 	~Game();

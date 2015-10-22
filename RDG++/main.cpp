@@ -43,7 +43,7 @@ int main()
 		LOG(INFO) << "Game initialized successfully";
 	}
 
-	game.pushState(new GameStateMainMenu(game));
+	game.pushState(std::shared_ptr<GameState>( new GameStateMainMenu(game)));
 	game.gameLoop();
 
 	LOG(INFO) << "Shutting down...";

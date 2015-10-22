@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 
 #include "gameStateMainMenu.hpp"
+#include "gameStateOptions.hpp"
+#include "gameStateLoading.hpp"
 #include "gameStateGame.hpp"
 #include "gameState.hpp"
 #include "easylogging++.hpp"
@@ -16,9 +18,10 @@ GameStateMainMenu::GameStateMainMenu(Game& game_) :
 	guiView.setCenter(size);
 	view.setCenter(size);
 
-	game.backgroundSprite.setTexture(ResourceManager::getInstance().getTexture("Frog"));
-	game.backgroundSprite.setTextureRect(sf::IntRect(0, 0, 64, 64));
-	game.backgroundSprite.setScale(sf::Vector2f(0.5f, 0.5f));
+	background.setTexture(ResourceManager::getInstance().getTexture("background"));
+	background.setTextureRect(sf::IntRect(0, 0, settings->width, settings->height));
+
+	loadGui();
 }
 
 void GameStateMainMenu::draw(const float deltaTime)
@@ -26,7 +29,8 @@ void GameStateMainMenu::draw(const float deltaTime)
 	game.window.setView(view);
 
 	game.window.clear(sf::Color::Black);
-	game.window.draw(game.backgroundSprite);
+	game.window.draw(background);
+	gui.draw();
 
 	return;
 }
@@ -42,55 +46,84 @@ void GameStateMainMenu::handleInput()
 
 	while (game.window.pollEvent(event))
 	{
-		switch (event.type)
+		if (event.type == sf::Event::Closed)
 		{
-			/* Close the window */
-			case sf::Event::Closed:
-			{
-				game.window.close();
-				break;
-			}
-			/* Resize the window */
-			case sf::Event::KeyPressed:
-			{
-				// just sample code - remove later on
-				if (event.key.code == sf::Keyboard::Escape)
-				{
-					game.window.close();
-				}
-				if (event.key.code == sf::Keyboard::Return)
-				{
-					loadgame();
-				}
-				break;
-			}
-			default: break;
+			game.window.close();
 		}
+
+		gui.handleEvent(event);
 	}
-
-	// check all the window's events that were triggered since the last iteration of the loop
-	//while (game.window.pollEvent(event))
-	//{
-	//	// "close requested" event: we close the window
-	//	if (event.type == sf::Event::Closed) {
-	//		game.window.close();
-	//	}
-	//	else if (event.type == sf::Event::KeyPressed) {
-	//		settings->fullscreen = settings->fullscreen;
-	//		game.window.create(sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH), settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
-
-	//		settings->saveSettings();
-	//	}
-
-	//	return;
-	//}
 }
 
-void GameStateMainMenu::loadgame()
+void GameStateMainMenu::startGame()
 {
-	LOG(INFO) << "Loading game world...";
+	LOG(INFO) << "Switching to loading screen...";
 
-	game.pushState(new GameStateGame(game));
+	game.pushState(std::shared_ptr<GameState>(new GameStateLoading(game)));
 
 	return;
+}
+
+void GameStateMainMenu::quit()
+{
+	LOG(INFO) << "Quitting game...";
+
+	game.window.close();
+
+	return;
+}
+
+void GameStateMainMenu::openSettings()
+{
+	LOG(INFO) << "Opening settings...";
+
+	game.pushState(std::shared_ptr<GameState>(new GameStateOptions(game)));
+
+	return;
+}
+
+void GameStateMainMenu::loadGui()
+{
+	gui.removeAllWidgets();
+	gui.setWindow(game.window);
+
+	// set global font that all widgets can use by default
+	gui.setFont("res/fonts/DejaVuSans.ttf");
+
+	tgui::VerticalLayout::Ptr layout = std::make_shared<tgui::VerticalLayout>();
+
+	layoutWidth = static_cast<float>(settings->defWidgetWidth);
+	layoutHeight = static_cast<float>(settings->widgetHeight * 3.5);
+	layoutCenterX = static_cast<unsigned int>(settings->width) * 0.5f;
+	layoutCenterY = static_cast<unsigned int>(settings->height) * 0.5f;
+
+	layout->setSize(layoutWidth, layoutHeight);
+	layout->setPosition(layoutCenterX - layoutWidth * 0.5f, layoutCenterY - layoutHeight * 0.5f);
+
+	gui.add(layout, "MainMenu_Layout");
+
+	tgui::Button::Ptr startButton = std::make_shared<tgui::Button>();
+	startButton->setText("Start Game");
+	startButton->setOpacity(0.9f);
+	startButton->setTextSize(settings->buttonTextSize);
+	startButton->connect("pressed", [&](){ startGame(); });
+
+	tgui::Button::Ptr optionsButton = std::make_shared<tgui::Button>();
+	optionsButton->setText("Settings");
+	optionsButton->setOpacity(0.9f);
+	optionsButton->setTextSize(settings->buttonTextSize);
+	optionsButton->connect("pressed", [&](){ openSettings(); });
+
+	tgui::Button::Ptr quitButton = std::make_shared<tgui::Button>();
+	quitButton->setText("Quit");
+	quitButton->setOpacity(0.9f);
+	quitButton->setTextSize(settings->buttonTextSize);
+	quitButton->connect("pressed", [&](){ quit(); });
+	
+	layout->add(startButton);
+	layout->add(optionsButton);
+	layout->add(quitButton);
+
+	layout->insertSpace(1, 0.25f);
+	layout->insertSpace(3, 0.25f);
 }

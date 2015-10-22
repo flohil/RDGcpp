@@ -1,6 +1,5 @@
 #include <stack>
 
-#include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 
 #include "game.hpp"
@@ -41,9 +40,12 @@ Game::Game()
 
 	// create video mode and window
 	vmode = sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH);
-	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
+	window.create(vmode, settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Close));
 
 	window.setFramerateLimit(60); //limit fps to 60 
+
+	// Load the black theme
+	// theme = std::make_shared<tgui::Theme>("res/widgets/black.txt");
 
 	// retrieve a list of all possible fullscreen video modes
 	std::vector<sf::VideoMode> vmodes = sf::VideoMode::getFullscreenModes();
@@ -52,24 +54,25 @@ Game::Game()
 	// prototypeStorage->testPrintGameObjects();
 }
 
-void Game::pushState(GameState* state)
+void Game::pushState(std::shared_ptr<GameState> state)
 {
-	this->states.push(state);
+	states.push(state);
 
 	return;
 }
 
 void Game::popState()
 {
-	delete this->states.top();
-	this->states.pop();
+	LOG(DEBUG) << "deleting state " << states.top();
+	//delete states.top();
+	states.pop();
 
 	return;
 }
 
-void Game::changeState(GameState* state)
+void Game::changeState(std::shared_ptr<GameState> state)
 {
-	if (!this->states.empty())
+	if (!states.empty())
 	{
 		popState();
 	}
@@ -78,13 +81,13 @@ void Game::changeState(GameState* state)
 	return;
 }
 
-GameState* Game::peekState()
+std::shared_ptr<GameState> Game::peekState()
 {
-	if (this->states.empty())
+	if (states.empty())
 	{
 		return nullptr;
 	}
-	return this->states.top();
+	return states.top();
 }
 
 void Game::gameLoop()
@@ -108,9 +111,27 @@ void Game::gameLoop()
 	}
 }
 
+void Game::reloadGuis()
+{
+	std::stack<std::shared_ptr<GameState>> oldStates;
+
+	while (!states.empty())
+	{
+		oldStates.push(peekState());
+		peekState()->loadGui();
+		popState();
+	}
+	
+	while (!oldStates.empty())
+	{
+		states.push(oldStates.top());
+		oldStates.pop();
+	}
+}
+
 Game::~Game()
 {
-	while (!this->states.empty())
+	while (!states.empty())
 	{
 		popState();
 	}

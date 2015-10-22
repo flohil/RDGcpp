@@ -206,26 +206,198 @@ RoomTypes::Enum EnumMapper::mapRoomTypes(std::string input)
 	}
 }
 
+ArmamentType::Enum EnumMapper::mapArmamentType(std::string input)
+{
+	if (input == "helmet")
+	{
+		return ArmamentType::HELMET;
+	}
+	else if (input == "harness")
+	{
+		return ArmamentType::HARNESS;
+	}
+	else if (input == "cuisse")
+	{
+		return ArmamentType::CUISSE;
+	}
+	else if (input == "gauntlets")
+	{
+		return ArmamentType::GAUNTLETS;
+	}
+	else if (input == "boots")
+	{
+		return ArmamentType::BOOTS;
+	}
+	else
+	{
+		LOG(ERROR) << "Unknown input for ArmamentType::Enum: " << input;
+		return ArmamentType::Enum::UNKNOWN;
+	}
+}
+
 std::string EnumMapper::mapRoomNames(RoomTypes::Enum input)
 {
 	switch (input)
 	{
-	case RoomTypes::DEADEND:
-		return "Dead End";
-	case RoomTypes::HALLWAY:
-		return "Hallway";
-	case RoomTypes::JUNCTION:
-		return "Junction";
-	case RoomTypes::TJUNCTION:
-		return "T-Junction";
-	case RoomTypes::TREASURECHAMBER:
-		return "Treasure Chamber";
-	case RoomTypes::TURN:
-		return "Turn";
-	case RoomTypes::UNKNOWN:
-		LOG(ERROR) << "Unknown input for RoomTypes::Enum: " << input;
-		return "Unknown";
-	default:
-		return "Unknown";
+		case RoomTypes::DEADEND:
+			return "Dead End";
+		case RoomTypes::HALLWAY:
+			return "Hallway";
+		case RoomTypes::JUNCTION:
+			return "Junction";
+		case RoomTypes::TJUNCTION:
+			return "T-Junction";
+		case RoomTypes::TREASURECHAMBER:
+			return "Treasure Chamber";
+		case RoomTypes::TURN:
+			return "Turn";
+		case RoomTypes::UNKNOWN:
+			LOG(ERROR) << "Unknown input for RoomTypes::Enum: " << input;
+			return "Unknown";
+		default:
+			return "Unmatched";
 	}
 }
+
+std::string EnumMapper::mapArmamentTypeNames(ArmamentType::Enum input)
+{
+	switch (input)
+	{
+		case ArmamentType::HELMET:
+			return "helmet";
+		case ArmamentType::HARNESS:
+			return "harness";
+		case ArmamentType::CUISSE:
+			return "cuisse";
+		case ArmamentType::GAUNTLETS:
+			return "gauntlets";
+		case ArmamentType::BOOTS:
+			return "boots";
+		case ArmamentType::UNKNOWN:
+			LOG(ERROR) << "Unknown input for ArmamentType::Enum: " << input;
+			return "Unknown";
+		default:
+			return "Unmatched";
+	}
+};
+
+std::string EnumMapper::mapLevelName(Classes::Enum input)
+{
+	switch (input)
+	{
+		case Classes::NONE:
+			return "none";
+		case Classes::WEAK:
+			return "weak";
+		case Classes::MEDIUM:
+			return "medium";
+		case Classes::STRONG:
+			return "strong";
+		case Classes::UNKNOWN:
+			LOG(ERROR) << "Unknown input for Classes::Enum: " << input;
+			return "Unknown";
+		default:
+			return "Unmatched";
+	}
+};
+
+std::string EnumMapper::mapTargetName(Target::Enum input)
+{
+	switch (input)
+	{
+		case Target::OPPONENT:
+			return "opponent";
+		case Target::SELF:
+			return "self";
+		case Target::UNKNOWN:
+			LOG(ERROR) << "Unknown input for Target::Enum: " << input;
+			return "Unknown";
+		default:
+			return "Unmatched";
+	}
+};
+
+std::string EnumMapper::mapAttributeName(Attribute::Enum input)
+{
+	switch (input)
+	{
+		case Attribute::ACCURACY:
+			return "accuracy";
+		case Attribute::HP:
+			return "hp";
+		case Attribute::SPEED:
+			return "speed";
+		case Attribute::STRENGTH:
+			return "strength";
+		case Attribute::UNKNOWN:
+			LOG(ERROR) << "Unknown input for Attribute::Enum: " << input;
+			return "Unknown";
+		default:
+			return "Unmatched";
+	}
+};
+
+std::string EnumMapper::mapModeName(Mode::Enum input)
+{
+	switch (input)
+	{
+		case Mode::CURE:
+			return "cure";
+		case Mode::INCREMENTAL_DECREASE:
+			return "incremental decrease";
+		case Mode::INCREMENTAL_INCREASE:
+			return "incremental increase";
+		case Mode::TEMPORARY_DECREASE:
+			return "temporary decrease";
+		case Mode::TEMPORARY_INCREASE:
+			return "temporary increase";
+		case Mode::UNKNOWN:
+			LOG(ERROR) << "Unknown input for Mode::Enum: " << input;
+			return "Unknown";
+		default:
+			return "Unmatched";
+	}
+};
+
+std::string EnumMapper::mapWeaponTypeName(WeaponType::Enum input)
+{
+	switch (input)
+	{
+		case WeaponType::DOUBLE:
+			return "double";
+		case WeaponType::SINGLE:
+			return "single";
+		case WeaponType::UNKNOWN:
+			LOG(ERROR) << "Unknown input for WeaponType::Enum: " << input;
+			return "Unknown";
+		default:
+			return "Unmatched";
+	}
+};
+
+std::string EnumMapper::mapAttackName(Attacks::Enum input)
+{
+	switch (input)
+	{
+		case Attacks::ARMS:
+			return "arms";
+		case Attacks::HEAD:
+			return "head";
+		case Attacks::LEGS:
+			return "legs";
+		case Attacks::PARRY:
+			return "parry";
+		case Attacks::POTION:
+			return "potion";
+		case Attacks::SET:
+			return "set";
+		case Attacks::TORSO:
+			return "torso";
+		case Attacks::UNKNOWN:
+			LOG(ERROR) << "Unknown input for Attacks::Enum: " << input;
+			return "Unknown";
+		default:
+			return "Unmatched";
+	}
+};
+
