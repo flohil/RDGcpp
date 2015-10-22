@@ -106,6 +106,11 @@ bool Settings::loadSettings()
 		settingsParser.get("tileSize", tileSize);
 		settingsParser.get("playerName", playerName);
 
+		if (playerName.length() == 0)
+		{
+			playerName = "Player";
+		}
+
 		// mazeSize must be uneven number >= 3
 		if (mazeSize < 3 || (mazeSize % 2) != 1)
 		{

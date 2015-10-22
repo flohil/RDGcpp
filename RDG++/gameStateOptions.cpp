@@ -83,7 +83,10 @@ void GameStateOptions::saveSettings()
 	std::string selectedItemId = mazeSizeCombobox->getSelectedItemId();
 	std::string resolutionStr = resolutionsCombobox->getSelectedItem();
 	sf::Vector2u resolution = GameStateOptions::guiStrCrossPairToUi(resolutionStr);
-	// settings->playerName = playerName;
+	if (playerName.length() > 0)
+	{
+		settings->playerName = playerName;
+	}
 	settings->fullscreen = fullscreenCheckbox->isChecked();
 	settings->mazeSize = std::stoul(selectedItemId, nullptr, 0);
 	settings->width = resolution.x;
