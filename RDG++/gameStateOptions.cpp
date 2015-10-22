@@ -46,29 +46,19 @@ void GameStateOptions::handleInput()
 
 	while (game.window.pollEvent(event))
 	{
-		switch (event.type)
+		if (event.type == sf::Event::Closed)
 		{
-			/* Close the window */
-			case sf::Event::Closed:
+			game.window.close();
+		}
+		else if (event.type == sf::Event::KeyPressed)
+		{
+			if (event.key.code == sf::Keyboard::Escape)
 			{
-				game.window.close();
-				break;
-			}
-			case sf::Event::KeyPressed:
-			{
-				// just sample code - remove later on
-				if (event.key.code == sf::Keyboard::Escape)
-				{
-					returnToMainMenu();
-				}
-				break;
-			}
-			default:
-			{
-				gui.handleEvent(event);
-				break;
+				returnToMainMenu();
 			}
 		}
+
+		gui.handleEvent(event);
 	}
 }
 
