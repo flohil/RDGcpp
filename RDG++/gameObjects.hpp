@@ -12,6 +12,7 @@
 class Map;
 class Weapon;
 class Armament;
+class Potion;
 
 struct EquipmentSet
 {
@@ -22,6 +23,9 @@ struct EquipmentSet
 	std::shared_ptr<Armament> cuisse;
 	std::shared_ptr<Armament> gauntlets;
 	std::shared_ptr<Armament> boots;
+
+	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
+
 };
 
 class GameObject
@@ -93,16 +97,16 @@ class Creature
 {
 public:
 
-	Creature(float hp_, float strength_, float speed_, float accuracy_, CreatureType::Enum creatureType_, DifficultyLevel::Enum level_)
-		: orHp(hp_), orStrength(strength_), orSpeed(speed_), orAccuracy(accuracy_), hp(hp_), strength(strength_), speed(speed_), accuracy(accuracy_), creatureType(creatureType_), difficultyLevel(level_) {};
+	Creature(float hp_, float strength_, float speed_, float accuracy_, CreatureType::Enum creatureType_)
+		: orHp(hp_), orStrength(strength_), orSpeed(speed_), orAccuracy(accuracy_), hp(hp_), strength(strength_), speed(speed_), accuracy(accuracy_), creatureType(creatureType_) {};
 
 	float hp, strength, speed, accuracy;
 
-	unsigned int getOrHP() { return orHp; };
-	unsigned int getOrSpeed() { return orSpeed; };
-	unsigned int getOrAccuracy() { return orAccuracy; };
-	unsigned int getOrStrength() { return orStrength; };
-	DifficultyLevel::Enum getLevel() const { return difficultyLevel; };
+	float getOrHP() { return orHp; };
+	float getOrSpeed() { return orSpeed; };
+	float getOrAccuracy() { return orAccuracy; };
+	float getOrStrength() { return orStrength; };
+	virtual DifficultyLevel::Enum getLevel() const = 0;
 	void resetOriginals();
 	CreatureType::Enum getCreatureType() { return creatureType; };
 	std::vector<Potion> activePotions;
@@ -113,7 +117,6 @@ private:
 
 	float const orHp, orStrength, orSpeed, orAccuracy;
 	CreatureType::Enum creatureType;
-	DifficultyLevel::Enum difficultyLevel;
 };
 
 class Player : public RenderableObject, public Creature
@@ -129,6 +132,12 @@ public:
 	bool putInInventar(std::shared_ptr<RenderableObject> object);
 	Point getPlayerPosition() const { return playerPosition; };
 	sf::Vector2f getPixelPosition() const { return RenderableObject::getPosition(); };
+	DifficultyLevel::Enum getLevel() const { return DifficultyLevel::UNKNOWN; };
+	EquipmentSet getEquipmentSet()
+	{
+		if (activeSet == 1u) return setOne;
+		else if (activeSet == 2u) return setTwo;
+	};
 
 private:
 
@@ -159,6 +168,7 @@ private:
 	std::vector<std::shared_ptr<RenderableObject>> inventory;
 	EquipmentSet setOne = EquipmentSet{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	EquipmentSet setTwo = EquipmentSet{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	unsigned int activeSet = 1;
 
 	void setPosition(Point position_);
 	void preMove();
@@ -191,11 +201,12 @@ class Monster : public RenderableObject, public Creature, public DebugPrintObjec
 public:
 
 	Monster(const std::string& name_, const DifficultyLevel::Enum level_, const Attribute::Enum killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
-		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER, level(level_)), killBonusType(killBonusType_), killBonus(killBonus_) {};
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER), level(level_), killBonusType(killBonusType_), killBonus(killBonus_) {};
 
 	Attribute::Enum getKillBonusType() const { return killBonusType; };
 	float getKillBonus() const { return killBonus; };
 	virtual void debugPrint() const;
+	DifficultyLevel::Enum getLevel() const { return level; };
 
 protected:
 

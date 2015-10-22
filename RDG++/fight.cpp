@@ -24,7 +24,7 @@ Fight::~Fight()
 {
 }
 
-Creature Fight::fight()
+std::shared_ptr<Creature> Fight::fight()
 {
 	/* MAIN FIGHT LOOP */
 	while (player->hp > 0 && enemy->accuracy > 0)
@@ -119,7 +119,7 @@ Creature Fight::fight()
 	// enemy->emptyActivePotions();
 
 	//return loser of the fight
-	return *fightLoser;
+	return fightLoser;
 }
 
 void Fight::resetRoundVariables()
@@ -412,7 +412,7 @@ float Fight::calcCreatureAccuracy(std::shared_ptr<Creature> creature)
 	}
 
 	//perform calculations
-	accuracy = creature->accuracy / 100 * armorView.getStats(ArmorStatsTypes.WEAPON, ArmorStatsMode.AVERAGE, ArmorStatsAttributes.ACCURACY) * accuracyMultiplier;
+	accuracy = creature->accuracy / 100 * player->getEquipmentSet().getStats(ItemType::WEAPON, ArmorStatsMode::AVG, ArmorStatsAttributes::ACCURACY) * accuracyMultiplier;
 
 	return accuracy;
 }
@@ -501,7 +501,7 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	}
 	else
 	{
-		attackerWeaponDamage = armorView.getStats(ArmorStatsTypes.Weapons, ArmorStatsMode.SUM, ArmorStatsAttributes.ATTACK);
+		attackerWeaponDamage = player->getEquipmentSet.getStats(ItemType::WEAPON, ArmorStatsMode::SUM, ArmorStatsAttributes::ATTACK);
 		finishedStagesMult = 1;
 	}
 
@@ -524,7 +524,7 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	}
 	else if (defender == player)
 	{
-		defenderArmor = armorView.getStats(ArmorStatsTypes.ARMAMENT, ArmorStatsMode.SUM, ArmorStatsAttributes.ARMOR);
+		defenderArmor = player->getEquipmentSet.getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::ARMOR);
 		finishedStagesMult = 1;
 		baseDefense = baseDefensePlayer;
 	}

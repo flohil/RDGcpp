@@ -453,10 +453,15 @@ void Creature::resetOriginals()
 
 void Creature::removeActivePotions(Potion potion_)
 {
-	activePotions.erase(std::remove(activePotions.begin(), activePotions.end(), potion_), activePotions.end));
+	activePotions.erase(std::remove(activePotions.begin(), activePotions.end(), potion_), activePotions.end());
 }
 
 void Creature::addActivePotion(Potion potion_)
 {
 	activePotions.push_back(potion_);
+}
+
+float EquipmentSet::getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum)
+{
+	return 0.f;
 }

@@ -3,16 +3,16 @@
 
 #include "gameObjects.hpp"
 #include "enums.hpp"
-#include "player.hpp"
 
 class Fight
 {
 public:
-	Fight(std::shared_ptr<Player>, std::shared_ptr<Creature>);
+	Fight(std::shared_ptr<Player> player_, std::shared_ptr<Creature> creature_);
 	~Fight();
 
+	std::shared_ptr<Creature> fight();
+
 	void handleFightOptions();
-	void run();
 
 private:
 	// VARIABLES
@@ -39,7 +39,6 @@ private:
 	bool enemyFinished;
 
 	// METHODS
-	Creature fight();
 	void resetRoundVariables();
 	std::shared_ptr<Potion> getSelectedPotion(std::shared_ptr<Creature> creature1);
 	Attacks::Enum getCommand(std::shared_ptr<Creature> creature);

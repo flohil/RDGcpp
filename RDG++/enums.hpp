@@ -18,6 +18,16 @@ struct ItemType
 	enum Enum { WEAPON, ARMAMENT, POTION, UNKNOWN };
 };
 
+struct ArmorStatsMode
+{
+	enum Enum { SUM, AVG, MIN, MAX };
+};
+
+struct ArmorStatsAttributes
+{
+	enum Enum { ARMOR, SPEED, ACCURACY, ATTACK };
+};
+
 struct ArmamentType
 {
 	enum Enum { HELMET, HARNESS, GAUNTLETS, CUISSE, BOOTS, UNKNOWN };
