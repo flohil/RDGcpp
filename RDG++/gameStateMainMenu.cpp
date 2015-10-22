@@ -46,20 +46,12 @@ void GameStateMainMenu::handleInput()
 
 	while (game.window.pollEvent(event))
 	{
-		switch (event.type)
+		if (event.type == sf::Event::Closed)
 		{
-			/* Close the window */
-			case sf::Event::Closed:
-			{
-				game.window.close();
-				break;
-			}
-			default:
-			{
-				gui.handleEvent(event);
-				break;
-			}
+			game.window.close();
 		}
+
+		gui.handleEvent(event);
 	}
 }
 

@@ -155,19 +155,12 @@ void GameStateGame::handleInput()
 
 	while (game.window.pollEvent(event))
 	{
-		switch (event.type)
+		if (event.type == sf::Event::Closed)
 		{
-			/* Close the window */
-		case sf::Event::Closed:
-		{
-
 			game.window.close();
-			break;
 		}
-		/* Resize the window */
-		case sf::Event::KeyPressed:
+		else if (event.type == sf::Event::KeyPressed)
 		{
-			// just sample code - remove later on
 			if (event.key.code == sf::Keyboard::Delete)
 			{
 				game.window.close();
@@ -180,29 +173,10 @@ void GameStateGame::handleInput()
 			{
 				player->handleInput(event);
 			}
+		}
 
-			break;
-		}
-		default: break;
-		}
+		// gui.handleEvent(event);
 	}
-
-	// check all the window's events that were triggered since the last iteration of the loop
-	//while (game.window.pollEvent(event))
-	//{
-	//	// "close requested" event: we close the window
-	//	if (event.type == sf::Event::Closed) {
-	//		game.window.close();
-	//	}
-	//	else if (event.type == sf::Event::KeyPressed) {
-	//		settings->fullscreen = settings->fullscreen;
-	//		game.window.create(sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH), settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
-
-	//		settings->saveSettings();
-	//	}
-
-	//	return;
-	//}
 }
 
 void GameStateGame::pauseGame()
