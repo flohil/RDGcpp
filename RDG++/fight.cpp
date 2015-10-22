@@ -1,6 +1,4 @@
 #include "fight.hpp"
-#include "minAvgMax.hpp"
-#include "attDefMinAvgMax.hpp"
 #include "chances.hpp"
 
 Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Creature> enemy_)
@@ -22,6 +20,7 @@ Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Creature> enemy_)
 
 Fight::~Fight()
 {
+
 }
 
 std::shared_ptr<Creature> Fight::fight()
@@ -32,7 +31,7 @@ std::shared_ptr<Creature> Fight::fight()
 		std::shared_ptr<Creature> creature1 = nullptr;
 		std::shared_ptr<Creature> creature2 = nullptr;
 
-		float firstAttackTemp = determineFirstAttack();
+		unsigned int firstAttackTemp = determineFirstAttack();
 
 		if (firstAttackTemp == 1)
 		{
@@ -106,7 +105,7 @@ std::shared_ptr<Creature> Fight::fight()
 	{
 		fightLoser = enemy;
 		//give attribute bonus to winner of the fight
-		if (fightLoser->getCreatureType == CreatureType::MONSTER)
+		if (fightLoser->getCreatureType() == CreatureType::MONSTER)
 		{
 			attributeBonusForWinner(fightLoser);
 		}
@@ -115,8 +114,8 @@ std::shared_ptr<Creature> Fight::fight()
 	}
 
 	// empty active potion lists
-	// player->emptyActivePotions();
-	// enemy->emptyActivePotions();
+	 player->emptyActivePotions();
+	 enemy->emptyActivePotions();
 
 	//return loser of the fight
 	return fightLoser;
@@ -137,15 +136,16 @@ void Fight::resetRoundVariables()
 
 std::shared_ptr<Potion> Fight::getSelectedPotion(std::shared_ptr<Creature> creature1)
 {
-	
+	return nullptr;
 }
 
+// replace with gui commands for player and random attack for monster
 Attacks::Enum Fight::getCommand(std::shared_ptr<Creature> creature)
 {
 	//check which option was selected, returns enum
 	Attacks::Enum chosenAttackType = Attacks::UNKNOWN;
 
-	if (creature->getCreatureType == CreatureType::PLAYER)
+	if (creature->getCreatureType() == CreatureType::PLAYER)
 	{
 		// wait for the player to chose an attack - also set selected Potion, Set changes and so on...
 		while (activeAttackType == Attacks::UNKNOWN)
@@ -215,17 +215,17 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 		break;
 
 	case Attacks::PARRY:
-		if (parrySuccess(creature1, creature2))
-		{
-			// when creature (player) parries successful, he deals x times the damage of a normal torso attack
-			parryMultiplier = 2.f;
-			activeAttack = &attacks.at(Attacks::TORSO);
-		}
-		else
-		{
-			parryMultiplier = 0.f;
-			activeAttack = &attacks.at(Attacks::TORSO);
-		}
+		//if (parrySuccess(creature1, creature2))
+		//{
+		//	// when creature (player) parries successful, he deals x times the damage of a normal torso attack
+		//	parryMultiplier = 2.f;
+		//	activeAttack = &attacks.at(Attacks::TORSO);
+		//}
+		//else
+		//{
+		//	parryMultiplier = 0.f;
+		//	activeAttack = &attacks.at(Attacks::TORSO);
+		//}
 		activeAttackNumber = 7.f;
 		break;
 
@@ -236,7 +236,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 	// actual attack
 	if (activeAttackNumber < 5.f || activeAttackNumber > 6.f)
 	{
-		attack(creature1, creature2);
+		//attack(creature1, creature2);
 	}
 
 	// parryMultiplier is used on every attack and only temporarily increased when parrying -> needs to be resetted
@@ -300,15 +300,14 @@ float Fight::calcCreatureSpeed(std::shared_ptr<Creature> creature)
 	float speed = 0.f;
 
 	// get monster's speed value
-	if (creature->getCreatureType == CreatureType::MONSTER)
+	if (creature->getCreatureType() == CreatureType::MONSTER)
 	{
 		return creature->speed;
 	}
 
 	// get Speed of player
-	// playerArmorSpeedMalusSum = armorView.getStats(ArmorStatsTypes.ARMAMENT, ArmorStatsMode.SUM, ArmorStatsAttributes.SPEED);
-	// playerWeaponSpeedMalusMax = armorView.getStats(ArmorStatsTypes.WEAPONS, ArmorStatsMode.MAX, ArmorStatsAttributes.SPEED);
-
+	playerArmorSpeedMalusSum = player->getEquipmentSet().getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::SPEED);
+	playerWeaponSpeedMalusMax = player->getEquipmentSet().getStats(ItemType::WEAPON, ArmorStatsMode::MAX, ArmorStatsAttributes::SPEED);
 
 	// perform calculations
 	playerArmorSpeedMalus = creature->speed / 100 * playerArmorSpeedMalusSum * armorSpeedMalusMult;
@@ -336,53 +335,51 @@ AttDefMinAvgMax Fight::speedBasedSuccess(std::shared_ptr<Creature> attacker, std
 	defenderSpeedTemp = defender->speed;
 
 	// include a finishedStages Bonus for Monsters
-	if (defender->getCreatureType == CreatureType::MONSTER)
+	if (defender->getCreatureType() == CreatureType::MONSTER)
 	{
 		defenderSpeedTemp = defenderSpeedTemp * (1 + finishedStages / finishedStagesDivisor);
 	}
-	if (attacker->getCreatureType == CreatureType::MONSTER)
+	if (attacker->getCreatureType() == CreatureType::MONSTER)
 	{
 		attackerSpeedTemp = attackerSpeedTemp * (1 + finishedStages / finishedStagesDivisor);
 	}
 
 	// perform caltulations
-	attackerSpeedBase = attackerSpeedTemp + (calcCreatureSpeed(attacker) / attackerSpeedTemp * attackerSpeedBase);
-	defenderSpeedBase = defenderSpeedTemp + (calcCreatureSpeed(defender) / defenderSpeedTemp * defenderSpeedBase);
-	MinAvgMax *attackerSpeed = new MinAvgMax(speedRandLow, speedRandHigh, attackerSpeedBase);
-	MinAvgMax *defenderSpeed = new MinAvgMax(speedRandLow, speedRandHigh, defenderSpeedBase);
+	attackerSpeedBase = attackerSpeedTemp + (calcCreatureSpeed(attacker) / attackerSpeedTemp) * speedBase;
+	defenderSpeedBase = defenderSpeedTemp + (calcCreatureSpeed(defender) / defenderSpeedTemp) * speedBase;
+	MinAvgMax attackerSpeed(speedRandLow, speedRandHigh, attackerSpeedBase);
+	MinAvgMax defenderSpeed(speedRandLow, speedRandHigh, defenderSpeedBase);
 
-	return AttDefMinAvgMax(*attackerSpeed, *defenderSpeed);
+	return AttDefMinAvgMax(attackerSpeed, defenderSpeed);
 } 
 
-float Fight::determineFirstAttack()
+unsigned int Fight::determineFirstAttack()
 {
 	//variables
-	AttDefMinAvgMax speedBasedSuccessRetVal;
 	float randAttackerSpeed;
 	float randDefenderSpeed;
 
 	// perform randomizing alculations
-	speedBasedSuccessRetVal = speedBasedSuccess(player, enemy);
-	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker->min, speedBasedSuccessRetVal.attacker->min);
-	randDefenderSpeed = Chances::randomFloat(speedBasedSuccessRetVal.defender->min, speedBasedSuccessRetVal.defender->max);
+	AttDefMinAvgMax speedBasedSuccessRetVal = speedBasedSuccess(player, enemy);
+	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker.min, speedBasedSuccessRetVal.attacker.min);
+	randDefenderSpeed = Chances::randomFloat(speedBasedSuccessRetVal.defender.min, speedBasedSuccessRetVal.defender.max);
 
 	// determine which player comes first
-	if (randAttackerSpeed >= randDefenderSpeed)	return 1.f;
-	else return 2.f;
+	if (randAttackerSpeed >= randDefenderSpeed)	return 1u;
+	else return 2u;
 }
 
 bool Fight::parrySuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender)
 {
 	// variables
-	AttDefMinAvgMax speedBasedSuccessRetVal;
 	float randAttackerSpeed;
 	float randDefenderSpeed;
 	bool parrySuccess = false;
 
 	// perform randomizng calculations
-	speedBasedSuccessRetVal = speedBasedSuccess(player, enemy);
-	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker->min, speedBasedSuccessRetVal.attacker->max);
-	randDefenderSpeed = Chances::randomFloat(speedBasedSuccessRetVal.defender->min, speedBasedSuccessRetVal.defender->max);
+	AttDefMinAvgMax speedBasedSuccessRetVal = speedBasedSuccess(player, enemy);
+	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker.min, speedBasedSuccessRetVal.attacker.max);
+	randDefenderSpeed = Chances::randomFloat(speedBasedSuccessRetVal.defender.min, speedBasedSuccessRetVal.defender.max);
 
 	//determine which player comes first
 	if (randAttackerSpeed >= randDefenderSpeed)
@@ -406,7 +403,7 @@ float Fight::calcCreatureAccuracy(std::shared_ptr<Creature> creature)
 	float accuracy;
 
 	// get accuracy of monster
-	if (creature->getCreatureType == CreatureType::MONSTER)
+	if (creature->getCreatureType() == CreatureType::MONSTER)
 	{
 		return creature->accuracy;
 	}
@@ -427,8 +424,8 @@ float Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<
 
 	// variables
 	float attackerAccuracyBase;
-	//MinAvgMax atackerAccuracy;
-	//MinAvgMax defenderSpeed;
+	MinAvgMax attackerAccuracy;
+	MinAvgMax defenderSpeed;
 	float randAttackerAccuracy;
 	float randDefenderSpeed;
 
@@ -436,22 +433,23 @@ float Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<
 	bool hitSuccess;
 
 	// set finishedStagesMult Bonus for Monsters
-	if (attacker->getCreatureType == CreatureType::MONSTER)
+	if (attacker->getCreatureType() == CreatureType::MONSTER)
 	{
 	
 	}
 	else
 	{
+
 	}
 
 	//perform calculations
-	attackerAccuracyBase = activeAttack->getHitProbability * (attacker->accuracy + calcCreatureAccuracy(attacker) / attacker->accuracy * accuracyBase);
-	//attackerAccuracy = new MinAvgMax(randAccuracyLow, randAccuracyHigh, attackerAccuracyBase);
-	//defenderSpeed = speedBasedSuccess(attacker, defender).defender;
+	attackerAccuracyBase = activeAttack->getHitProbability() * (attacker->accuracy + calcCreatureAccuracy(attacker) / attacker->accuracy * accuracyBase);
+	attackerAccuracy = MinAvgMax(randAccuracyLow, randAccuracyHigh, attackerAccuracyBase);
+	defenderSpeed = speedBasedSuccess(attacker, defender).defender;
 
 	// calculate randomized values
-	//randAttackerAccuracy = Chances.randomFloat(attackerAccuracy.min, attackerAccuracy.max);
-	//randDefenderSpeed = Chances.randomFloat(defenderSpeed.min, defenderSpeed.max);
+	randAttackerAccuracy = Chances::randomFloat(attackerAccuracy.min, attackerAccuracy.max);
+	randDefenderSpeed = Chances::randomFloat(defenderSpeed.min, defenderSpeed.max);
 
 	//determine hitSuccess - always hit after successful parry
 	if (randAttackerAccuracy >= randDefenderSpeed || parryMultiplier > 1.f)
@@ -484,36 +482,36 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	float baseDefense;
 
 	//variables
-	MinAvgMax *attackDamage;
-	MinAvgMax *attackerRawDamage;
+	MinAvgMax attackDamage;
+	MinAvgMax attackerRawDamage;
 	float defenderDefense;
-	MinAvgMax *healthDamage;
+	MinAvgMax healthDamage;
 	float finishedStagesMult;
 
 	//results
 	float randHealthDamage;
 
 	// set parameters
-	if (attacker->getCreatureType == CreatureType::MONSTER)
+	if (attacker->getCreatureType() == CreatureType::MONSTER)
 	{
 		attackerWeaponDamage = 0;		// maybe change because of armed enemies??
 		finishedStagesMult = 1 + (finishedStages / finishedStagesDivisor);
 	}
 	else
 	{
-		attackerWeaponDamage = player->getEquipmentSet.getStats(ItemType::WEAPON, ArmorStatsMode::SUM, ArmorStatsAttributes::ATTACK);
+		attackerWeaponDamage = player->getEquipmentSet().getStats(ItemType::WEAPON, ArmorStatsMode::SUM, ArmorStatsAttributes::ATTACK);
 		finishedStagesMult = 1;
 	}
 
-	if (defender->getCreatureType == CreatureType::MONSTER)
+	if (defender->getCreatureType() == CreatureType::MONSTER)
 	{
 		defenderArmor = 0;
 		finishedStagesMult = 1 + (finishedStages / finishedStagesDivisor);
-		if (defender->getLevel == DifficultyLevel::EASY)
+		if (defender->getLevel() == DifficultyLevel::EASY)
 		{
 			baseDefense = baseDefenseEasy;
 		}
-		else if (defender->getLevel == DifficultyLevel::NORMAL)
+		else if (defender->getLevel() == DifficultyLevel::NORMAL)
 		{
 			baseDefense = baseDefenseNormal;
 		}
@@ -524,7 +522,7 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	}
 	else if (defender == player)
 	{
-		defenderArmor = player->getEquipmentSet.getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::ARMOR);
+		defenderArmor = player->getEquipmentSet().getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::ARMOR);
 		finishedStagesMult = 1;
 		baseDefense = baseDefensePlayer;
 	}
@@ -536,13 +534,20 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	}
 
 	// perform calculations
-	attackDamage = new MinAvgMax(activeAttack->getAttackStatsLowMultiplier, activeAttack->getAttackStatsHighMultiplier, activeAttack->getHpDamageMultiplier);
-	attackerRawDamage = new MinAvgMax(
-		parryMultiplier * attackerRawDamage->min / defenderDefense * damageMult,
-		parryMultiplier * attackerRawDamage->max / defenderDefense * damageMult);
+	attackDamage = MinAvgMax( activeAttack->getAttackStatsLowMultiplier(), activeAttack->getAttackStatsHighMultiplier(), activeAttack->getHpDamageMultiplier() );
+	attackerRawDamage = MinAvgMax(
+		attackDamage.min * (strengthMult * attacker->strength + weaponMult * attackerWeaponDamage),
+		attackDamage.max * (strengthMult * attacker->strength + weaponMult * attackerWeaponDamage)
+	);
+
+	defenderDefense = finishedStagesMult * baseDefense + armorMult * defenderArmor;
+	healthDamage = MinAvgMax(
+		parryMultiplier * attackerRawDamage.min / defenderDefense * damageMult,
+		parryMultiplier * attackerRawDamage.max / defenderDefense * damageMult
+	);
 
 	// calculate a randomized result
-	randHealthDamage = Chances::randomFloat(healthDamage->min, healthDamage->max);
+	randHealthDamage = Chances::randomFloat(healthDamage.min, healthDamage.max);
 
 	return randHealthDamage;
 }
@@ -564,32 +569,32 @@ float Fight::calcAttributeDamage(std::shared_ptr<Creature> defender)
 	float attributeDamage;
 
 	// get enemies curent atribute values
-	switch (activeAttack->getEffect)
+	switch (activeAttack->getEffect())
 	{
-	case Attribute::HP:
-		defenderAttribute = defender->hp;
-		break;
-	case Attribute::ACCURACY:
-		defenderAttribute = defender->accuracy;
-		break;
-	case Attribute::STRENGTH:
-		defenderAttribute = defender->strength;
-		break;
-	case Attribute::SPEED:
-		defenderAttribute = defender->speed;
-		break;
-	default:
-		break;
+		case Attribute::HP:
+			defenderAttribute = defender->hp;
+			break;
+		case Attribute::ACCURACY:
+			defenderAttribute = defender->accuracy;
+			break;
+		case Attribute::STRENGTH:
+			defenderAttribute = defender->strength;
+			break;
+		case Attribute::SPEED:
+			defenderAttribute = defender->speed;
+			break;
+		default:
+			break;
 	}
 
 	// set atributeDamageMult
-	if (defender->getCreatureType == CreatureType::MONSTER)
+	if (defender->getCreatureType() == CreatureType::MONSTER)
 	{
-		if (defender->getLevel == DifficultyLevel::EASY)
+		if (defender->getLevel() == DifficultyLevel::EASY)
 		{
 			attributeDamageMult = easyAttributeDamageMult;
 		}
-		else if (defender->getLevel == DifficultyLevel::NORMAL)
+		else if (defender->getLevel() == DifficultyLevel::NORMAL)
 		{
 			attributeDamageMult = normalAtributeDamageMult;
 		}
@@ -604,7 +609,7 @@ float Fight::calcAttributeDamage(std::shared_ptr<Creature> defender)
 	}
 
 	// perform calculations
-	defenderDamageMult = attributeDamageMult * activeAttack->getAttributeDamageMultiplier;
+	defenderDamageMult = attributeDamageMult * activeAttack->getAttributeDamageMultiplier();
 	attributeDamage = defenderAttribute - defenderAttribute * defenderDamageMult;
 
 	return attributeDamage;
@@ -619,30 +624,36 @@ void Fight::updateHealth(std::shared_ptr<Creature> defender, float healthDamage)
 
 void Fight::updateAttributes(std::shared_ptr<Creature> defender, float attributeDamage)
 {
-	switch (activeAttack->getEffect)
+	switch (activeAttack->getEffect())
 	{
 	case Attribute::HP:
-		/*
+	{
 		float hp = defender->hp - attributeDamage;
 		if (hp < 0) hp = 0;
 		defender->hp = hp;
-		*/
 		break;
+	}
 	case Attribute::ACCURACY:
+	{
 		float accuracy = defender->accuracy - attributeDamage;
 		if (accuracy < 0) accuracy = 0;
 		defender->accuracy = accuracy;
 		break;
+	}
 	case Attribute::STRENGTH:
+	{
 		float strength = defender->strength - attributeDamage;
 		if (strength < 0) strength = 0;
 		defender->strength = strength;
 		break;
+	}
 	case Attribute::SPEED:
+	{
 		float speed = defender->speed - attributeDamage;
 		if (speed < 0) speed = 0;
 		defender->speed = speed;
 		break;
+	}
 	default:
 		break;
 	}
@@ -653,32 +664,32 @@ void Fight::usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Crea
 	// if player uses antidote / removes the first poison in the list
 	if (potion->getMode() == Mode::CURE)
 	{
-		for (Potion _potion : potionUser->activePotions)
+		/*for (Potion _potion : potionUser->activePotions)
 		{
 			if (_potion.getEffect == Attribute::HP && _potion.getMode() == Mode::INCREMENTAL_DECREASE)
 			{
 				potionUser->removeActivePotions(_potion);
 			}
 			break;
-		}
+		}*/
 	}
 	else
 	{
 		//store potions to the creature that they affect
-		if (potion->getTarget == Target::SELF)
+		if (potion->getTarget() == Target::SELF)
 		{
-			potionUser->addActivePotion(*potion);
+			potionUser->addActivePotion(potion);
 			if (potion->getMode() == Mode::TEMPORARY_INCREASE)
 			{
-				potionIncrease(potionUser, *potion);
+				potionIncrease(potionUser, potion);
 			}
 		}
 		else
 		{
-			opponent->addActivePotion(*potion);
+			opponent->addActivePotion(potion);
 			if (potion->getMode() == Mode::TEMPORARY_DECREASE)
 			{
-				potionDecrease(opponent, *potion);
+				potionDecrease(opponent, potion);
 			}
 		}
 	}
@@ -687,10 +698,10 @@ void Fight::usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Crea
 void Fight::potionEffects(std::shared_ptr<Creature> creature)
 {
 	// apply all non temporary potion effects
-	for (Potion potion : creature->activePotions)
+	for (std::shared_ptr<Potion> potion : creature->activePotions)
 	{
-		potion.setDuration(potion.getDuration - 1);
-		switch (potion.getMode())
+		potion->setDuration(potion->getDuration() - 1);
+		switch (potion->getMode())
 		{
 		case Mode::TEMPORARY_INCREASE:
 			potionIncrease(creature, potion);
@@ -701,7 +712,7 @@ void Fight::potionEffects(std::shared_ptr<Creature> creature)
 		default:
 			break;
 		}
-		if (potion.getDuration() <= 0)
+		if (potion->getDuration() <= 0)
 		{
 			revertEffect(creature, potion);
 			creature->removeActivePotions(potion);
@@ -709,19 +720,19 @@ void Fight::potionEffects(std::shared_ptr<Creature> creature)
 	}
 }
 
-void Fight::revertEffect(std::shared_ptr<Creature> creature, Potion potion)
+void Fight::revertEffect(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion)
 {
-	if (potion.getMode() == Mode::TEMPORARY_INCREASE)
+	if (potion->getMode() == Mode::TEMPORARY_INCREASE)
 	{
 		potionDecrease(creature, potion);
 	}
-	else if (potion.getMode() == Mode::TEMPORARY_DECREASE)
+	else if (potion->getMode() == Mode::TEMPORARY_DECREASE)
 	{
 		potionIncrease(creature, potion);
 	}
 }
 
-void Fight::potionDecrease(std::shared_ptr<Creature> creature, Potion potion)
+void Fight::potionDecrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion)
 {
 	// constants
 	float const finishedStagesDivisor = 50.f;
@@ -735,34 +746,42 @@ void Fight::potionDecrease(std::shared_ptr<Creature> creature, Potion potion)
 	}
 	*/
 
-	switch (potion.getEffect())
+	switch (potion->getEffect())
 	{
-	case Attribute::HP:
-		float hp = creature->hp - potion.getStrength() * finishedStagesMult;
-		if (hp < 0) hp = 0;
-		creature->hp = hp;
-		break;
-	case Attribute::SPEED:
-		float speed = creature->speed - potion.getStrength() * finishedStagesMult;
-		if (speed < 0) speed = 0;
-		creature->speed = speed;
-		break;
-	case Attribute::ACCURACY:
-		float accuracy = creature->accuracy - potion.getStrength() * finishedStagesMult;
-		if (accuracy < 0) accuracy = 0;
-		creature->accuracy = accuracy;
-		break;
-	case Attribute::STRENGTH:
-		float strength = creature->strength - potion.getStrength() * finishedStagesMult;
-		if (strength < 0) strength = 0;
-		creature->strength = strength;
-		break;
-	default:
-		break;
+		case Attribute::HP:
+		{
+			float hp = creature->hp - potion->getStrength() * finishedStagesMult;
+			if (hp < 0) hp = 0;
+			creature->hp = hp;
+			break;
+		}
+		case Attribute::SPEED:
+		{
+			float speed = creature->speed - potion->getStrength() * finishedStagesMult;
+			if (speed < 0) speed = 0;
+			creature->speed = speed;
+			break;
+		}
+		case Attribute::ACCURACY:
+		{
+			float accuracy = creature->accuracy - potion->getStrength() * finishedStagesMult;
+			if (accuracy < 0) accuracy = 0;
+			creature->accuracy = accuracy;
+			break;
+		}
+		case Attribute::STRENGTH:
+		{
+			float strength = creature->strength - potion->getStrength() * finishedStagesMult;
+			if (strength < 0) strength = 0;
+			creature->strength = strength;
+			break;
+		}
+		default:
+			break;
 	}
 }
 
-void Fight::potionIncrease(std::shared_ptr <Creature> creature, Potion potion)
+void Fight::potionIncrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion)
 {
 	// constants
 	float const finishedStagesDivisor = 50.f;
@@ -776,29 +795,44 @@ void Fight::potionIncrease(std::shared_ptr <Creature> creature, Potion potion)
 	}
 	*/
 
-	switch (potion.getEffect())
+	switch (potion->getEffect())
 	{
-	case Attribute::HP:
-		float hp = creature->hp + potion.getStrength * finishedStagesMult;
-		if (hp > creature->getOrHP) hp = creature->getOrHP();
-		creature->hp = hp;
-		break;
-	case Attribute::SPEED:
-		float speed = creature->speed + potion.getStrength * finishedStagesMult;
-		if (speed > creature->getOrSpeed) speed = creature->getOrSpeed();
-		creature->speed = speed;
-		break;
-	case Attribute::ACCURACY:
-		float accuracy = creature->accuracy + potion.getStrength * finishedStagesMult;
-		if (accuracy > creature->getOrAccuracy) accuracy = creature->getOrAccuracy();
-		creature->accuracy = accuracy;
-		break;
-	case Attribute::STRENGTH:
-		float strength = creature->strength + potion.getStrength * finishedStagesMult;
-		if (strength > creature->getOrStrength) strength = creature->getOrStrength();
-		creature->strength = strength;
-		break;
-	default:
-		break;
+		case Attribute::HP:
+		{
+			float hp = creature->hp + potion->getStrength() * finishedStagesMult;
+			if (hp > creature->getOrHP()) hp = creature->getOrHP();
+			creature->hp = hp;
+			break;
+		}
+		case Attribute::SPEED:
+		{
+			float speed = creature->speed + potion->getStrength() * finishedStagesMult;
+			if (speed > creature->getOrSpeed()) speed = creature->getOrSpeed();
+			creature->speed = speed;
+			break;
+		}
+		case Attribute::ACCURACY:
+		{
+			float accuracy = creature->accuracy + potion->getStrength() * finishedStagesMult;
+			if (accuracy > creature->getOrAccuracy()) accuracy = creature->getOrAccuracy();
+			creature->accuracy = accuracy;
+			break;
+		}
+		case Attribute::STRENGTH:
+		{
+			float strength = creature->strength + potion->getStrength() * finishedStagesMult;
+			if (strength > creature->getOrStrength()) strength = creature->getOrStrength();
+			creature->strength = strength;
+			break;
+		}
+		default:
+			break;
 	}
+}
+
+void Fight::attributeBonusForWinner(std::shared_ptr<Creature>)
+{
+	//implement
+
+	return;
 }

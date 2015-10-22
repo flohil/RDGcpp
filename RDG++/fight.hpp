@@ -4,6 +4,25 @@
 #include "gameObjects.hpp"
 #include "enums.hpp"
 
+struct MinAvgMax
+{
+	MinAvgMax(float min_, float max_, float base_) : min(min_ * base_), max(max_ * base_), avg((min_ + (max_ - min_)) * base_ / 2) {};
+	MinAvgMax(float min_, float max_) : min(min_), max(max_), avg(min_ + (max_ - min_) / 2) {};
+	MinAvgMax() : min(0), max(0), avg(0) {};
+
+	float min;
+	float avg;
+	float max;
+};
+
+struct AttDefMinAvgMax
+{
+	AttDefMinAvgMax(MinAvgMax attacker_, MinAvgMax defender_) : attacker(attacker_), defender(defender_) {};
+
+	MinAvgMax attacker;
+	MinAvgMax defender;
+};
+
 class Fight
 {
 public:
@@ -12,23 +31,17 @@ public:
 
 	std::shared_ptr<Creature> fight();
 
-	void handleFightOptions();
-
 private:
+
 	// VARIABLES
 	bool activeFight;
-	std::map<Attacks::Enum, Attack> attacks;
+	std::map<Attacks::Enum, Attack> attacks; // ?
 	Attack* activeAttack;
 	float parryMultiplier;
-	//GameEnvironment gameEnvironment;
-	//Chat chat;
-	//ResourceManager resource;
 	std::shared_ptr<Creature> enemy;
 	std::shared_ptr<Player> player;
 	bool changeTabActive;
 	bool potionTakingActive;
-	//ArmorView armorview;
-	//AttackScreens attackScreen;
 	float finishedStages;
 	bool attackSet;
 	Attacks::Enum activeAttackType;
@@ -46,7 +59,7 @@ private:
 	void attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
 	float calcCreatureSpeed(std::shared_ptr<Creature> creature);
 	AttDefMinAvgMax speedBasedSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
-	float determineFirstAttack();
+	unsigned int determineFirstAttack();
 	bool parrySuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
 	float calcCreatureAccuracy(std::shared_ptr<Creature> creature);
 	float calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
@@ -56,11 +69,10 @@ private:
 	void updateAttributes(std::shared_ptr<Creature> defender, float attributeDamage);
 	void usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Creature> opponent, std::shared_ptr<Potion> potion);
 	void potionEffects(std::shared_ptr<Creature> creature);
-	void revertEffect(std::shared_ptr<Creature>, Potion potion);
-	void potionDecrease(std::shared_ptr<Creature> creature, Potion potion);
-	void potionIncrease(std::shared_ptr<Creature> creature, Potion potion);
+	void revertEffect(std::shared_ptr<Creature>, std::shared_ptr<Potion> potion);
+	void potionDecrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
+	void potionIncrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
 	void attributeBonusForWinner(std::shared_ptr<Creature>);
-
 };
 
 #endif //FIGHT_INCLUDE

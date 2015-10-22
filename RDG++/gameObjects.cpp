@@ -451,17 +451,19 @@ void Creature::resetOriginals()
 	this->strength = this->orStrength;
 }
 
-void Creature::removeActivePotions(Potion potion_)
+void Creature::removeActivePotions(std::shared_ptr<Potion> potion_)
 {
 	activePotions.erase(std::remove(activePotions.begin(), activePotions.end(), potion_), activePotions.end());
 }
 
-void Creature::addActivePotion(Potion potion_)
+void Creature::addActivePotion(std::shared_ptr<Potion> potion_)
 {
 	activePotions.push_back(potion_);
 }
 
 float EquipmentSet::getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum)
 {
+	//implement this!!!
+
 	return 0.f;
 }

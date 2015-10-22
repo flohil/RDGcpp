@@ -25,7 +25,6 @@ struct EquipmentSet
 	std::shared_ptr<Armament> boots;
 
 	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
-
 };
 
 class GameObject
@@ -109,9 +108,10 @@ public:
 	virtual DifficultyLevel::Enum getLevel() const = 0;
 	void resetOriginals();
 	CreatureType::Enum getCreatureType() { return creatureType; };
-	std::vector<Potion> activePotions;
-	void removeActivePotions(Potion potion);
-	void addActivePotion(Potion potion);
+	std::vector<std::shared_ptr<Potion>> activePotions;
+	void removeActivePotions(std::shared_ptr<Potion> potion);
+	void addActivePotion(std::shared_ptr<Potion> potion);
+	void emptyActivePotions() { activePotions.clear(); };
 
 private:
 
@@ -137,6 +137,7 @@ public:
 	{
 		if (activeSet == 1u) return setOne;
 		else if (activeSet == 2u) return setTwo;
+		else return setOne;
 	};
 
 private:
