@@ -416,12 +416,12 @@ void Player::handleInput(sf::Event event)
 					if (putInInventar(object))
 					{
 						map->setOverlayObject(facingPoint, nullptr);
+						map->openTreasureChamber();
 					} 
 					else
 					{
 						OutputFormatter::chat(chatBox, "Inventory full", sf::Color::White);
 					}
-					map->openTreasureChamber();
 					break;
 				case ObjectType::ITEM:
 					std::cout << "putting into inventary " << object->getName() << std::endl;

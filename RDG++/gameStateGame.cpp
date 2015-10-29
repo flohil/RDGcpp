@@ -80,7 +80,7 @@ GameState(game_)
 	maxRight = mapSize.x - borderMargin.x;
 
 	armorSprite.setTexture(ResourceManager::getInstance().getTexture("armorBackground"));
-	armorSprite.setPosition(0.f, 0.f);
+	armorSprite.setPosition(0.f, 50.f);
 	armorSprite.setScale(sf::Vector2f(0.65f, 0.65f));
 
 	std::cout << "armorView x = " << armorView.getSize().x << ", y = " << armorView.getSize().y << std::endl;
@@ -219,6 +219,7 @@ void GameStateGame::handleInput()
 		chatGui.handleEvent(event);
 		// detailsGui.handleEvent(event);
 		fightGui.handleEvent(event);
+		armorGui.handleEvent(event);
 	}
 }
 
@@ -252,6 +253,8 @@ void GameStateGame::loadGui()
 	// set global font that all widgets can use by default
 	chatGui.setFont("res/fonts/DejaVuSans.ttf");
 	detailsGui.setFont("res/fonts/DejaVuSans.ttf");
+	armorGui.setFont("res/fonts/DejaVuSans.ttf");
+	inventoryGui.setFont("res/fonts/DejaVuSans.ttf");
 	fightGui.setFont("res/fonts/DejaVuSans.ttf");
 
 	// gui loading
@@ -267,20 +270,12 @@ void GameStateGame::loadGui()
 
 	detailsbox = theme->load("ChatBox");
 	detailsbox->setSize(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
-	detailsbox->setTextSize(18);
-	detailsbox->setPosition(0, 0);
-	detailsbox->setLinesStartFromTop();
-	detailsbox->addLine(" Detailsbox!", sf::Color::White);
-	detailsbox->addLine(" Me : Looks awesome! ;)", sf::Color::White);
-	detailsbox->addLine(" texus : Thanks! :)", sf::Color::White);
-	detailsbox->addLine(" Me : The widgets rock ^^", sf::Color::White);
 	detailsGui.add(detailsbox, "details");
 
 	detailsGui.setView(detailsView);
 
 	inventorybox = theme->load("ChatBox");
-	//inventorybox->setSize(size.x * (1 - horSplit), size.y * (1.f - rightVerSplit));
-	inventorybox->setSize(size.x * (1 - horSplit), size.y * rightVerSplit);
+	inventorybox->setSize(size.x * (1 - horSplit), size.y * (1.f - rightVerSplit));
 	inventorybox->setPosition(0, 0);
 	inventoryGui.add(inventorybox, "inventory");
 
@@ -291,17 +286,23 @@ void GameStateGame::loadGui()
 	armorbox->setPosition(0, 0);
 	armorGui.add(armorbox, "armor");
 
-	/*tgui::Button::Ptr set1Button = std::make_shared<tgui::Button>();
-	set1Button->setText("Start Game");
-	set1Button->setOpacity(0.9f);
-	set1Button->setTextSize(settings->buttonTextSize);
-	set1Button->connect("pressed", [&](){ startGame(); });
+	tgui::Button::Ptr set1Button = theme->load("Button");
+	set1Button->setText("Set 1");
+	set1Button->setOpacity(1.f);
+	set1Button->setPosition(4, 4);
+	set1Button->setSize(size.x * (1 - horSplit) * 0.5f - 4, 35);
+	set1Button->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * 18));
+	//set1Button->connect("pressed", [&](){ startGame(); });
+	armorGui.add(set1Button);
 
-	tgui::Button::Ptr set2Button = std::make_shared<tgui::Button>();
-	optionsButton->setText("Settings");
-	optionsButton->setOpacity(0.9f);
-	optionsButton->setTextSize(settings->buttonTextSize);
-	optionsButton->connect("pressed", [&](){ openSettings(); });*/
+	tgui::Button::Ptr set2Button = theme->load("Button");
+	set2Button->setText("Set 2");
+	set2Button->setOpacity(1.f);
+	set2Button->setPosition(set1Button->getSize().x + 6, 4);
+	set2Button->setSize(size.x * (1 - horSplit) * 0.5f - 4, 35);
+	set2Button->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * 18));
+	//set2Button->connect("pressed", [&](){ startGame(); });
+	armorGui.add(set2Button);
 
 	armorGui.setView(armorView);
 
