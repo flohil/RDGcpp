@@ -19,8 +19,7 @@ GameStateMainMenu::GameStateMainMenu(Game& game_) :
 	view.setCenter(size * 0.5f);
 
 	background.setTexture(ResourceManager::getInstance().getTexture("background"));
-	background.setScale(size.x / static_cast<float>(background.getTexture()->getSize().x), size.y / static_cast<float>(background.getTexture()->getSize().y));
-
+	
 	loadGui();
 }
 
@@ -84,6 +83,10 @@ void GameStateMainMenu::openSettings()
 
 void GameStateMainMenu::loadGui()
 {
+	background.setScale(static_cast<float>(settings->width) / static_cast<float>(background.getTexture()->getSize().x), static_cast<float>(settings->height) / static_cast<float>(background.getTexture()->getSize().y));
+	view.setSize(static_cast<float>(settings->width), static_cast<float>(settings->height));
+	view.setCenter(static_cast<float>(settings->width) * 0.5f, static_cast<float>(settings->height) * 0.5f);
+
 	gui.removeAllWidgets();
 	gui.setWindow(game.window);
 
@@ -92,8 +95,8 @@ void GameStateMainMenu::loadGui()
 
 	tgui::VerticalLayout::Ptr layout = std::make_shared<tgui::VerticalLayout>();
 
-	layoutWidth = static_cast<float>(settings->defWidgetWidth);
-	layoutHeight = static_cast<float>(settings->widgetHeight * 3.5);
+	layoutWidth = static_cast<float>(settings->defWidgetWidth) * settings->widthScaleFactor;
+	layoutHeight = static_cast<float>(settings->widgetHeight * 3.5) * settings->heightScaleFactor;
 	layoutCenterX = static_cast<unsigned int>(settings->width) * 0.5f;
 	layoutCenterY = static_cast<unsigned int>(settings->height) * 0.5f;
 
@@ -105,19 +108,19 @@ void GameStateMainMenu::loadGui()
 	tgui::Button::Ptr startButton = std::make_shared<tgui::Button>();
 	startButton->setText("Start Game");
 	startButton->setOpacity(0.9f);
-	startButton->setTextSize(settings->buttonTextSize);
+	startButton->setTextSize(static_cast<unsigned int>(settings->buttonTextSize * settings->heightScaleFactor));
 	startButton->connect("pressed", [&](){ startGame(); });
 
 	tgui::Button::Ptr optionsButton = std::make_shared<tgui::Button>();
 	optionsButton->setText("Settings");
 	optionsButton->setOpacity(0.9f);
-	optionsButton->setTextSize(settings->buttonTextSize);
+	optionsButton->setTextSize(static_cast<unsigned int>(settings->buttonTextSize * settings->heightScaleFactor));
 	optionsButton->connect("pressed", [&](){ openSettings(); });
 
 	tgui::Button::Ptr quitButton = std::make_shared<tgui::Button>();
 	quitButton->setText("Quit");
 	quitButton->setOpacity(0.9f);
-	quitButton->setTextSize(settings->buttonTextSize);
+	quitButton->setTextSize(static_cast<unsigned int>(settings->buttonTextSize * settings->heightScaleFactor));
 	quitButton->connect("pressed", [&](){ quit(); });
 	
 	layout->add(startButton);

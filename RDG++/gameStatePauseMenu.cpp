@@ -16,7 +16,6 @@ GameState(game_)
 	view.setCenter(size * 0.5f);
 
 	background.setTexture(ResourceManager::getInstance().getTexture("background"));
-	background.setScale(size.x / static_cast<float>(background.getTexture()->getSize().x), size.y / static_cast<float>(background.getTexture()->getSize().y));
 
 	// create gui 
 	loadGui();
@@ -85,6 +84,10 @@ void GameStatePauseMenu::quitToMainMenu()
 
 void GameStatePauseMenu::loadGui()
 {
+	background.setScale(static_cast<float>(settings->width) / static_cast<float>(background.getTexture()->getSize().x), static_cast<float>(settings->height) / static_cast<float>(background.getTexture()->getSize().y));
+	view.setSize(static_cast<float>(settings->width), static_cast<float>(settings->height));
+	view.setCenter(static_cast<float>(settings->width) * 0.5f, static_cast<float>(settings->height) * 0.5f);
+
 	gui.removeAllWidgets();
 	gui.setWindow(game.window);
 
@@ -93,8 +96,8 @@ void GameStatePauseMenu::loadGui()
 
 	tgui::VerticalLayout::Ptr layout = std::make_shared<tgui::VerticalLayout>();
 
-	layoutWidth = static_cast<float>(settings->defWidgetWidth);
-	layoutHeight = static_cast<float>(settings->widgetHeight * 2.25);
+	layoutWidth = static_cast<float>(settings->defWidgetWidth) * settings->widthScaleFactor;
+	layoutHeight = static_cast<float>(settings->widgetHeight * 2.25) * settings->heightScaleFactor;
 	layoutCenterX = static_cast<unsigned int>(settings->width) * 0.5f;
 	layoutCenterY = static_cast<unsigned int>(settings->height) * 0.5f;
 
@@ -109,10 +112,8 @@ void GameStatePauseMenu::loadGui()
 	returnButton->setText("Return to Game");
 	quitButton->setText("Quit to Main Menu");
 
-	returnButton->setTextSize(settings->buttonTextSize);
-	quitButton->setTextSize(settings->buttonTextSize);
-
-	std::cout << "text: " << returnButton->getText().toAnsiString() << std::endl;
+	returnButton->setTextSize(static_cast<unsigned int>(settings->buttonTextSize * settings->heightScaleFactor));
+	quitButton->setTextSize(static_cast<unsigned int>(settings->buttonTextSize * settings->heightScaleFactor));
 
 	returnButton->setOpacity(0.9f);
 	quitButton->setOpacity(0.9f);

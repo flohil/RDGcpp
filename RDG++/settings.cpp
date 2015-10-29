@@ -20,6 +20,8 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	fullscreen = true;
 	width = desktopWidth;
 	height = desktopHeight;
+	widthScaleFactor = static_cast<float>(width) / static_cast<float>(scaleWidth);
+	heightScaleFactor = static_cast<float>(height) / static_cast<float>(scaleHeight);
 	mazeSize = 5;
 	tileSize = 32;
 	creatureSize = 128;
@@ -121,6 +123,18 @@ bool Settings::loadSettings()
 
 			mazeSize = 3;
 		}
+
+		std::cout << "scalewidht: " << scaleWidth << std::endl;
+		std::cout << "scaleheight: " << scaleHeight << std::endl;
+
+		std::cout << "width: " << width << std::endl;
+		std::cout << "height: " << height << std::endl;
+
+		widthScaleFactor = static_cast<float>(width) / static_cast<float>(scaleWidth);
+		heightScaleFactor = static_cast<float>(height) / static_cast<float>(scaleHeight);
+
+		std::cout << "widthScaleFactor: " << widthScaleFactor << std::endl;
+		std::cout << "heightScaleFactor: " << heightScaleFactor << std::endl;
 
 		settingsParser.print();
 	}

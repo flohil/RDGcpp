@@ -16,7 +16,6 @@ GameState(game_)
 	view.setCenter(size * 0.5f);
 
 	background.setTexture(ResourceManager::getInstance().getTexture("background"));
-	background.setScale(size.x / static_cast<float>(background.getTexture()->getSize().x), size.y / static_cast<float>(background.getTexture()->getSize().y));
 
 	// create gui 
 	loadGui();
@@ -64,6 +63,10 @@ void GameStateLoading::triggerLoading()
 
 void GameStateLoading::loadGui()
 {
+	background.setScale(static_cast<float>(settings->width) / static_cast<float>(background.getTexture()->getSize().x), static_cast<float>(settings->height) / static_cast<float>(background.getTexture()->getSize().y));
+	view.setSize(static_cast<float>(settings->width), static_cast<float>(settings->height));
+	view.setCenter(static_cast<float>(settings->width) * 0.5f, static_cast<float>(settings->height) * 0.5f);
+
 	gui.removeAllWidgets();
 	gui.setWindow(game.window);
 
@@ -72,8 +75,8 @@ void GameStateLoading::loadGui()
 
 	tgui::VerticalLayout::Ptr layout = std::make_shared<tgui::VerticalLayout>();
 
-	layoutWidth = 330;
-	layoutHeight = 100;
+	layoutWidth = 330 * settings->widthScaleFactor;
+	layoutHeight = 100 * settings->heightScaleFactor;
 	layoutCenterX = static_cast<unsigned int>(settings->width) * 0.5f;
 	layoutCenterY = static_cast<unsigned int>(settings->height) * 0.5f;
 
@@ -86,7 +89,7 @@ void GameStateLoading::loadGui()
 	loadingLabel->setText("loading...");
 	loadingLabel->setTextColor(sf::Color::White);
 	loadingLabel->setOpacity(0.5f);
-	loadingLabel->setTextSize(72);
+	loadingLabel->setTextSize(static_cast<unsigned int>(72.f * settings->heightScaleFactor));
 
 	layout->add(loadingLabel, "LoadingLabel_Label");
 }

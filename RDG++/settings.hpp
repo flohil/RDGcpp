@@ -24,6 +24,8 @@ public:
 	// variables
 	unsigned int width;
 	unsigned int height;
+	float widthScaleFactor;
+	float heightScaleFactor;
 	bool fullscreen;
 	unsigned int mazeSize;
 	unsigned int tileSize;

@@ -18,7 +18,6 @@ GameState(game_)
 	status = "";
 
 	background.setTexture(ResourceManager::getInstance().getTexture("background"));
-	background.setScale(size.x / static_cast<float>(background.getTexture()->getSize().x), size.y / static_cast<float>(background.getTexture()->getSize().y));
 
 	loadGui();
 }
@@ -101,10 +100,22 @@ void GameStateOptions::saveSettings()
 	{
 		game.window.create(sf::VideoMode(settings->width, settings->height, settings->COLOR_DEPTH), settings->APPNAME, (settings->fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close));
 
-		/*if (oldWidth != settings->width || oldHeight != settings->height)
+		if (oldWidth != settings->width || oldHeight != settings->height)
 		{
+			std::cout << "scalewidht: " << settings->scaleWidth << std::endl;
+			std::cout << "scaleheight: " << settings->scaleHeight << std::endl;
+
+			std::cout << "width: " << settings->width << std::endl;
+			std::cout << "height: " << settings->height << std::endl;
+
+			settings->widthScaleFactor = static_cast<float>(settings->width) / static_cast<float>(settings->scaleWidth);
+			settings->heightScaleFactor = static_cast<float>(settings->height) / static_cast<float>(settings->scaleHeight);
+
+			std::cout << "widthScaleFactor: " << settings->widthScaleFactor << std::endl;
+			std::cout << "heightScaleFactor: " << settings->heightScaleFactor << std::endl;
+
 			game.reloadGuis();
-		}*/
+		}
 	}
 
 	return;
@@ -112,6 +123,10 @@ void GameStateOptions::saveSettings()
 
 void GameStateOptions::loadGui()
 {
+	background.setScale(static_cast<float>(settings->width) / static_cast<float>(background.getTexture()->getSize().x), static_cast<float>(settings->height) / static_cast<float>(background.getTexture()->getSize().y));
+	view.setSize(static_cast<float>(settings->width), static_cast<float>(settings->height));
+	view.setCenter(static_cast<float>(settings->width) * 0.5f, static_cast<float>(settings->height) * 0.5f);
+
 	gui.removeAllWidgets();
 	gui.setWindow(game.window);
 
@@ -139,32 +154,32 @@ void GameStateOptions::loadGui()
 	// set global font that all widgets can use by default
 	gui.setFont("res/fonts/DejaVuSans.ttf");
 
-	layoutWidth = static_cast<float>(settings->defWidgetWidth);
+	layoutWidth = static_cast<float>(settings->defWidgetWidth) * settings->widthScaleFactor;
 	layoutCenterX = static_cast<unsigned int>(settings->width) * 0.5f;
 	layoutCenterY = static_cast<unsigned int>(settings->height) * 0.5f;
 
 	float layoutLeft = layoutCenterX - layoutWidth * 0.5f;
-	float horSpace = 20.f;
-	float verSpace = 20.f;
+	float horSpace = 20.f * settings->widthScaleFactor;
+	float verSpace = 20.f * settings->heightScaleFactor;
 
 	tgui::Label::Ptr playerNameLabel = std::make_shared<tgui::Label>();
 	playerNameLabel->setText("Player Name");
 	playerNameLabel->setTextColor(sf::Color::Black);
-	playerNameLabel->setTextSize(settings->labelSmallTextSize);
-	playerNameLabel->setSize(settings->defWidgetWidth - settings->labelPaddingX, settings->labelSmallHeight);
+	playerNameLabel->setTextSize(static_cast<unsigned int>(settings->labelSmallTextSize * settings->heightScaleFactor));
+	playerNameLabel->setSize(settings->widthScaleFactor * (settings->defWidgetWidth - settings->labelPaddingX), settings->heightScaleFactor * settings->labelSmallHeight);
 
 	playerNameEditbox = std::make_shared<tgui::EditBox>();
 	playerNameEditbox->setOpacity(0.9f);
 	playerNameEditbox->setDefaultText(settings->playerName);
-	playerNameEditbox->setTextSize(settings->labelBigTextSize);
-	playerNameEditbox->setSize(settings->defWidgetWidth, settings->labelBigHeight);
+	playerNameEditbox->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelBigTextSize));
+	playerNameEditbox->setSize(settings->widthScaleFactor * settings->defWidgetWidth, settings->heightScaleFactor * settings->labelBigHeight);
 	playerNameEditbox->setMaximumCharacters(20);
 
 	tgui::Label::Ptr mazeSizeLabel = std::make_shared<tgui::Label>();
 	mazeSizeLabel->setText("Maze Size");
 	mazeSizeLabel->setTextColor(sf::Color::Black);
-	mazeSizeLabel->setTextSize(settings->labelSmallTextSize);
-	mazeSizeLabel->setSize(settings->defWidgetWidth * 0.5f - horSpace * 0.5f - settings->labelPaddingX, settings->labelSmallHeight);
+	mazeSizeLabel->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelSmallTextSize));
+	mazeSizeLabel->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - settings->labelPaddingX) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelSmallHeight);
 
 	mazeSizeCombobox = std::make_shared<tgui::ComboBox>();
 	mazeSizeCombobox->setOpacity(0.9f);
@@ -181,18 +196,18 @@ void GameStateOptions::loadGui()
 	{
 		mazeSizeCombobox->setSelectedItemById(std::to_string(5u));
 	}
-	mazeSizeCombobox->setTextSize(settings->labelBigTextSize);
-	mazeSizeCombobox->setSize(settings->defWidgetWidth * 0.5f - horSpace * 0.5f, settings->labelBigHeight);
+	mazeSizeCombobox->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelBigTextSize));
+	mazeSizeCombobox->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelBigHeight);
 
 	tgui::Label::Ptr fullscreenLabel = std::make_shared<tgui::Label>();
 	fullscreenLabel->setText("Fullscreen");
 	fullscreenLabel->setTextColor(sf::Color::Black);
-	fullscreenLabel->setTextSize(settings->labelSmallTextSize);
-	fullscreenLabel->setSize(settings->defWidgetWidth * 0.5f - horSpace * 0.5f - settings->labelPaddingX, settings->labelSmallHeight);
+	fullscreenLabel->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelSmallTextSize));
+	fullscreenLabel->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - settings->labelPaddingX) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelSmallHeight);
 
 	fullscreenCheckbox = std::make_shared<tgui::CheckBox>();
 	fullscreenCheckbox->setOpacity(0.9f);
-	fullscreenCheckbox->setSize(settings->labelBigHeight, settings->labelBigHeight);
+	fullscreenCheckbox->setSize(settings->heightScaleFactor * settings->labelBigHeight, settings->heightScaleFactor * settings->labelBigHeight);
 	if (settings->fullscreen)
 	{
 		fullscreenCheckbox->check();
@@ -201,8 +216,8 @@ void GameStateOptions::loadGui()
 	tgui::Label::Ptr resolutionLabel = std::make_shared<tgui::Label>();
 	resolutionLabel->setText("Resolution");
 	resolutionLabel->setTextColor(sf::Color::Black);
-	resolutionLabel->setTextSize(settings->labelSmallTextSize);
-	resolutionLabel->setSize(settings->defWidgetWidth * 0.5f - horSpace * 0.5f - settings->labelPaddingX, settings->labelSmallHeight);
+	resolutionLabel->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelSmallTextSize));
+	resolutionLabel->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - settings->labelPaddingX) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelSmallHeight);
 
 	resolutionsCombobox = std::make_shared<tgui::ComboBox>();
 	resolutionsCombobox->setOpacity(0.9f);
@@ -211,28 +226,28 @@ void GameStateOptions::loadGui()
 		resolutionsCombobox->addItem(GameStateOptions::uiToGuiStrCrossPair(vMode.width, vMode.height));
 	}
 	resolutionsCombobox->setSelectedItem(GameStateOptions::uiToGuiStrCrossPair(settings->width, settings->height));
-	resolutionsCombobox->setTextSize(settings->labelBigTextSize);
-	resolutionsCombobox->setSize(settings->defWidgetWidth * 0.5f - horSpace * 0.5f, settings->labelBigHeight);
+	resolutionsCombobox->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelBigTextSize));
+	resolutionsCombobox->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelBigHeight);
 
 	statusLabel = std::make_shared<tgui::Label>();
 	statusLabel->setText(status);
 	statusLabel->setTextColor(sf::Color::Black);
-	statusLabel->setTextSize(settings->labelSmallTextSize);
-	statusLabel->setSize(settings->defWidgetWidth, settings->labelSmallHeight);
+	statusLabel->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelSmallTextSize));
+	statusLabel->setSize(settings->widthScaleFactor * settings->defWidgetWidth, settings->heightScaleFactor * settings->labelSmallHeight);
 
 	tgui::Button::Ptr saveButton = std::make_shared<tgui::Button>();
 	saveButton->setText("Save");
 	saveButton->setOpacity(0.9f);
-	saveButton->setTextSize(settings->buttonTextSize);
+	saveButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
 	saveButton->connect("pressed", [&](){ saveSettings(); });
-	saveButton->setSize(settings->defWidgetWidth * 0.5f - horSpace * 0.5f, static_cast<float>(settings->widgetHeight));
+	saveButton->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) - horSpace * 0.5f, static_cast<float>(settings->heightScaleFactor * settings->widgetHeight));
 
 	tgui::Button::Ptr backButton = std::make_shared<tgui::Button>();
 	backButton->setText("Back");
 	backButton->setOpacity(0.9f);
-	backButton->setTextSize(settings->buttonTextSize);
+	backButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
 	backButton->connect("pressed", [&](){ returnToMainMenu(); });
-	backButton->setSize(settings->defWidgetWidth * 0.5f - horSpace * 0.5f, static_cast<float>(settings->widgetHeight));
+	backButton->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) - horSpace * 0.5f, static_cast<float>(settings->heightScaleFactor * settings->widgetHeight));
 
 	// obtain size of all elements
 	layoutHeight = playerNameLabel->getSize().y + playerNameEditbox->getSize().y + mazeSizeCombobox->getSize().y + fullscreenCheckbox->getSize().y + resolutionsCombobox->getSize().y + statusLabel->getSize().y + saveButton->getSize().y + 6 * verSpace;
@@ -240,28 +255,28 @@ void GameStateOptions::loadGui()
 	float heightSum = layoutTop;
 
 	//set positions
-	playerNameLabel->setPosition(layoutLeft + settings->labelPaddingX, layoutTop);
+	playerNameLabel->setPosition(layoutLeft + settings->widthScaleFactor * (settings->labelPaddingX), layoutTop);
 	heightSum += playerNameLabel->getSize().y;
 	playerNameEditbox->setPosition(layoutLeft, heightSum);
 	heightSum += playerNameEditbox->getSize().y;
 	heightSum += verSpace; //space
-	mazeSizeLabel->setPosition(layoutLeft + settings->labelPaddingX, heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
-	mazeSizeCombobox->setPosition(layoutLeft + settings->defWidgetWidth * 0.5f + horSpace * 0.5f, heightSum);
+	mazeSizeLabel->setPosition(layoutLeft + settings->widthScaleFactor * (settings->labelPaddingX), heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
+	mazeSizeCombobox->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) + horSpace * 0.5f, heightSum);
 	heightSum += mazeSizeCombobox->getSize().y;
 	heightSum += verSpace; //space
-	fullscreenLabel->setPosition(layoutLeft + settings->labelPaddingX, heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
-	fullscreenCheckbox->setPosition(layoutLeft + settings->defWidgetWidth * 0.5f + horSpace * 0.5f - 1, heightSum);
+	fullscreenLabel->setPosition(layoutLeft + settings->widthScaleFactor * (settings->labelPaddingX), heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
+	fullscreenCheckbox->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - 1) + horSpace * 0.5f, heightSum);
 	heightSum += mazeSizeCombobox->getSize().y;
 	heightSum += verSpace; //space
-	resolutionLabel->setPosition(layoutLeft + settings->labelPaddingX, heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
-	resolutionsCombobox->setPosition(layoutLeft + settings->defWidgetWidth * 0.5f + horSpace * 0.5f, heightSum);
+	resolutionLabel->setPosition(layoutLeft + settings->widthScaleFactor * (settings->labelPaddingX), heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
+	resolutionsCombobox->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) + horSpace * 0.5f, heightSum);
 	heightSum += mazeSizeCombobox->getSize().y;
 	heightSum += verSpace; //space
-	statusLabel->setPosition(layoutLeft + 75, heightSum);
+	statusLabel->setPosition(layoutLeft + settings->widthScaleFactor * (75), heightSum);
 	heightSum += verSpace; //space
 	heightSum += verSpace; //space
 	saveButton->setPosition(layoutLeft, heightSum);
-	backButton->setPosition(layoutLeft + settings->defWidgetWidth * 0.5f + horSpace * 0.5f, heightSum);
+	backButton->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) + horSpace * 0.5f, heightSum);
 
 	gui.add(playerNameLabel);
 	gui.add(playerNameEditbox);
