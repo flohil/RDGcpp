@@ -29,7 +29,17 @@ private:
 	sf::Sprite armorSprite;
 
 	// gui
+	sf::Vector2f size;
+	float horSplit;
+	float rightVerSplit;
+	float verSplit;
+	float bottomHorSplit;
+
 	tgui::Gui chatGui;
+	tgui::Gui detailsGui;
+	tgui::Gui fightGui;
+
+	tgui::Theme::Ptr theme;
 
 public:
 

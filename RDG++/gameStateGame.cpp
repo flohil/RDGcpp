@@ -10,16 +10,16 @@ GameStateGame::GameStateGame(Game& game_) :
 GameState(game_)
 {
 	settings = game_.getSettings();
-	sf::Vector2f size = sf::Vector2f(1280, 720);
+	size = sf::Vector2f(1280, 720);
 
 	float aspectRatio = size.x / size.y;
 
 	//1280 * 720 upwards! -> all 16:9
 
-	float horSplit = 0.85f;
-	float rightVerSplit = 0.4f;
-	float verSplit = 0.75f;
-	float bottomHorSplit = 0.4f;
+	horSplit = 0.85f;
+	rightVerSplit = 0.4f;
+	verSplit = 0.75f;
+	bottomHorSplit = 0.4f;
 	
 	// for aspect Ratio 16:9
 	sf::Vector2f possibleMapViewSize = sf::Vector2f(size.x * horSplit, size.y * 0.75f);
@@ -205,7 +205,21 @@ void GameStateGame::pauseGame()
 
 void GameStateGame::loadGui()
 {
+	theme = std::make_shared<tgui::Theme>(settings->IMAGE_PATH + "widgets/Black.txt");
+
+
+
 	// gui loading
+	tgui::ChatBox::Ptr chatbox = theme->load("ChatBox");
+	chatbox->setSize(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
+	chatbox->setTextSize(18);
+	chatbox->setPosition(0, 0);
+	chatbox->setLinesStartFromTop();
+	chatbox->addLine("texus : Hey, this is TGUI!", sf::Color::Green);
+	chatbox->addLine("Me : Looks awesome! ;)", sf::Color::Yellow);
+	chatbox->addLine("texus : Thanks! :)", sf::Color::Green);
+	chatbox->addLine("Me : The widgets rock ^^", sf::Color::Yellow);
+	chatGui.add(chatbox);
 
 }
 
