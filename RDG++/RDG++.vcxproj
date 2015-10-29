@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{01DD5475-D876-4214-BA1A-918FD146D39B}</ProjectGuid>
+    <RootNamespace>RDG</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\include\TGUI;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>.\lib\TGUI;.\lib\SFML;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;opengl32.lib;tgui-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>D:\Program Files %28x86%29\SFML-2.3.2\include;C:\Program Files %28x86%29\TGUI-0.7\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>D:\Program Files %28x86%29\SFML-2.3.2\lib;C:\Program Files %28x86%29\TGUI-0.7\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-system.lib;opengl32.lib;tgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="animationHandler.cpp" />
+    <ClCompile Include="chances.cpp" />
+    <ClCompile Include="fight.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="gameObjects.cpp" />
+    <ClCompile Include="gameStateGame.cpp" />
+    <ClCompile Include="gameStateLoading.cpp" />
+    <ClCompile Include="gameStateOptions.cpp" />
+    <ClCompile Include="gameStatePauseMenu.cpp" />
+    <ClCompile Include="gameStateMainMenu.cpp" />
+    <ClCompile Include="map.cpp" />
+    <ClCompile Include="mapper.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="maze.cpp" />
+    <ClCompile Include="prototypes.cpp" />
+    <ClCompile Include="pugixml.cpp" />
+    <ClCompile Include="resourceManager.cpp" />
+    <ClCompile Include="settings.cpp" />
+    <ClCompile Include="SettingsParser.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="animationHandler.hpp" />
+    <ClInclude Include="chances.hpp" />
+    <ClInclude Include="debugPrint.hpp" />
+    <ClInclude Include="easylogging++.hpp" />
+    <ClInclude Include="enums.hpp" />
+    <ClInclude Include="fight.hpp" />
+    <ClInclude Include="game.hpp" />
+    <ClInclude Include="gameObjects.hpp" />
+    <ClInclude Include="gameState.hpp" />
+    <ClInclude Include="gameStateGame.hpp" />
+    <ClInclude Include="gameStateLoading.hpp" />
+    <ClInclude Include="gameStateMainMenu.hpp" />
+    <ClInclude Include="gameStatePauseMenu.hpp" />
+    <ClInclude Include="gameStateOptions.hpp" />
+    <ClInclude Include="map.hpp" />
+    <ClInclude Include="maze.hpp" />
+    <ClInclude Include="prototypes.hpp" />
+    <ClInclude Include="pugiconfig.hpp" />
+    <ClInclude Include="pugixml.hpp" />
+    <ClInclude Include="random.hpp" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="resourceManager.hpp" />
+    <ClInclude Include="settings.hpp" />
+    <ClInclude Include="SettingsParser.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
