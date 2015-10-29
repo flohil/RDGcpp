@@ -78,6 +78,8 @@ GameState(game_)
 	map->init(player);
 	
 	player->init(map, settings->tileSize);
+
+	theme = std::make_shared<tgui::Theme>(settings->IMAGE_PATH + "widgets/Black.txt");
 }
 
 void GameStateGame::draw(const float deltaTime)
@@ -91,7 +93,6 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.setView(armorView);
 	game.window.draw(armorSprite);
 	
-
 	/*game.window.setView(inventoryView);
 
 	game.window.setView(messageView);
@@ -205,13 +206,16 @@ void GameStateGame::pauseGame()
 
 void GameStateGame::loadGui()
 {
-	theme = std::make_shared<tgui::Theme>(settings->IMAGE_PATH + "widgets/Black.txt");
+	chatGui.removeAllWidgets();
+	chatGui.setWindow(game.window);
 
-
+	// set global font that all widgets can use by default
+	chatGui.setFont("res/fonts/DejaVuSans.ttf");
 
 	// gui loading
 	tgui::ChatBox::Ptr chatbox = theme->load("ChatBox");
-	chatbox->setSize(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
+	//chatbox->setSize(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
+	chatbox->setSize(400, 300);
 	chatbox->setTextSize(18);
 	chatbox->setPosition(0, 0);
 	chatbox->setLinesStartFromTop();
@@ -220,6 +224,7 @@ void GameStateGame::loadGui()
 	chatbox->addLine("texus : Thanks! :)", sf::Color::Green);
 	chatbox->addLine("Me : The widgets rock ^^", sf::Color::Yellow);
 	chatGui.add(chatbox);
+
 
 }
 

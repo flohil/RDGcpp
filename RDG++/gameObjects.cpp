@@ -184,25 +184,29 @@ void Player::update(const float deltaTime)
 				bool passable = map->isFieldPassable(target);
 
 				// enable to only turn player when moving direction changes
-				/*switch (lastDir)
+				switch (lastDir)
 				{
-				case ViewingDirections::N:
-					picAngle = 0.f;
-					break;
-				case ViewingDirections::E:
-					picAngle = 90.f;
-					break;
-				case ViewingDirections::S:
-					picAngle = 180.f;
-					break;
-				case ViewingDirections::W:
-					picAngle = 270.f;
-					break;
-				default:
-					break;
+					case ViewingDirections::N:
+						picAngle = 0.f;
+						facingDir = ViewingDirections::N;
+						break;
+					case ViewingDirections::E:
+						picAngle = 90.f;
+						facingDir = ViewingDirections::E;
+						break;
+					case ViewingDirections::S:
+						picAngle = 180.f;
+						facingDir = ViewingDirections::S;
+						break;
+					case ViewingDirections::W:
+						picAngle = 270.f;
+						facingDir = ViewingDirections::W;
+						break;
+					default:
+						break;
 				}
 
-				setRotation(picAngle);*/
+				setRotation(picAngle);
 
 				if (passable)
 				{
@@ -264,7 +268,7 @@ void Player::preMove()
 		waitTillStandingCtr = 0;
 		intendedMovDir = tempMovDir;
 
-		switch (intendedMovDir)
+		/* switch (intendedMovDir)
 		{
 		case ViewingDirections::N:
 			picAngle = 0.f;
@@ -284,33 +288,37 @@ void Player::preMove()
 			break;
 		default:
 			break;
-		}
+		} 
 
-		setRotation(picAngle);
+		setRotation(picAngle); */
 
 		// enable to only turn player when moving direction changes or when standing still
-		/*if (initialWait)
+		if (initialWait)
 		{
 			switch (intendedMovDir)
 			{
-			case ViewingDirections::N:
-				picAngle = 0.f;
-				break;
-			case ViewingDirections::E:
-				picAngle = 90.f;
-				break;
-			case ViewingDirections::S:
-				picAngle = 180.f;
-				break;
-			case ViewingDirections::W:
-				picAngle = 270.f;
-				break;
-			default:
-				break;
+				case ViewingDirections::N:
+					picAngle = 0.f;
+					facingDir = ViewingDirections::N;
+					break;
+				case ViewingDirections::E:
+					picAngle = 90.f;
+					facingDir = ViewingDirections::E;
+					break;
+				case ViewingDirections::S:
+					picAngle = 180.f;
+					facingDir = ViewingDirections::S;
+					break;
+				case ViewingDirections::W:
+					picAngle = 270.f;
+					facingDir = ViewingDirections::W;
+					break;
+				default:
+					break;
 			}
 
 			setRotation(picAngle);
-		}*/
+		}
 	} 
 	else
 	{
@@ -388,6 +396,9 @@ void Player::handleInput(sf::Event event)
 
 	if (event.key.code == sf::Keyboard::E)
 	{
+
+		std::cout << "facing dir: " << facingDir << std::endl;
+
 		Point facingPoint = playerPosition.getDirPoint(facingDir);
 		std::shared_ptr<RenderableObject> object = map->getOverlayObject(facingPoint);
 		
