@@ -11,10 +11,10 @@ class GameStateGame : public GameState
 private:
 
 	sf::View mapView;
-	sf::View messageView;
+	sf::View chatView;
 	sf::View inventoryView;
 	sf::View armorView;
-	sf::View detailView;
+	sf::View detailsView;
 	Map* map;
 	std::shared_ptr<Player> player;
 	sf::Vector2f borderMargin;
@@ -35,11 +35,20 @@ private:
 	float verSplit;
 	float bottomHorSplit;
 
+	float armorHeight;
+
 	tgui::Gui chatGui;
 	tgui::Gui detailsGui;
 	tgui::Gui fightGui;
+	tgui::Gui inventoryGui;
+	tgui::Gui armorGui;
 
 	tgui::Theme::Ptr theme;
+
+	tgui::ChatBox::Ptr chatbox;
+	tgui::ChatBox::Ptr detailsbox;
+	tgui::ChatBox::Ptr inventorybox;
+	tgui::ChatBox::Ptr armorbox;
 
 public:
 

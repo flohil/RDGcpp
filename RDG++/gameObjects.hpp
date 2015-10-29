@@ -2,7 +2,7 @@
 #define GAME_OBJECTS_INCLUDE
 
 #include "debugPrint.hpp"
-#include <SFML\Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 #include "enums.hpp"
 #include <map>
 #include <set>
@@ -13,6 +13,7 @@ class Map;
 class Weapon;
 class Armament;
 class Potion;
+class GameStateGame;
 
 struct EquipmentSet
 {
@@ -126,7 +127,7 @@ public:
 	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_, float moveDistance_, unsigned int maxInventorySize_) : 
 		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_), moveDistance(moveDistance_), maxInventorySize(maxInventorySize_) {};
 
-	void init(Map* map_, const unsigned int tileSize_);
+	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_);
 	void update(const float deltaTime);
 	void handleInput(sf::Event event);
 	bool putInInventar(std::shared_ptr<RenderableObject> object);
@@ -139,6 +140,7 @@ public:
 		else if (activeSet == 2u) return setTwo;
 		else return setOne;
 	};
+	std::string getPlayerName() const { return playerName; };
 
 private:
 
@@ -170,6 +172,8 @@ private:
 	EquipmentSet setOne = EquipmentSet{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	EquipmentSet setTwo = EquipmentSet{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	unsigned int activeSet = 1;
+
+	tgui::ChatBox::Ptr chatBox;
 
 	void setPosition(Point position_);
 	void preMove();

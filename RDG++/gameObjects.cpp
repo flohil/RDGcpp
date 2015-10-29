@@ -2,6 +2,7 @@
 #include "enums.hpp"
 #include "resourceManager.hpp"
 #include "map.hpp"
+#include "OutputFormatter.hpp"
 #include <iostream>
 #include <map>
 
@@ -142,10 +143,11 @@ void Room::initialize(unsigned int width, unsigned int height)
 	}
 }
 
-void Player::init(Map* map_, const unsigned int tileSize_)
+void Player::init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_)
 {
 	map = map_;
 	tileSize = tileSize_;
+	chatBox = chatBox_;
 
 	Point point = map->initPlayerPosition();
 	prevPlayerPosition = point;
@@ -409,22 +411,33 @@ void Player::handleInput(sf::Event event)
 			switch (object->getObjectType())
 			{
 				case ObjectType::KEY:
+					chatBox->addLine("Found key for treasure chamber", sf::Color::White);
 					std::cout << "found treasure chamber key " << object->getName() << std::endl;
 					if (putInInventar(object))
 					{
 						map->setOverlayObject(facingPoint, nullptr);
-					};
+					} 
+					else
+					{
+						OutputFormatter::chat(chatBox, "Inventory full", sf::Color::White);
+					}
 					map->openTreasureChamber();
 					break;
 				case ObjectType::ITEM:
 					std::cout << "putting into inventary " << object->getName() << std::endl;
 					if (putInInventar(object))
 					{
+						OutputFormatter::chat(chatBox, "Picked up " + object->getName(), sf::Color::White);
 						map->setOverlayObject(facingPoint, nullptr);
-					};
+					}
+					else
+					{
+						OutputFormatter::chat(chatBox, "Inventory full", sf::Color::White);
+					}
 					break;
 				case ObjectType::CREATURE:
 					std::cout << "starting fight against " << object->getName() << std::endl;
+					OutputFormatter::chat(chatBox, "Started fight against " + object->getName(), sf::Color::White);
 					//startFight(this, std::dynamic_pointer_cast<Creature>(object));
 					break;
 				default:

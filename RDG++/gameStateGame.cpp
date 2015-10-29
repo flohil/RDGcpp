@@ -5,6 +5,7 @@
 #include "gameState.hpp"
 #include "chances.hpp"
 #include "easylogging++.hpp"
+#include "OutputFormatter.hpp"
 
 GameStateGame::GameStateGame(Game& game_) :
 GameState(game_)
@@ -16,18 +17,27 @@ GameState(game_)
 
 	//1280 * 720 upwards! -> all 16:9
 
-	horSplit = 0.85f;
-	rightVerSplit = 0.4f;
+	/*inventory margins:
+		left & right: 10px
+		top & bottom: 10px
+		in between: 5px
+	*/
+	
+
+	horSplit = 0.8265625f;
+	rightVerSplit = 0.5f;
 	verSplit = 0.75f;
-	bottomHorSplit = 0.4f;
+	bottomHorSplit = 0.5f; // relative to horSplit
+
+	float armorImageHeight = size.x * (1.f - horSplit);
 	
 	// for aspect Ratio 16:9
 	sf::Vector2f possibleMapViewSize = sf::Vector2f(size.x * horSplit, size.y * 0.75f);
 	viewportSize = possibleMapViewSize;
-	sf::Vector2f messageViewSize = sf::Vector2f(size.x * 0.5f, size.y * 0.25f);
-	sf::Vector2f detailViewSize = sf::Vector2f(size.x * 0.5f, size.y * 0.25f);
+	sf::Vector2f chatViewSize = sf::Vector2f(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
+	sf::Vector2f detailsViewSize = sf::Vector2f(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
 	sf::Vector2f armorViewSize = sf::Vector2f(size.x * (1.f - horSplit), size.y * rightVerSplit);
-	sf::Vector2f inventoryViewSize = sf::Vector2f(size.x * 0.25f, size.y * 0.6f);
+	sf::Vector2f inventoryViewSize = sf::Vector2f(size.x * (1.f - horSplit), size.y * (1.f - rightVerSplit));
 
 	unsigned int tilesX = (game_.getSettings()->ROOM_WIDTH + 1) * game_.getSettings()->mazeSize + 1;
 	unsigned int tilesY = (game_.getSettings()->ROOM_HEIGHT + 1) * game_.getSettings()->mazeSize + 1;
@@ -46,16 +56,23 @@ GameState(game_)
 	float top = (possibleMapViewSize.y - viewportSize.y) / size.y;
 
 	mapView.setViewport(sf::FloatRect(left / 2, top / 2, viewportSize.x / size.x, viewportSize.y / size.y));
-	armorView.setViewport(sf::FloatRect(0.85f, 0.f, 0.15f, size.x / size.y * 0.15f));
-	
-
-	armorViewSize = sf::Vector2f(size.x * 0.15f, size.x * 0.15f);
+	armorView.setViewport(sf::FloatRect(horSplit, 0.f, (1.f - horSplit), rightVerSplit));
+	chatView.setViewport(sf::FloatRect(0.f, verSplit, horSplit * bottomHorSplit, (1.f - verSplit)));
+	detailsView.setViewport(sf::FloatRect(horSplit * bottomHorSplit, verSplit, (horSplit - horSplit * bottomHorSplit), (1.f - verSplit)));
+	inventoryView.setViewport(sf::FloatRect(horSplit, rightVerSplit, (1.f - horSplit), (1.f - rightVerSplit)));
 
 	mapView.setSize(viewportSize);
 	armorView.setSize(armorViewSize);
+	chatView.setSize(chatViewSize);
+	detailsView.setSize(detailsViewSize);
+	inventoryView.setSize(inventoryViewSize);
 	mapView.setCenter(viewportSize * 0.5f);
 	armorView.setCenter(armorViewSize * 0.5f);
+	chatView.setCenter(chatViewSize * 0.5f);
+	detailsView.setCenter(detailsViewSize * 0.5f);
+	inventoryView.setCenter(inventoryViewSize * 0.5f);
 
+	// for camera center adaption
 	borderMargin.x = static_cast<float>(settings->tileSize * (settings->ROOM_WIDTH + 1));
 	borderMargin.y = static_cast<float>(settings->tileSize * (settings->ROOM_HEIGHT + 1));
 	minTop = borderMargin.y;
@@ -76,10 +93,14 @@ GameState(game_)
 
 	map = new Map(game);
 	map->init(player);
-	
-	player->init(map, settings->tileSize);
 
 	theme = std::make_shared<tgui::Theme>(settings->IMAGE_PATH + "widgets/Black.txt");
+
+	loadGui();
+
+	player->init(map, settings->tileSize, chatbox);
+
+	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 }
 
 void GameStateGame::draw(const float deltaTime)
@@ -87,17 +108,23 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.clear(sf::Color::Black);
 
 	game.window.setView(mapView);
+	fightGui.draw();
 	map->draw(game.window, deltaTime);
 	player->draw(game.window, deltaTime);
 	
 	game.window.setView(armorView);
+	armorGui.draw();
 	game.window.draw(armorSprite);
-	
-	/*game.window.setView(inventoryView);
 
-	game.window.setView(messageView);
+	game.window.setView(inventoryView);
+	inventoryGui.draw();
 
-	game.window.setView(detailView);*/
+	game.window.setView(chatView);
+	chatGui.draw();
+
+	game.window.setView(detailsView);
+	detailsGui.draw();
+
 
 	return;
 }
@@ -191,7 +218,9 @@ void GameStateGame::handleInput()
 			}
 		}
 
-		// gui.handleEvent(event);
+		chatGui.handleEvent(event);
+		// detailsGui.handleEvent(event);
+		fightGui.handleEvent(event);
 	}
 }
 
@@ -209,22 +238,61 @@ void GameStateGame::loadGui()
 	chatGui.removeAllWidgets();
 	chatGui.setWindow(game.window);
 
+	detailsGui.removeAllWidgets();
+	detailsGui.setWindow(game.window);
+
+	fightGui.removeAllWidgets();
+	fightGui.setWindow(game.window);
+
+	armorGui.removeAllWidgets();
+	armorGui.setWindow(game.window);
+
+	inventoryGui.removeAllWidgets();
+	inventoryGui.setWindow(game.window);
+
 	// set global font that all widgets can use by default
 	chatGui.setFont("res/fonts/DejaVuSans.ttf");
+	detailsGui.setFont("res/fonts/DejaVuSans.ttf");
+	fightGui.setFont("res/fonts/DejaVuSans.ttf");
 
 	// gui loading
-	tgui::ChatBox::Ptr chatbox = theme->load("ChatBox");
-	//chatbox->setSize(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
-	chatbox->setSize(400, 300);
+	chatbox = theme->load("ChatBox");
+	chatbox->setSize(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
 	chatbox->setTextSize(18);
 	chatbox->setPosition(0, 0);
+	chatbox->setLineLimit(8);
 	chatbox->setLinesStartFromTop();
-	chatbox->addLine("texus : Hey, this is TGUI!", sf::Color::Green);
-	chatbox->addLine("Me : Looks awesome! ;)", sf::Color::Yellow);
-	chatbox->addLine("texus : Thanks! :)", sf::Color::Green);
-	chatbox->addLine("Me : The widgets rock ^^", sf::Color::Yellow);
-	chatGui.add(chatbox);
+	chatGui.add(chatbox, "log");
 
+	chatGui.setView(chatView);
+
+	detailsbox = theme->load("ChatBox");
+	detailsbox->setSize(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
+	detailsbox->setTextSize(18);
+	detailsbox->setPosition(0, 0);
+	detailsbox->setLinesStartFromTop();
+	detailsbox->addLine(" Detailsbox!", sf::Color::White);
+	detailsbox->addLine(" Me : Looks awesome! ;)", sf::Color::White);
+	detailsbox->addLine(" texus : Thanks! :)", sf::Color::White);
+	detailsbox->addLine(" Me : The widgets rock ^^", sf::Color::White);
+	detailsGui.add(detailsbox, "details");
+
+	detailsGui.setView(detailsView);
+
+	inventorybox = theme->load("ChatBox");
+	//inventorybox->setSize(size.x * (1 - horSplit), size.y * (1.f - rightVerSplit));
+	inventorybox->setSize(size.x * (1 - horSplit), size.y * rightVerSplit);
+	inventorybox->setPosition(0, 0);
+	inventoryGui.add(inventorybox, "inventory");
+
+	inventoryGui.setView(inventoryView);
+
+	armorbox = theme->load("ChatBox");
+	armorbox->setSize(size.x * (1 - horSplit), size.y * rightVerSplit);
+	armorbox->setPosition(0, 0);
+	armorGui.add(armorbox, "armor");
+
+	armorGui.setView(armorView);
 
 }
 
