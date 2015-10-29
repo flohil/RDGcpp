@@ -23,7 +23,6 @@ GameState(game_)
 		in between: 5px
 	*/
 	
-
 	horSplit = 0.8265625f;
 	rightVerSplit = 0.5f;
 	verSplit = 0.75f;
@@ -82,7 +81,7 @@ GameState(game_)
 
 	armorSprite.setTexture(ResourceManager::getInstance().getTexture("armorBackground"));
 	armorSprite.setPosition(0.f, 0.f);
-	armorSprite.setScale(sf::Vector2f(1.2f, 1.2f));
+	armorSprite.setScale(sf::Vector2f(0.65f, 0.65f));
 
 	std::cout << "armorView x = " << armorView.getSize().x << ", y = " << armorView.getSize().y << std::endl;
 	std::cout << "armorView center x = " << armorView.getCenter().x << ", y = " << armorView.getCenter().y << std::endl;
