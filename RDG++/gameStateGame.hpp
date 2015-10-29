@@ -13,7 +13,8 @@ private:
 	sf::View mapView;
 	sf::View messageView;
 	sf::View inventoryView;
-	sf::View playerView;
+	sf::View armorView;
+	sf::View detailView;
 	Map* map;
 	std::shared_ptr<Player> player;
 	sf::Vector2f borderMargin;
@@ -24,6 +25,8 @@ private:
 	float maxBottom;
 	float minLeft;
 	float maxRight;
+
+	sf::Sprite armorSprite;
 
 	// gui
 	tgui::Gui chatGui;
