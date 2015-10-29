@@ -16,6 +16,10 @@ public:
 	virtual void update(const float deltaTime) = 0;
 	virtual void handleInput() = 0;
 	virtual void loadGui() = 0;
+
+protected:
+
+	sf::Vector2f size;
 };
 
 #endif /* GAME_STATE_HPP */

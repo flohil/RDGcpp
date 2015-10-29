@@ -29,7 +29,6 @@ private:
 	sf::Sprite armorSprite;
 
 	// gui
-	sf::Vector2f size;
 	float horSplit;
 	float rightVerSplit;
 	float verSplit;

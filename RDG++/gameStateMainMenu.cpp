@@ -11,14 +11,15 @@ GameStateMainMenu::GameStateMainMenu(Game& game_) :
 	GameState(game_)
 {
 	settings = game_.getSettings();
-	sf::Vector2f size = sf::Vector2f(game.window.getSize());
+	//sf::Vector2f size = sf::Vector2f(game.window.getSize());
+	size = sf::Vector2f(static_cast<float>(settings->scaleWidth), static_cast<float>(settings->scaleHeight));
 	guiView.setSize(size);
 	view.setSize(size);
-	size *= 0.5f; // for positioning view centrally
-	guiView.setCenter(size);
-	view.setCenter(size);
+	guiView.setCenter(size * 0.5f);
+	view.setCenter(size * 0.5f);
 
 	background.setTexture(ResourceManager::getInstance().getTexture("background"));
+	background.setScale(size.x / static_cast<float>(background.getTexture()->getSize().x), size.y / static_cast<float>(background.getTexture()->getSize().y));
 
 	loadGui();
 }
@@ -83,10 +84,6 @@ void GameStateMainMenu::openSettings()
 
 void GameStateMainMenu::loadGui()
 {
-	background.setScale(static_cast<float>(settings->width) / static_cast<float>(background.getTexture()->getSize().x), static_cast<float>(settings->height) / static_cast<float>(background.getTexture()->getSize().y));
-	view.setSize(static_cast<float>(settings->width), static_cast<float>(settings->height));
-	view.setCenter(static_cast<float>(settings->width) * 0.5f, static_cast<float>(settings->height) * 0.5f);
-
 	gui.removeAllWidgets();
 	gui.setWindow(game.window);
 

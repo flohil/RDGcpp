@@ -411,7 +411,7 @@ void Player::handleInput(sf::Event event)
 			switch (object->getObjectType())
 			{
 				case ObjectType::KEY:
-					chatBox->addLine("Found key for treasure chamber", sf::Color::White);
+					OutputFormatter::chat(chatBox, "Found key for treasure chamber", sf::Color::White);
 					std::cout << "found treasure chamber key " << object->getName() << std::endl;
 					if (putInInventar(object))
 					{

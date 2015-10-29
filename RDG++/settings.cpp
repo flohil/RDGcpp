@@ -11,7 +11,9 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	COLOR_DEPTH(32), 
 	ROOM_WIDTH(8),
 	ROOM_HEIGHT(6),
-	MAX_TRIES(15)
+	MAX_TRIES(15),
+	scaleWidth(1280),
+	scaleHeight(720)
 {
 
 	//set default values for variables

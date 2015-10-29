@@ -11,7 +11,7 @@ GameStateGame::GameStateGame(Game& game_) :
 GameState(game_)
 {
 	settings = game_.getSettings();
-	size = sf::Vector2f(1280, 720);
+	size = sf::Vector2f(static_cast<float>(settings->scaleWidth), static_cast<float>(settings->scaleHeight));
 
 	float aspectRatio = size.x / size.y;
 
@@ -125,7 +125,6 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.setView(detailsView);
 	detailsGui.draw();
 
-
 	return;
 }
 
@@ -235,6 +234,7 @@ void GameStateGame::pauseGame()
 
 void GameStateGame::loadGui()
 {
+
 	chatGui.removeAllWidgets();
 	chatGui.setWindow(game.window);
 
@@ -291,6 +291,18 @@ void GameStateGame::loadGui()
 	armorbox->setSize(size.x * (1 - horSplit), size.y * rightVerSplit);
 	armorbox->setPosition(0, 0);
 	armorGui.add(armorbox, "armor");
+
+	/*tgui::Button::Ptr set1Button = std::make_shared<tgui::Button>();
+	set1Button->setText("Start Game");
+	set1Button->setOpacity(0.9f);
+	set1Button->setTextSize(settings->buttonTextSize);
+	set1Button->connect("pressed", [&](){ startGame(); });
+
+	tgui::Button::Ptr set2Button = std::make_shared<tgui::Button>();
+	optionsButton->setText("Settings");
+	optionsButton->setOpacity(0.9f);
+	optionsButton->setTextSize(settings->buttonTextSize);
+	optionsButton->connect("pressed", [&](){ openSettings(); });*/
 
 	armorGui.setView(armorView);
 

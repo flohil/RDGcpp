@@ -18,6 +18,8 @@ public:
 	const unsigned int ROOM_WIDTH; // in tiles excluding walls
 	const unsigned int ROOM_HEIGHT; // in tiles excluding walls
 	const unsigned int MAX_TRIES; // number of tries when looking for a free field in a room
+	const unsigned int scaleWidth;
+	const unsigned int scaleHeight;
 
 	// variables
 	unsigned int width;
