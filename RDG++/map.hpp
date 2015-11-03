@@ -79,6 +79,8 @@ private:
 	void fillGround(std::shared_ptr<Room> room, RoomTypes::Enum type);
 	void addMonster(std::shared_ptr<Room> room, RoomTypes::Enum type);
 	void addItems(std::shared_ptr<Room> room, RoomTypes::Enum type);
+	std::shared_ptr<RenderableObject> placeInOverlay(Point pos, std::shared_ptr<RenderableObject> obj);
+	std::shared_ptr<RenderableObject> placeInBackground(Point pos, std::shared_ptr<RenderableObject> obj);
 };
 
 #endif /* MAP */

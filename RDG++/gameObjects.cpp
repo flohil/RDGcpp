@@ -20,9 +20,41 @@ bool RenderableObject::obtainSprite(ObjectType::Enum objectType) {
 	return false;
 }
 
+void RenderableObject::setScale(const sf::Vector2f scale_)
+{
+	if (scale_ == scale)
+	{
+		return;
+	}
+
+	if (objectType == ObjectType::TILE)
+	{
+		sf::Texture& tex = ResourceManager::getInstance().getTexture("tileset");
+		scale.x = scale_.x * 0.1f;
+		scale.y = scale_.y * 0.1f;
+		size.x = tex.getSize().x * scale.x;
+		size.y = tex.getSize().y * scale.y;
+	}
+	else
+	{
+		sf::Texture& tex = ResourceManager::getInstance().getTexture(name);
+		scale.x = scale_.x;
+		scale.y = scale_.y;
+		size.x = tex.getSize().x * scale.x;
+		size.y = tex.getSize().y * scale.y;
+	}
+
+	sprite.setScale(scale_);
+}
+
 void RenderableObject::setSize(const unsigned int width, const unsigned int height)
 {
 	sf::Vector2f scale;
+
+	if (size.x == width && size.y == height)
+	{
+		return; //did not change
+	}
 
 	if (objectType == ObjectType::TILE)
 	{
@@ -34,7 +66,26 @@ void RenderableObject::setSize(const unsigned int width, const unsigned int heig
 		sf::Texture& tex = ResourceManager::getInstance().getTexture(name);
 		scale = sf::Vector2f(static_cast<float>(width) / tex.getSize().x, static_cast<float>(height) / tex.getSize().y);
 	}
+
+	size.x = static_cast<float>(width);
+	size.y = static_cast<float>(height);
+
 	sprite.setScale(scale);
+}
+
+void RenderableObject::setPosition(const sf::Vector2f pos_)
+{
+	if (pos_ == rawPos)
+	{ 
+		return; // position did not change
+	}
+
+	rawPos = pos_;
+
+	finalPos.x = rawPos.x + size.x * 0.5f;
+	finalPos.y = rawPos.y + size.y * 0.5f;
+	
+	sprite.setPosition(finalPos);
 }
 
 void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)
@@ -455,9 +506,77 @@ bool Player::putInInventar(std::shared_ptr<RenderableObject> object)
 	}
 	else
 	{
+		object->setSize(tileSize * 2, tileSize * 2);
+		setPositionInInventory(inventory.size(), object);
 		inventory.push_back(object);
 		std::cout << "inventory now contains " << inventory.size() << " objects " << std::endl;
 		return true;
+	}
+}
+
+void Player::setPositionInInventory(unsigned int idx, std::shared_ptr<RenderableObject> object)
+{
+	float padding = 12.f;
+	float spacing = 5.f;
+	unsigned int horItemCount = 3u;
+
+	unsigned int colIdx = idx % horItemCount;
+	unsigned int rowIdx = idx / horItemCount;
+
+	object->setPosition(sf::Vector2f(padding + colIdx * (spacing + 2 * tileSize), padding + rowIdx * (spacing + 2 * tileSize)));
+}
+
+void Player::drawInventory(sf::RenderWindow& window, const float deltaTime) const
+{
+	for (unsigned int i = 0; i < inventory.size(); i++)
+	{
+		inventory[i]->draw(window, deltaTime);
+	}
+}
+
+void Player::drawEquipment(sf::RenderWindow& window, const float deltaTime) const
+{
+	std::shared_ptr<EquipmentSet> set = getEquipmentSet();
+
+	if (set->getHelmet() != nullptr)
+	{
+		set->getHelmet()->draw(window, deltaTime);
+	}
+	if (set->getHarness() != nullptr)
+	{
+		set->getHarness()->draw(window, deltaTime);
+	}
+	if (set->getCuisse() != nullptr)
+	{
+		set->getCuisse()->draw(window, deltaTime);
+	}
+	if (set->getGauntlets() != nullptr)
+	{
+		set->getGauntlets()->draw(window, deltaTime);
+	}
+	if (set->getBoots() != nullptr)
+	{
+		set->getBoots()->draw(window, deltaTime);
+	}
+	if (set->getPrimaryWeapon() != nullptr)
+	{
+		set->getPrimaryWeapon()->draw(window, deltaTime);
+	}
+	if (set->getSecondaryWeapon() != nullptr)
+	{
+		set->getSecondaryWeapon()->draw(window, deltaTime);
+	}
+	if (set->getPotion1() != nullptr)
+	{
+		set->getPotion1()->draw(window, deltaTime);
+	}
+	if (set->getPotion2() != nullptr)
+	{
+		set->getPotion2()->draw(window, deltaTime);
+	}
+	if (set->getPotion3() != nullptr)
+	{
+		set->getPotion3()->draw(window, deltaTime);
 	}
 }
 
@@ -491,3 +610,53 @@ float EquipmentSet::getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAtt
 
 	return 0.f;
 }
+
+void EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> weapon_) 
+{ 
+	primaryWeapon = weapon_; 
+};
+
+void EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon> weapon_) 
+{ 
+	secondaryWeapon = weapon_;
+};
+
+void EquipmentSet::setHelmet(std::shared_ptr<Armament> helmet_) 
+{ 
+	helmet = helmet_; 
+};
+
+void EquipmentSet::setHarness(std::shared_ptr<Armament> harness_) 
+{ 
+	harness = harness_; 
+};
+
+void EquipmentSet::setCuisse(std::shared_ptr<Armament> cuisse_) 
+{ 
+	cuisse = cuisse_; 
+};
+
+void EquipmentSet::setGauntlets(std::shared_ptr<Armament> gauntlets_) 
+{ 
+	gauntlets = gauntlets_; 
+};
+
+void EquipmentSet::setBoots(std::shared_ptr<Armament> boots_) 
+{ 
+	boots = boots_; 
+};
+
+void EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_) 
+{ 
+	potion1 = potion_; 
+};
+
+void EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_) 
+{ 
+	potion2 = potion_; 
+};
+
+void EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_) 
+{ 
+	potion3 = potion_; 
+};

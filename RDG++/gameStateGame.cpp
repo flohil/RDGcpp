@@ -80,8 +80,6 @@ GameState(game_)
 	maxRight = mapSize.x - borderMargin.x;
 
 	armorSprite.setTexture(ResourceManager::getInstance().getTexture("armorBackground"));
-	armorSprite.setPosition(0.f, 50.f);
-	armorSprite.setScale(sf::Vector2f(0.65f, 0.65f));
 
 	std::cout << "armorView x = " << armorView.getSize().x << ", y = " << armorView.getSize().y << std::endl;
 	std::cout << "armorView center x = " << armorView.getCenter().x << ", y = " << armorView.getCenter().y << std::endl;
@@ -99,6 +97,18 @@ GameState(game_)
 
 	player->init(map, settings->tileSize, chatbox);
 
+	// test fill set
+	player->getEquipmentSet()->setBoots(game.getPrototypeStorage()->armamentFactory->create("Leather Boots"));
+	player->getEquipmentSet()->setCuisse(game.getPrototypeStorage()->armamentFactory->create("Leather Cuisse"));
+	player->getEquipmentSet()->setGauntlets(game.getPrototypeStorage()->armamentFactory->create("Leather Gauntlets"));
+	player->getEquipmentSet()->setHarness(game.getPrototypeStorage()->armamentFactory->create("Leather Harness"));
+	player->getEquipmentSet()->setHelmet(game.getPrototypeStorage()->armamentFactory->create("Leather Helmet"));
+	player->getEquipmentSet()->setPrimaryWeapon(game.getPrototypeStorage()->weaponFactory->create("Dagger"));
+	player->getEquipmentSet()->setSecondaryWeapon(game.getPrototypeStorage()->weaponFactory->create("Axt"));
+	player->getEquipmentSet()->setPotion1(game.getPrototypeStorage()->potionFactory->create("Antidote"));
+	player->getEquipmentSet()->setPotion2(game.getPrototypeStorage()->potionFactory->create("Antidote"));
+	player->getEquipmentSet()->setPotion3(game.getPrototypeStorage()->potionFactory->create("Antidote"));
+
 	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 }
 
@@ -114,9 +124,11 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.setView(armorView);
 	armorGui.draw();
 	game.window.draw(armorSprite);
+	player->drawEquipment(game.window, deltaTime);
 
 	game.window.setView(inventoryView);
 	inventoryGui.draw();
+	player->drawInventory(game.window, deltaTime);
 
 	game.window.setView(chatView);
 	chatGui.draw();
@@ -286,26 +298,71 @@ void GameStateGame::loadGui()
 	armorbox->setPosition(0, 0);
 	armorGui.add(armorbox, "armor");
 
-	tgui::Button::Ptr set1Button = theme->load("Button");
+	float armorButtonsTopMargin = 10.f;
+	float armorButtonsLeftMargin = 8.f;
+	float spacing = 2.f;
+	sf::Vector2f setButtonSize(size.x * (1 - horSplit) * 0.5f - armorButtonsLeftMargin - spacing, 35);
+	unsigned int setButtonTextSize = 18u;
+
+	set1Button = theme->load("Button");
 	set1Button->setText("Set 1");
-	set1Button->setOpacity(1.f);
-	set1Button->setPosition(4, 4);
-	set1Button->setSize(size.x * (1 - horSplit) * 0.5f - 4, 35);
-	set1Button->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * 18));
-	//set1Button->connect("pressed", [&](){ startGame(); });
+	set1Button->setPosition(armorButtonsLeftMargin, armorButtonsTopMargin);
+	set1Button->setSize(setButtonSize.x, setButtonSize.y);
+	set1Button->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * setButtonTextSize));
+	set1Button->connect("pressed", [&](){ changeSet(1); });
 	armorGui.add(set1Button);
 
-	tgui::Button::Ptr set2Button = theme->load("Button");
+	set2Button = theme->load("Button");
 	set2Button->setText("Set 2");
-	set2Button->setOpacity(1.f);
-	set2Button->setPosition(set1Button->getSize().x + 6, 4);
-	set2Button->setSize(size.x * (1 - horSplit) * 0.5f - 4, 35);
-	set2Button->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * 18));
-	//set2Button->connect("pressed", [&](){ startGame(); });
+	set2Button->setPosition(armorButtonsLeftMargin + setButtonSize.x + 2 * spacing, armorButtonsTopMargin);
+	set2Button->setSize(setButtonSize.x, setButtonSize.y);
+	set2Button->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * setButtonTextSize));
+	set2Button->connect("pressed", [&](){ changeSet(2); });
 	armorGui.add(set2Button);
+
+	changeSet(player->getEquipmentSet()->getNumerator());
+
+	armorSprite.setPosition(0.f, armorButtonsTopMargin + setButtonSize.y + 20.f);
+	armorSprite.setScale(sf::Vector2f(0.65f, 0.65f));
 
 	armorGui.setView(armorView);
 
+	float detailsLeftMargin = 30.f;
+	float detailsTopMargin = 10.f;
+	float detailsWidth = detailsView.getSize().x - detailsLeftMargin * 2;
+	float detailsHeight = detailsView.getSize().y - detailsLeftMargin * 2;
+
+	tgui::VerticalLayout::Ptr detailsLayout = std::make_shared<tgui::VerticalLayout>();
+	tgui::HorizontalLayout::Ptr keysLayout = std::make_shared<tgui::HorizontalLayout>();
+	tgui::HorizontalLayout::Ptr valuesLayout = std::make_shared<tgui::HorizontalLayout>();
+
+	detailsLayout->setSize(detailsWidth, detailsHeight);
+	detailsLayout->setPosition(detailsLeftMargin, detailsTopMargin);
+
+	/*keysLayout->setSize(detailsLayout->getSize().x * 0.5, detailsLayout->getSize().y);
+	valuesLayout->setSize(detailsLayout->getSize().x * 0.5, detailsLayout->getSize().y);*/
+
+	tgui::Label::Ptr detailsTitleLabel = theme->load("Label");
+
+
+}
+
+void GameStateGame::changeSet(unsigned int numerator)
+{
+	float activeOpacity = 1.f;
+	float inactiveOpacity = 0.7f;
+
+	player->setActiveEquipmentSet(numerator);
+	if (numerator == 1u)
+	{
+		set1Button->setOpacity(activeOpacity);
+		set2Button->setOpacity(inactiveOpacity);
+	}
+	else
+	{
+		set1Button->setOpacity(inactiveOpacity);
+		set2Button->setOpacity(activeOpacity);
+	}
 }
 
 GameStateGame::~GameStateGame()

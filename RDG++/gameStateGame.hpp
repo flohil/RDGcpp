@@ -49,6 +49,11 @@ private:
 	tgui::ChatBox::Ptr inventorybox;
 	tgui::ChatBox::Ptr armorbox;
 
+	tgui::Button::Ptr set1Button;
+	tgui::Button::Ptr set2Button;
+
+	void changeSet(unsigned int numerator);
+
 public:
 
 	virtual void draw(const float deltaTime);

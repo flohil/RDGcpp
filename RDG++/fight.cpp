@@ -306,8 +306,8 @@ float Fight::calcCreatureSpeed(std::shared_ptr<Creature> creature)
 	}
 
 	// get Speed of player
-	playerArmorSpeedMalusSum = player->getEquipmentSet().getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::SPEED);
-	playerWeaponSpeedMalusMax = player->getEquipmentSet().getStats(ItemType::WEAPON, ArmorStatsMode::MAX, ArmorStatsAttributes::SPEED);
+	playerArmorSpeedMalusSum = player->getEquipmentSet()->getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::SPEED);
+	playerWeaponSpeedMalusMax = player->getEquipmentSet()->getStats(ItemType::WEAPON, ArmorStatsMode::MAX, ArmorStatsAttributes::SPEED);
 
 	// perform calculations
 	playerArmorSpeedMalus = creature->speed / 100 * playerArmorSpeedMalusSum * armorSpeedMalusMult;
@@ -409,7 +409,7 @@ float Fight::calcCreatureAccuracy(std::shared_ptr<Creature> creature)
 	}
 
 	//perform calculations
-	accuracy = creature->accuracy / 100 * player->getEquipmentSet().getStats(ItemType::WEAPON, ArmorStatsMode::AVG, ArmorStatsAttributes::ACCURACY) * accuracyMultiplier;
+	accuracy = creature->accuracy / 100 * player->getEquipmentSet()->getStats(ItemType::WEAPON, ArmorStatsMode::AVG, ArmorStatsAttributes::ACCURACY) * accuracyMultiplier;
 
 	return accuracy;
 }
@@ -499,7 +499,7 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	}
 	else
 	{
-		attackerWeaponDamage = player->getEquipmentSet().getStats(ItemType::WEAPON, ArmorStatsMode::SUM, ArmorStatsAttributes::ATTACK);
+		attackerWeaponDamage = player->getEquipmentSet()->getStats(ItemType::WEAPON, ArmorStatsMode::SUM, ArmorStatsAttributes::ATTACK);
 		finishedStagesMult = 1;
 	}
 
@@ -522,7 +522,7 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	}
 	else if (defender == player)
 	{
-		defenderArmor = player->getEquipmentSet().getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::ARMOR);
+		defenderArmor = player->getEquipmentSet()->getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::ARMOR);
 		finishedStagesMult = 1;
 		baseDefense = baseDefensePlayer;
 	}

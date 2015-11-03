@@ -15,8 +15,10 @@ class Armament;
 class Potion;
 class GameStateGame;
 
-struct EquipmentSet
+class EquipmentSet
 {
+private:
+
 	std::shared_ptr<Weapon> primaryWeapon;
 	std::shared_ptr<Weapon> secondaryWeapon;
 	std::shared_ptr<Armament> helmet;
@@ -24,6 +26,40 @@ struct EquipmentSet
 	std::shared_ptr<Armament> cuisse;
 	std::shared_ptr<Armament> gauntlets;
 	std::shared_ptr<Armament> boots;
+	std::shared_ptr<Potion> potion1;
+	std::shared_ptr<Potion> potion2;
+	std::shared_ptr<Potion> potion3;
+	unsigned int numerator;
+
+public:
+
+	EquipmentSet(unsigned int numerator_) :
+		numerator(numerator_), primaryWeapon(nullptr), secondaryWeapon(nullptr),
+		helmet(nullptr), harness(nullptr), cuisse(nullptr), gauntlets(nullptr), boots(nullptr),
+		potion1(nullptr), potion2(nullptr), potion3(nullptr) {};
+
+	std::shared_ptr<Weapon> getPrimaryWeapon() const { return primaryWeapon; };
+	std::shared_ptr<Weapon> getSecondaryWeapon() const { return secondaryWeapon; };
+	std::shared_ptr<Armament> getHelmet() const { return helmet; };
+	std::shared_ptr<Armament> getHarness() const { return harness; };
+	std::shared_ptr<Armament> getCuisse() const { return cuisse; };
+	std::shared_ptr<Armament> getGauntlets() const { return gauntlets; };
+	std::shared_ptr<Armament> getBoots() const { return boots; };
+	std::shared_ptr<Potion> getPotion1() const { return potion1; };
+	std::shared_ptr<Potion> getPotion2() const { return potion2; };
+	std::shared_ptr<Potion> getPotion3() const { return potion3; };
+	unsigned int getNumerator() const { return numerator; };
+
+	void EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> weapon_);
+	void setSecondaryWeapon(std::shared_ptr<Weapon> weapon_);
+	void setHelmet(std::shared_ptr<Armament> helmet_);
+	void setHarness(std::shared_ptr<Armament> harness_);
+	void setCuisse(std::shared_ptr<Armament> cuisse_);
+	void setGauntlets(std::shared_ptr<Armament> gauntlets_);
+	void setBoots(std::shared_ptr<Armament> boots_);
+	void setPotion1(std::shared_ptr<Potion> potion_);
+	void setPotion2(std::shared_ptr<Potion> potion_);
+	void setPotion3(std::shared_ptr<Potion> potion_);
 
 	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
 };
@@ -49,7 +85,8 @@ class RenderableObject : public GameObject
 public:
 
 	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_) : RenderableObject(name_, objectType_, 0.f) {};
-	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_, float angle_) : GameObject(name_, objectType_), visible(true)
+	RenderableObject(const std::string& name_, const ObjectType::Enum objectType_, float angle_) : GameObject(name_, objectType_), visible(true),
+		size(sf::Vector2f(-1.f, -1.f)), scale(sf::Vector2f(-1.f, -1.f)), rawPos(sf::Vector2f(-1.f, -1.f)), finalPos(sf::Vector2f(-1.f, -1.f))
 	{
 		obtainSprite(objectType_);
 		sf::FloatRect globalBounds = sprite.getGlobalBounds();
@@ -60,11 +97,13 @@ public:
 	bool isVisible() const { return visible; };
 	void setVisible(const bool visible_) { visible = visible_; };
 	void setRotation(const float angle_) { sprite.setRotation(angle_); };
-	void setPosition(sf::Vector2f pos_) { sprite.setPosition(pos_.x + 16, pos_.y + 16); };
+	void setPosition(const sf::Vector2f pos_); 
 	void setSize(const unsigned int width, const unsigned int height);
-	void setScale(const sf::Vector2f scale_) { sprite.setScale(scale_); };
+	void setScale(const sf::Vector2f scale_);
 	void draw(sf::RenderWindow& window, float deltaTime);
-	sf::Vector2f getPosition() const { return sprite.getPosition(); };
+	sf::Vector2f getPosition() const { return finalPos; };
+	sf::Vector2f getSize() const { return size; };
+	sf::Vector2f getScale() const { return scale; };
 
 protected:
 
@@ -74,6 +113,10 @@ private:
 
 	bool obtainSprite(ObjectType::Enum objectType);
 	sf::Sprite sprite;
+	sf::Vector2f size;
+	sf::Vector2f scale;
+	sf::Vector2f rawPos;
+	sf::Vector2f finalPos;
 };
 
 class Item : public RenderableObject
@@ -134,13 +177,16 @@ public:
 	Point getPlayerPosition() const { return playerPosition; };
 	sf::Vector2f getPixelPosition() const { return RenderableObject::getPosition(); };
 	DifficultyLevel::Enum getLevel() const { return DifficultyLevel::UNKNOWN; };
-	EquipmentSet getEquipmentSet()
+	std::shared_ptr<EquipmentSet> getEquipmentSet() const
 	{
-		if (activeSet == 1u) return setOne;
-		else if (activeSet == 2u) return setTwo;
+		if (setOne->getNumerator() == activeSet) return setOne;
+		else if (setTwo->getNumerator() == activeSet) return setTwo;
 		else return setOne;
 	};
 	std::string getPlayerName() const { return playerName; };
+	void drawInventory(sf::RenderWindow& window, const float deltaTime) const;
+	void drawEquipment(sf::RenderWindow& window, const float deltaTime) const;
+	void setActiveEquipmentSet(unsigned int numerator) { activeSet = numerator; };
 
 private:
 
@@ -169,8 +215,8 @@ private:
 	ViewingDirections::Enum facingDir = ViewingDirections::N;
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 	std::vector<std::shared_ptr<RenderableObject>> inventory;
-	EquipmentSet setOne = EquipmentSet{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-	EquipmentSet setTwo = EquipmentSet{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u));
+	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u));
 	unsigned int activeSet = 1;
 
 	tgui::ChatBox::Ptr chatBox;
@@ -178,6 +224,7 @@ private:
 	void setPosition(Point position_);
 	void preMove();
 	void move(const float deltaTime);
+	void setPositionInInventory(unsigned int idx, std::shared_ptr<RenderableObject> object);
 };
 
 class Armament : public Item, public DebugPrintObject

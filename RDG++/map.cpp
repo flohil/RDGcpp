@@ -105,8 +105,7 @@ void Map::fillWalls()
 			// load walls and set them to not passable
 			if (wallModX == 0 || wallModY == 0)
 			{
-				overlay[i][j].reset(new RenderableObject("darkGreyGround", ObjectType::TILE));
-				overlay[i][j]->setSize(settings->tileSize, settings->tileSize);
+				placeInOverlay(Point{ j, i }, std::shared_ptr<RenderableObject>(new RenderableObject("darkGreyGround", ObjectType::TILE)));
 			}
 		}
 	}
@@ -167,8 +166,8 @@ void Map::fillWithRooms()
 					unsigned int posY = i * (settings->ROOM_HEIGHT + 1) + y + 1; //row
 					unsigned int posX = j * (settings->ROOM_WIDTH + 1) + x + 1; //column
 
-					background[posY][posX] = rooms[i][j]->background[y][x];
-					overlay[posY][posX] = rooms[i][j]->overlay[y][x];
+					placeInBackground(Point{ posX, posY }, std::shared_ptr<RenderableObject>(rooms[i][j]->background[y][x]));
+					placeInOverlay(Point{ posX, posY }, std::shared_ptr<RenderableObject>(rooms[i][j]->overlay[y][x]));
 				}
 			}
 		}
@@ -240,29 +239,23 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 	}
 
 	// treasure chamber
-	if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y) 
+	if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y)
 	{
-		background[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f));
-		background[doory1][doorx1]->setSize(settings->tileSize, settings->tileSize);
-		overlay[doory1][doorx1].reset(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f));
-		overlay[doory1][doorx1]->setSize(settings->tileSize, settings->tileSize);
-		background[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
-		background[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
-		overlay[doory2][doorx2].reset(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle));
-		overlay[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
+		placeInBackground(Point{ doorx1, doory1 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f)));
+		placeInOverlay(Point{ doorx1, doory1 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f)));
+		placeInBackground(Point{ doorx2, doory2 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle)));
+		placeInOverlay(Point{ doorx2, doory2 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle)));
 
 		treasureDoorOne = Point{ doorx1, doory1 };
 		treasureDoorTwo = Point{ doorx2, doory2 };
 	}
 	// normal door
-	else 
+	else
 	{
-		background[doory1][doorx1].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
-		background[doory1][doorx1]->setSize(settings->tileSize, settings->tileSize);
-		overlay[doory1][doorx1] = nullptr;
-		background[doory2][doorx2].reset(new RenderableObject("greyGround", ObjectType::TILE, angle));
-		background[doory2][doorx2]->setSize(settings->tileSize, settings->tileSize);
-		overlay[doory2][doorx2] = nullptr;
+		placeInBackground(Point{ doorx1, doory1 }, std::shared_ptr<RenderableObject>(new RenderableObject("greyGround", ObjectType::TILE, angle)));
+		placeInBackground(Point{ doorx2, doory2 }, std::shared_ptr<RenderableObject>(new RenderableObject("greyGround", ObjectType::TILE, angle)));
+		placeInOverlay(Point{ doorx1, doory1 }, nullptr);
+		placeInOverlay(Point{ doorx2, doory2 }, nullptr);
 	}
 }
 
@@ -519,20 +512,13 @@ void Map::draw(sf::RenderWindow& window, float deltaTime)
 	{
 		for (unsigned int x = 0; x < width; x++)
 		{
-			// Set the position of the tile in the 2d world
-			sf::Vector2f pos;
-			pos.x = static_cast<float>(x * settings->tileSize);
-			pos.y = static_cast<float>(y * settings->tileSize);
-
 			if (background[y][x] != nullptr)
 			{
-				background[y][x]->setPosition(pos);
 				background[y][x]->draw(window, deltaTime);
 			}
 			
 			if (overlay[y][x] != nullptr)
 			{
-				overlay[y][x]->setPosition(pos);
 				overlay[y][x]->draw(window, deltaTime);
 			}
 		}
@@ -562,4 +548,40 @@ void Map::openTreasureChamber()
 
 		treasureDoorOpened = true;
 	}
+}
+
+std::shared_ptr<RenderableObject> Map::placeInOverlay(Point pos, std::shared_ptr<RenderableObject> obj)
+{
+	std::shared_ptr<RenderableObject> oldObj = overlay[pos.y][pos.x];
+
+	if (obj != nullptr)
+	{
+		sf::Vector2f pixelPos;
+		pixelPos.x = static_cast<float>(pos.x * settings->tileSize);
+		pixelPos.y = static_cast<float>(pos.y * settings->tileSize);
+		obj->setSize(settings->tileSize, settings->tileSize);
+		obj->setPosition(sf::Vector2f(pixelPos.x, pixelPos.y));
+	}
+
+	overlay[pos.y][pos.x] = obj;
+
+	return oldObj;
+}
+
+std::shared_ptr<RenderableObject> Map::placeInBackground(Point pos, std::shared_ptr<RenderableObject> obj)
+{
+	std::shared_ptr<RenderableObject> oldObj = overlay[pos.y][pos.x];
+
+	if (obj != nullptr)
+	{
+		sf::Vector2f pixelPos;
+		pixelPos.x = static_cast<float>(pos.x * settings->tileSize);
+		pixelPos.y = static_cast<float>(pos.y * settings->tileSize);
+		obj->setSize(settings->tileSize, settings->tileSize);
+		obj->setPosition(sf::Vector2f(pixelPos.x, pixelPos.y));
+	}
+
+	background[pos.y][pos.x] = obj;
+
+	return oldObj;
 }
