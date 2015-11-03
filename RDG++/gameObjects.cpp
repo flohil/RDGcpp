@@ -612,52 +612,99 @@ float EquipmentSet::getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAtt
 	return 0.f;
 }
 
-void EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> weapon_) 
+std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> weapon_)
 { 
+	weapon_->setSize(itemSize, itemSize);
 	primaryWeapon = weapon_; 
+
+	return primaryWeapon;
 };
 
-void EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon> weapon_) 
+std::shared_ptr<Weapon> EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon> weapon_)
 { 
+	weapon_->setSize(itemSize, itemSize);
 	secondaryWeapon = weapon_;
+
+	return secondaryWeapon;
 };
 
-void EquipmentSet::setHelmet(std::shared_ptr<Armament> helmet_) 
+std::shared_ptr<Armament> EquipmentSet::setHelmet(std::shared_ptr<Armament> helmet_) 
 { 
+	helmet_->setSize(itemSize, itemSize);
 	helmet = helmet_; 
+
+	return helmet;
 };
 
-void EquipmentSet::setHarness(std::shared_ptr<Armament> harness_) 
+std::shared_ptr<Armament> EquipmentSet::setHarness(std::shared_ptr<Armament> harness_)
 { 
+	harness_->setSize(itemSize, itemSize);
 	harness = harness_; 
+
+	return harness;
 };
 
-void EquipmentSet::setCuisse(std::shared_ptr<Armament> cuisse_) 
+std::shared_ptr<Armament> EquipmentSet::setCuisse(std::shared_ptr<Armament> cuisse_)
 { 
+	cuisse_->setSize(itemSize, itemSize);
 	cuisse = cuisse_; 
+
+	return cuisse;
 };
 
-void EquipmentSet::setGauntlets(std::shared_ptr<Armament> gauntlets_) 
+std::shared_ptr<Armament> EquipmentSet::setGauntlets(std::shared_ptr<Armament> gauntlets_)
 { 
+	gauntlets_->setSize(itemSize, itemSize);
 	gauntlets = gauntlets_; 
+
+	return gauntlets;
 };
 
-void EquipmentSet::setBoots(std::shared_ptr<Armament> boots_) 
+std::shared_ptr<Armament> EquipmentSet::setBoots(std::shared_ptr<Armament> boots_)
 { 
+	boots_->setSize(itemSize, itemSize);
 	boots = boots_; 
+
+	return boots;
 };
 
-void EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_) 
+std::shared_ptr<Potion> EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_)
 { 
+	potion_->setSize(itemSize, itemSize);
 	potion1 = potion_; 
+
+	return potion1;
 };
 
-void EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_) 
+std::shared_ptr<Potion> EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_)
 { 
+	potion_->setSize(itemSize, itemSize);
 	potion2 = potion_; 
+
+	return potion2;
 };
 
-void EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_) 
+std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_)
 { 
+	potion_->setSize(itemSize, itemSize);
 	potion3 = potion_; 
+
+	return potion3;
 };
+
+std::list<std::shared_ptr<RenderableObject>> setItem(std::shared_ptr<Item> obj)
+{
+	std::list<std::shared_ptr<RenderableObject>> retList;
+
+	switch (obj->getItemType())
+	{
+		case ItemType::ARMAMENT:
+			break;
+		case ItemType::WEAPON:
+			break;
+		case ItemType::POTION:
+			break;
+	}
+
+	return retList;
+}

@@ -13,6 +13,8 @@ class Map;
 class Weapon;
 class Armament;
 class Potion;
+class Item;
+class RenderableObject;
 class GameStateGame;
 
 class EquipmentSet
@@ -30,13 +32,15 @@ private:
 	std::shared_ptr<Potion> potion2;
 	std::shared_ptr<Potion> potion3;
 	unsigned int numerator;
+	unsigned int itemSize;
+	sf::Vector2f armorOffsets;
+	sf::Vector2f potionOffsets;
 
 public:
 
-	EquipmentSet(unsigned int numerator_) :
-		numerator(numerator_), primaryWeapon(nullptr), secondaryWeapon(nullptr),
-		helmet(nullptr), harness(nullptr), cuisse(nullptr), gauntlets(nullptr), boots(nullptr),
-		potion1(nullptr), potion2(nullptr), potion3(nullptr) {};
+	EquipmentSet(unsigned int numerator_, unsigned int itemSize_, sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_) :
+		primaryWeapon(nullptr), secondaryWeapon(nullptr), helmet(nullptr), harness(nullptr), cuisse(nullptr), gauntlets(nullptr), 
+		boots(nullptr), potion1(nullptr), potion2(nullptr), potion3(nullptr), numerator(numerator_), itemSize(itemSize_), armorOffsets(armorOffsets_), potionOffsets(potionOffsets_) {};
 
 	std::shared_ptr<Weapon> getPrimaryWeapon() const { return primaryWeapon; };
 	std::shared_ptr<Weapon> getSecondaryWeapon() const { return secondaryWeapon; };
@@ -50,16 +54,18 @@ public:
 	std::shared_ptr<Potion> getPotion3() const { return potion3; };
 	unsigned int getNumerator() const { return numerator; };
 
-	void EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> weapon_);
-	void setSecondaryWeapon(std::shared_ptr<Weapon> weapon_);
-	void setHelmet(std::shared_ptr<Armament> helmet_);
-	void setHarness(std::shared_ptr<Armament> harness_);
-	void setCuisse(std::shared_ptr<Armament> cuisse_);
-	void setGauntlets(std::shared_ptr<Armament> gauntlets_);
-	void setBoots(std::shared_ptr<Armament> boots_);
-	void setPotion1(std::shared_ptr<Potion> potion_);
-	void setPotion2(std::shared_ptr<Potion> potion_);
-	void setPotion3(std::shared_ptr<Potion> potion_);
+	std::shared_ptr<Weapon> setPrimaryWeapon(std::shared_ptr<Weapon> weapon_);
+	std::shared_ptr<Weapon> setSecondaryWeapon(std::shared_ptr<Weapon> weapon_);
+	std::shared_ptr<Armament> setHelmet(std::shared_ptr<Armament> helmet_);
+	std::shared_ptr<Armament> setHarness(std::shared_ptr<Armament> harness_);
+	std::shared_ptr<Armament> setCuisse(std::shared_ptr<Armament> cuisse_);
+	std::shared_ptr<Armament> setGauntlets(std::shared_ptr<Armament> gauntlets_);
+	std::shared_ptr<Armament> setBoots(std::shared_ptr<Armament> boots_);
+	std::shared_ptr<Potion> setPotion1(std::shared_ptr<Potion> potion_);
+	std::shared_ptr<Potion> setPotion2(std::shared_ptr<Potion> potion_);
+	std::shared_ptr<Potion> setPotion3(std::shared_ptr<Potion> potion_);
+
+	std::list<std::shared_ptr<RenderableObject>> setItem(std::shared_ptr<Item> obj);
 
 	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
 };
@@ -167,8 +173,8 @@ class Player : public RenderableObject, public Creature
 {
 public:
 
-	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_, float moveDistance_, unsigned int maxInventorySize_) : 
-		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_), moveDistance(moveDistance_), maxInventorySize(maxInventorySize_) {};
+	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_, float moveDistance_, unsigned int maxInventorySize_, sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_) : 
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_), moveDistance(moveDistance_), maxInventorySize(maxInventorySize_), armorOffsets(armorOffsets_), potionOffsets(potionOffsets_) {};
 
 	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_);
 	void update(const float deltaTime);
@@ -215,8 +221,10 @@ private:
 	ViewingDirections::Enum facingDir = ViewingDirections::N;
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 	std::vector<std::shared_ptr<RenderableObject>> inventory;
-	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u));
-	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u));
+	sf::Vector2f armorOffsets;
+	sf::Vector2f potionOffsets;
+	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u, tileSize, armorOffsets, potionOffsets));
+	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u, tileSize, armorOffsets, potionOffsets));
 	unsigned int activeSet = 1;
 
 	tgui::ChatBox::Ptr chatBox;

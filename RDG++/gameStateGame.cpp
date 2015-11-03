@@ -87,15 +87,15 @@ GameState(game_)
 	std::cout << "armorView center x = " << armorView.getCenter().x << ", y = " << armorView.getCenter().y << std::endl;
 	std::cout << "armorView viewport left = " << armorView.getViewport().left << ", top = " << armorView.getViewport().top << ", width = " << armorView.getViewport().width << ", height = " << armorView.getViewport().height << std::endl;
 
-	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize));
+	loadGui();
+
+	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
 
 	map = new Map(game);
 	map->init(player);
 
 	theme = std::make_shared<tgui::Theme>(settings->IMAGE_PATH + "widgets/Black.txt");
-
-	loadGui();
 
 	player->init(map, settings->tileSize, chatbox);
 
@@ -325,9 +325,14 @@ void GameStateGame::loadGui()
 
 	changeSet(player->getEquipmentSet()->getNumerator());
 
-	armorSprite.setPosition(-1.f, armorButtonsTopMargin + setButtonSize.y + 10.f);
+	armorTopOffset = armorButtonsTopMargin + setButtonSize.y + 10.f;
+	armorLeftOffset = -1.f;
+	potionTopOffset = rightVerSplit * size.y - 47.f;
+	potionLeftOffset = -2.f;
+
+	armorSprite.setPosition(armorLeftOffset, armorTopOffset);
 	armorSprite.setScale(sf::Vector2f(0.7f, 0.7f));
-	potionSprite.setPosition(-2.f, rightVerSplit * size.y - 47.f);
+	potionSprite.setPosition(potionLeftOffset, rightVerSplit * size.y - 47.f);
 	potionSprite.setScale(sf::Vector2f(1.1f, 1.1f));
 
 	armorGui.setView(armorView);

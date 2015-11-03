@@ -36,6 +36,10 @@ private:
 	float bottomHorSplit;
 
 	float armorHeight;
+	float armorTopOffset;
+	float armorLeftOffset;
+	float potionTopOffset;
+	float potionLeftOffset;
 
 	tgui::Gui chatGui;
 	tgui::Gui detailsGui;
