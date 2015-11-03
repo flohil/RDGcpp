@@ -83,6 +83,11 @@ struct Attacks
 	enum Enum { TORSO, HEAD, ARMS, LEGS, PARRY, SET, POTION, UNKNOWN };
 };
 
+struct EquipHotspots
+{
+	enum Enum { LEFT, RIGHT, POTION1, POTION2, POTION3, UNKNOWN };
+};
+
 
 struct Point {
 	unsigned int x;

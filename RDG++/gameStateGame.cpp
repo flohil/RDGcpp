@@ -87,8 +87,6 @@ GameState(game_)
 	std::cout << "armorView center x = " << armorView.getCenter().x << ", y = " << armorView.getCenter().y << std::endl;
 	std::cout << "armorView viewport left = " << armorView.getViewport().left << ", top = " << armorView.getViewport().top << ", width = " << armorView.getViewport().width << ", height = " << armorView.getViewport().height << std::endl;
 
-	loadGui();
-
 	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
 
@@ -97,19 +95,23 @@ GameState(game_)
 
 	theme = std::make_shared<tgui::Theme>(settings->IMAGE_PATH + "widgets/Black.txt");
 
+	loadGui();
+
 	player->init(map, settings->tileSize, chatbox);
 
 	// test fill set
-	player->getEquipmentSet()->setBoots(game.getPrototypeStorage()->armamentFactory->create("Leather Boots"));
-	player->getEquipmentSet()->setCuisse(game.getPrototypeStorage()->armamentFactory->create("Leather Cuisse"));
-	player->getEquipmentSet()->setGauntlets(game.getPrototypeStorage()->armamentFactory->create("Leather Gauntlets"));
-	player->getEquipmentSet()->setHarness(game.getPrototypeStorage()->armamentFactory->create("Leather Harness"));
-	player->getEquipmentSet()->setHelmet(game.getPrototypeStorage()->armamentFactory->create("Leather Helmet"));
-	player->getEquipmentSet()->setPrimaryWeapon(game.getPrototypeStorage()->weaponFactory->create("Dagger"));
-	player->getEquipmentSet()->setSecondaryWeapon(game.getPrototypeStorage()->weaponFactory->create("Axt"));
-	player->getEquipmentSet()->setPotion1(game.getPrototypeStorage()->potionFactory->create("Antidote"));
-	player->getEquipmentSet()->setPotion2(game.getPrototypeStorage()->potionFactory->create("Antidote"));
-	player->getEquipmentSet()->setPotion3(game.getPrototypeStorage()->potionFactory->create("Antidote"));
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Boots"), EquipHotspots::LEFT);
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Cuisse"), EquipHotspots::LEFT);
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Gauntlets"), EquipHotspots::RIGHT);
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Harness"), EquipHotspots::RIGHT);
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Helmet"), EquipHotspots::LEFT);
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->weaponFactory->create("Dagger"), EquipHotspots::LEFT);
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->weaponFactory->create("Axt"), EquipHotspots::RIGHT);
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->potionFactory->create("Antidote"), EquipHotspots::POTION1);
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->potionFactory->create("Antidote"), EquipHotspots::POTION2);
+	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->potionFactory->create("Antidote"), EquipHotspots::POTION3);
+
+	player->getEquipmentSet()->getPotion1()->debugPrint();
 
 	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 }
@@ -329,6 +331,8 @@ void GameStateGame::loadGui()
 	armorLeftOffset = -1.f;
 	potionTopOffset = rightVerSplit * size.y - 47.f;
 	potionLeftOffset = -2.f;
+
+	player->setEquipmentOffsets(sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset));
 
 	armorSprite.setPosition(armorLeftOffset, armorTopOffset);
 	armorSprite.setScale(sf::Vector2f(0.7f, 0.7f));

@@ -577,6 +577,8 @@ void Player::drawEquipment(sf::RenderWindow& window, const float deltaTime) cons
 	}
 	if (set->getPotion3() != nullptr)
 	{
+		std::cout << "potion3: " << set->getPotion3()->getName() << std::endl;
+		std::cout << "  pos: " << set->getPotion3()->getPosition().x << " - " << set->getPotion3()->getPosition().y << std::endl;
 		set->getPotion3()->draw(window, deltaTime);
 	}
 }
@@ -631,6 +633,7 @@ std::shared_ptr<Weapon> EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon>
 std::shared_ptr<Armament> EquipmentSet::setHelmet(std::shared_ptr<Armament> helmet_) 
 { 
 	helmet_->setSize(itemSize, itemSize);
+	helmet_->setPosition(sf::Vector2f(50.f, 50.f));
 	helmet = helmet_; 
 
 	return helmet;
@@ -687,24 +690,157 @@ std::shared_ptr<Potion> EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_
 std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_)
 { 
 	potion_->setSize(itemSize, itemSize);
+	potion_->setPosition(sf::Vector2f(10.f, 10.f));
 	potion3 = potion_; 
 
 	return potion3;
 };
 
-std::list<std::shared_ptr<RenderableObject>> setItem(std::shared_ptr<Item> obj)
+std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot)
 {
 	std::list<std::shared_ptr<RenderableObject>> retList;
+
+	if (obj == nullptr)
+	{
+		return retList;
+	}
 
 	switch (obj->getItemType())
 	{
 		case ItemType::ARMAMENT:
+		{
+			if (hotspot == EquipHotspots::LEFT || hotspot == EquipHotspots::RIGHT)
+			{
+				std::shared_ptr<Armament> retArm = std::dynamic_pointer_cast<Armament>(obj);
+
+				switch (retArm->getArmamentType())
+				{
+					case ArmamentType::BOOTS:
+					{
+						retArm = setBoots(retArm);
+						break;
+					}
+					case ArmamentType::CUISSE:
+					{
+						retArm = setCuisse(retArm);
+						break;
+					}
+					case ArmamentType::GAUNTLETS:
+					{
+						retArm = setGauntlets(retArm);
+						break;
+					}
+					case ArmamentType::HARNESS:
+					{
+						retArm = setHarness(retArm);
+						break;
+					}
+					case ArmamentType::HELMET:
+					{
+						retArm = setHelmet(retArm);
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+
+				if (retArm != nullptr)
+				{
+					retList.push_back(retArm);
+				}
+			}
 			break;
+		}
 		case ItemType::WEAPON:
+		{
+			std::shared_ptr<Weapon> weapon = std::dynamic_pointer_cast<Weapon>(obj);
+			std::shared_ptr<Weapon> retArm1 = nullptr;
+			std::shared_ptr<Weapon> retArm2 = nullptr;
+
+			if (hotspot == EquipHotspots::LEFT)
+			{
+				if (weapon->getSlots() == 1)
+				{
+					retArm1 = setPrimaryWeapon(weapon);
+
+					if (secondaryWeapon != nullptr && secondaryWeapon->getSlots() == 2)
+					{
+						retArm2 = secondaryWeapon;
+					}
+				}
+				else if (weapon->getSlots() == 2)
+				{
+					retArm1 = setPrimaryWeapon(weapon);
+					retArm2 = secondaryWeapon;
+				}
+			}
+			else if (hotspot == EquipHotspots::RIGHT)
+			{
+				if (weapon->getSlots() == 1)
+				{
+					retArm1 = setSecondaryWeapon(weapon);
+
+					if (primaryWeapon != nullptr && primaryWeapon->getSlots() == 2)
+					{
+						retArm2 = primaryWeapon;
+					}
+				}
+				else if (weapon->getSlots() == 2)
+				{
+					retArm1 = primaryWeapon;
+					retArm2 = setSecondaryWeapon(weapon);
+				}
+			}
+
+			if (retArm1 != nullptr)
+			{
+				retList.push_back(retArm1);
+			}
+			if (retArm2 != nullptr)
+			{
+				retList.push_back(retArm2);
+			}
+
 			break;
+		}
 		case ItemType::POTION:
+		{
+
+			std::shared_ptr<Potion> retPot = std::dynamic_pointer_cast<Potion>(obj);
+
+			if (hotspot == EquipHotspots::POTION1)
+			{
+				retPot = setPotion1(retPot);
+			}
+			else if (hotspot == EquipHotspots::POTION2)
+			{
+				retPot = setPotion2(retPot);
+			}
+			else if (hotspot == EquipHotspots::POTION3)
+			{
+				retPot = setPotion3(retPot);
+			}
+
+			if (retPot != nullptr)
+			{
+				retList.push_back(retPot);
+			}
+
 			break;
+		}
+		default:
+		{
+			break;
+		}
 	}
 
 	return retList;
+}
+
+void Player::setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets)
+{
+	setOne->setOffsets(armorOffsets, potionOffsets);
+	setTwo->setOffsets(armorOffsets, potionOffsets);
 }
