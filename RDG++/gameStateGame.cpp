@@ -23,7 +23,8 @@ GameState(game_)
 		in between: 5px
 	*/
 	
-	horSplit = 0.8265625f;
+	//horSplit = 0.8265625f;
+	horSplit = 0.815f;
 	rightVerSplit = 0.5f;
 	verSplit = 0.75f;
 	bottomHorSplit = 0.5f; // relative to horSplit
@@ -80,6 +81,7 @@ GameState(game_)
 	maxRight = mapSize.x - borderMargin.x;
 
 	armorSprite.setTexture(ResourceManager::getInstance().getTexture("armorBackground"));
+	potionSprite.setTexture(ResourceManager::getInstance().getTexture("potionBar"));
 
 	std::cout << "armorView x = " << armorView.getSize().x << ", y = " << armorView.getSize().y << std::endl;
 	std::cout << "armorView center x = " << armorView.getCenter().x << ", y = " << armorView.getCenter().y << std::endl;
@@ -124,6 +126,7 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.setView(armorView);
 	armorGui.draw();
 	game.window.draw(armorSprite);
+	game.window.draw(potionSprite);
 	player->drawEquipment(game.window, deltaTime);
 
 	game.window.setView(inventoryView);
@@ -322,8 +325,10 @@ void GameStateGame::loadGui()
 
 	changeSet(player->getEquipmentSet()->getNumerator());
 
-	armorSprite.setPosition(0.f, armorButtonsTopMargin + setButtonSize.y + 20.f);
-	armorSprite.setScale(sf::Vector2f(0.65f, 0.65f));
+	armorSprite.setPosition(-1.f, armorButtonsTopMargin + setButtonSize.y + 10.f);
+	armorSprite.setScale(sf::Vector2f(0.7f, 0.7f));
+	potionSprite.setPosition(-2.f, rightVerSplit * size.y - 47.f);
+	potionSprite.setScale(sf::Vector2f(1.1f, 1.1f));
 
 	armorGui.setView(armorView);
 

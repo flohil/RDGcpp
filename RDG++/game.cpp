@@ -105,8 +105,11 @@ void Game::gameLoop()
 		}
 		window.clear(sf::Color::Black);
 		peekState()->draw(deltaTime);
-		peekState()->handleInput();
-		peekState()->update(deltaTime);
+		if (window.hasFocus())
+		{
+			peekState()->handleInput();
+			peekState()->update(deltaTime);
+		}
 		window.display();
 	}
 }

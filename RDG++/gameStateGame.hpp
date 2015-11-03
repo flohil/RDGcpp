@@ -27,6 +27,7 @@ private:
 	float maxRight;
 
 	sf::Sprite armorSprite;
+	sf::Sprite potionSprite;
 
 	// gui
 	float horSplit;

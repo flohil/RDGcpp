@@ -516,14 +516,15 @@ bool Player::putInInventar(std::shared_ptr<RenderableObject> object)
 
 void Player::setPositionInInventory(unsigned int idx, std::shared_ptr<RenderableObject> object)
 {
-	float padding = 12.f;
+	float leftPadding = 17.f;
+	float topPadding = 12.f;
 	float spacing = 5.f;
 	unsigned int horItemCount = 3u;
 
 	unsigned int colIdx = idx % horItemCount;
 	unsigned int rowIdx = idx / horItemCount;
 
-	object->setPosition(sf::Vector2f(padding + colIdx * (spacing + 2 * tileSize), padding + rowIdx * (spacing + 2 * tileSize)));
+	object->setPosition(sf::Vector2f(leftPadding + colIdx * (spacing + 2 * tileSize), topPadding + rowIdx * (spacing + 2 * tileSize)));
 }
 
 void Player::drawInventory(sf::RenderWindow& window, const float deltaTime) const
