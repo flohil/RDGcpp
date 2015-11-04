@@ -204,6 +204,9 @@ void Player::init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr ch
 	prevPlayerPosition = point;
 	playerPosition = prevPlayerPosition;
 	RenderableObject::setPosition(sf::Vector2f(static_cast<float>(playerPosition.x * tileSize), static_cast<float>(playerPosition.y * tileSize)));
+
+	setOne->setItemSize(tileSize);
+	setTwo->setItemSize(tileSize);
 }
 
 // player may only move on tiles, but for smooth movements, player is moved in between tiles
@@ -615,7 +618,10 @@ float EquipmentSet::getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAtt
 std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> weapon_)
 { 
 	std::shared_ptr<Weapon> oldWeapon = primaryWeapon;
-	primaryWeapon = weapon_; 
+
+	primaryWeapon = weapon_;
+	primaryWeapon->setSize(itemSize, itemSize);
+	primaryWeapon->setPosition(sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 110.f));
 
 	return oldWeapon;
 };
@@ -623,7 +629,10 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 std::shared_ptr<Weapon> EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon> weapon_)
 { 
 	std::shared_ptr<Weapon> oldWeapon = secondaryWeapon;
+
 	secondaryWeapon = weapon_;
+	secondaryWeapon->setSize(itemSize, itemSize);
+	secondaryWeapon->setPosition(sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 110.f));
 
 	return oldWeapon;
 };
@@ -633,6 +642,8 @@ std::shared_ptr<Armament> EquipmentSet::setHelmet(std::shared_ptr<Armament> helm
 	std::shared_ptr<Armament> oldArmament = helmet;
 
 	helmet = helmet_; 
+	helmet->setSize(itemSize, itemSize);
+	helmet->setPosition(sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 12.f));
 
 	return oldArmament;
 };
@@ -642,6 +653,8 @@ std::shared_ptr<Armament> EquipmentSet::setHarness(std::shared_ptr<Armament> har
 	std::shared_ptr<Armament> oldArmament = harness;
 
 	harness = harness_; 
+	harness->setSize(itemSize, itemSize);
+	harness->setPosition(sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 59.f));
 
 	return oldArmament;
 };
@@ -651,6 +664,9 @@ std::shared_ptr<Armament> EquipmentSet::setCuisse(std::shared_ptr<Armament> cuis
 	std::shared_ptr<Armament> oldArmament = cuisse;
 
 	cuisse = cuisse_; 
+	cuisse->setSize(itemSize, itemSize);
+	cuisse->setPosition(sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 178.f));
+
 
 	return oldArmament;
 };
@@ -660,6 +676,8 @@ std::shared_ptr<Armament> EquipmentSet::setGauntlets(std::shared_ptr<Armament> g
 	std::shared_ptr<Armament> oldArmament = gauntlets;
 
 	gauntlets = gauntlets_; 
+	gauntlets->setSize(itemSize, itemSize);
+	gauntlets->setPosition(sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 42.f));
 
 	return oldArmament;
 };
@@ -669,6 +687,8 @@ std::shared_ptr<Armament> EquipmentSet::setBoots(std::shared_ptr<Armament> boots
 	std::shared_ptr<Armament> oldArmament = boots;
 
 	boots = boots_; 
+	boots->setSize(itemSize, itemSize);
+	boots->setPosition(sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 207.f));
 
 	return oldArmament;
 };
@@ -678,6 +698,8 @@ std::shared_ptr<Potion> EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_
 	std::shared_ptr<Potion> oldPotion = potion1;
 
 	potion1 = potion_; 
+	potion1->setSize(itemSize, itemSize);
+	potion1->setPosition(sf::Vector2f(potionOffsets.x + 178.f, potionOffsets.y + 2.f));
 
 	return oldPotion;
 };
@@ -687,6 +709,8 @@ std::shared_ptr<Potion> EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_
 	std::shared_ptr<Potion> oldPotion = potion2;
 
 	potion2 = potion_; 
+	potion2->setSize(itemSize, itemSize);
+	potion2->setPosition(sf::Vector2f(potionOffsets.x + 105.f, potionOffsets.y + 2.f));
 
 	return oldPotion;
 };
@@ -696,6 +720,8 @@ std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_
 	std::shared_ptr<Potion> oldPotion = potion3;
 
 	potion3 = potion_; 
+	potion3->setSize(itemSize, itemSize);
+	potion3->setPosition(sf::Vector2f(potionOffsets.x + 33.f, potionOffsets.y + 2.f));
 
 	return oldPotion;
 };

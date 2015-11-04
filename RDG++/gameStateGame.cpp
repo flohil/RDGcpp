@@ -107,8 +107,6 @@ GameState(game_)
 	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->potionFactory->create("Antidote"), EquipHotspots::POTION2);
 	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->potionFactory->create("Antidote"), EquipHotspots::POTION3);
 
-	player->getEquipmentSet()->getPotion1()->debugPrint();
-
 	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 }
 

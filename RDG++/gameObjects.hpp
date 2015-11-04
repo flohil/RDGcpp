@@ -38,9 +38,9 @@ private:
 
 public:
 
-	EquipmentSet(unsigned int numerator_, unsigned int itemSize_) :
+	EquipmentSet(unsigned int numerator_) :
 		primaryWeapon(nullptr), secondaryWeapon(nullptr), helmet(nullptr), harness(nullptr), cuisse(nullptr), gauntlets(nullptr), 
-		boots(nullptr), potion1(nullptr), potion2(nullptr), potion3(nullptr), numerator(numerator_), itemSize(itemSize_), 
+		boots(nullptr), potion1(nullptr), potion2(nullptr), potion3(nullptr), numerator(numerator_), itemSize(0u), 
 		armorOffsets(sf::Vector2f(0,0)), potionOffsets(sf::Vector2f(0,0)) {};
 
 	std::shared_ptr<Weapon> getPrimaryWeapon() const { return primaryWeapon; };
@@ -72,6 +72,7 @@ public:
 		armorOffsets = armorOffsets_;
 		potionOffsets = potionOffsets_;
 	}
+	void setItemSize(unsigned int itemSize_) { itemSize = itemSize_; };
 
 	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
 };
@@ -228,8 +229,8 @@ private:
 	ViewingDirections::Enum facingDir = ViewingDirections::N;
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 	std::vector<std::shared_ptr<RenderableObject>> inventory;
-	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u, tileSize));
-	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u, tileSize));
+	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u));
+	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u));
 	unsigned int activeSet = 1;
 
 	tgui::ChatBox::Ptr chatBox;
