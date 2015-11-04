@@ -98,7 +98,7 @@ GameState(game_)
 
 	loadGui();
 
-	player->init(map, settings->tileSize, chatbox);
+	player->init(map, settings->tileSize, chatbox, horSplitAbs, rightVerSplitAbs);
 
 	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 }
@@ -381,8 +381,6 @@ void GameStateGame::loadGui()
 	valuesLayout->setSize(detailsLayout->getSize().x * 0.5, detailsLayout->getSize().y);*/
 
 	tgui::Label::Ptr detailsTitleLabel = theme->load("Label");
-
-
 }
 
 void GameStateGame::changeSet(unsigned int numerator)
@@ -413,7 +411,10 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 	std::cout << "mouseEvent: pos = " << pos.x << ", " << pos.y << ", type: " << eventType << std::endl;
 
-
+	if (eventType == MouseEvent::DRAGSTART)
+	{
+		dragStartPos = pos; // in case anything goes wrong when dropping an item, return it to former position
+	}
 
 	if (pos.x < horSplitAbs && pos.y < verSplitAbs)
 	{
@@ -424,18 +425,41 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
 		{
-			
+			if (draggedItem != nullptr)
+			{
+				Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
+				if (map->getOverlayObject(facingPoint) == nullptr)
+				{
+					map->setOverlayObject(facingPoint, draggedItem); // place dragged item on map if there is a free tile in front of the player
+					draggedItem = nullptr;
+				}
+				else
+				{
+					handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE); // return dragged item to where it came from if there is no free tile in front of the player
+				}
+			}
 		}
 	}
 	else if (pos.x > horSplitAbs && pos.y < rightVerSplitAbs)
 	{
 		std::cout << "inside armor" << std::endl;
 
-		std::cout << rightVerSplitAbs << std::endl;
+		if (eventType == MouseEvent::CLICK)
+		{
+			std::cout << player->getArmorItemAtPixels(pos) << std::endl;
+		}
 	}
 	else if (pos.x > horSplitAbs && pos.y >= rightVerSplitAbs)
 	{
 		std::cout << "inside inventory" << std::endl;
+		if (eventType == MouseEvent::CLICK)
+		{
+			std::cout << player->getInventoryItemAtPixels(pos) << std::endl;
+		}
+		else if (eventType == MouseEvent::DRAGRELEASE)
+		{
+			player->getInventoryItemAtPixels(pos, true);
+		}
 	}
 }
 

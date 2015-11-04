@@ -36,6 +36,18 @@ private:
 	sf::Vector2f armorOffsets;
 	sf::Vector2f potionOffsets;
 
+	//positions - left, top
+	sf::Vector2f primaryWeaponPos;
+	sf::Vector2f secondaryWeaponPos;
+	sf::Vector2f helmetPos;
+	sf::Vector2f harnessPos;
+	sf::Vector2f cuissePos;
+	sf::Vector2f gauntletsPos;
+	sf::Vector2f bootsPos;
+	sf::Vector2f potion1Pos;
+	sf::Vector2f potion2Pos;
+	sf::Vector2f potion3Pos;
+
 public:
 
 	EquipmentSet(unsigned int numerator_) :
@@ -68,11 +80,9 @@ public:
 
 	std::list<std::shared_ptr<RenderableObject>> setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot);
 
-	void setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_) {
-		armorOffsets = armorOffsets_;
-		potionOffsets = potionOffsets_;
-	}
+	void setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_);
 	void setItemSize(unsigned int itemSize_) { itemSize = itemSize_; };
+	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos);
 
 	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
 };
@@ -183,24 +193,35 @@ public:
 	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_, float moveDistance_, unsigned int maxInventorySize_, sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_) : 
 		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_), moveDistance(moveDistance_), maxInventorySize(maxInventorySize_) {};
 
-	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_);
+	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_, int horSplitAbs_, int rightVerSplitAbs_);
 	void update(const float deltaTime);
 	void handleInput(sf::Event event);
 	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object); // return object if inventory is full
 	Point getPlayerPosition() const { return playerPosition; };
+	ViewingDirections::Enum getFacingDir() const { return facingDir; };
 	sf::Vector2f getPixelPosition() const { return RenderableObject::getPosition(); };
 	DifficultyLevel::Enum getLevel() const { return DifficultyLevel::UNKNOWN; };
 	std::shared_ptr<EquipmentSet> getEquipmentSet() const
 	{
-		if (setOne->getNumerator() == activeSet) return setOne;
-		else if (setTwo->getNumerator() == activeSet) return setTwo;
-		else return setOne;
+		return activeSet;
 	};
 	std::string getPlayerName() const { return playerName; };
 	void drawInventory(sf::RenderWindow& window, const float deltaTime) const;
 	void drawEquipment(sf::RenderWindow& window, const float deltaTime) const;
-	void setActiveEquipmentSet(unsigned int numerator) { activeSet = numerator; };
+	void setActiveEquipmentSet(unsigned int numerator) { 
+		if (numerator == 1u)
+		{
+			activeSet = setOne;
+		}
+		else if (numerator == 2u)
+		{
+			activeSet = setTwo;
+		}
+	};
 	void setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets);
+	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos) { return activeSet->getItemAtPixels(pos); };
+	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
+	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos, bool remove);
 
 private:
 
@@ -231,7 +252,15 @@ private:
 	std::vector<std::shared_ptr<RenderableObject>> inventory;
 	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u));
 	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u));
-	unsigned int activeSet = 1;
+	std::shared_ptr<EquipmentSet> activeSet = setOne;
+
+	float inventoryLeftPadding = 17.f;
+	float inventoryTopPadding = 12.f;
+	float inventorySpacing = 5.f;
+	unsigned int inventoryHorItemCount = 3u;
+
+	int horSplitAbs;
+	int verRightSplitAbs;
 
 	tgui::ChatBox::Ptr chatBox;
 

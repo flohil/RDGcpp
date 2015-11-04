@@ -194,11 +194,13 @@ void Room::initialize(unsigned int width, unsigned int height)
 	}
 }
 
-void Player::init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_)
+void Player::init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_, int horSplitAbs_, int rightVerSplitAbs_)
 {
 	map = map_;
 	tileSize = tileSize_;
 	chatBox = chatBox_;
+	horSplitAbs = horSplitAbs_;
+	verRightSplitAbs = rightVerSplitAbs_;
 
 	Point point = map->initPlayerPosition();
 	prevPlayerPosition = point;
@@ -505,15 +507,10 @@ std::shared_ptr<RenderableObject> Player::putInInventory(std::shared_ptr<Rendera
 
 void Player::setPositionInInventory(unsigned int idx, std::shared_ptr<RenderableObject> object)
 {
-	float leftPadding = 17.f;
-	float topPadding = 12.f;
-	float spacing = 5.f;
-	unsigned int horItemCount = 3u;
+	unsigned int colIdx = idx % inventoryHorItemCount;
+	unsigned int rowIdx = idx / inventoryHorItemCount;
 
-	unsigned int colIdx = idx % horItemCount;
-	unsigned int rowIdx = idx / horItemCount;
-
-	object->setPosition(sf::Vector2f(leftPadding + colIdx * (spacing + 2 * tileSize), topPadding + rowIdx * (spacing + 2 * tileSize)));
+	object->setPosition(sf::Vector2f(inventoryLeftPadding + colIdx * (inventorySpacing + 2 * tileSize), inventoryTopPadding + rowIdx * (inventorySpacing + 2 * tileSize)));
 }
 
 void Player::drawInventory(sf::RenderWindow& window, const float deltaTime) const
@@ -607,7 +604,7 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 
 	primaryWeapon = weapon_;
 	primaryWeapon->setSize(itemSize, itemSize);
-	primaryWeapon->setPosition(sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 110.f));
+	primaryWeapon->setPosition(primaryWeaponPos);
 
 	return oldWeapon;
 };
@@ -618,7 +615,7 @@ std::shared_ptr<Weapon> EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon>
 
 	secondaryWeapon = weapon_;
 	secondaryWeapon->setSize(itemSize, itemSize);
-	secondaryWeapon->setPosition(sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 110.f));
+	secondaryWeapon->setPosition(secondaryWeaponPos);
 
 	return oldWeapon;
 };
@@ -629,7 +626,7 @@ std::shared_ptr<Armament> EquipmentSet::setHelmet(std::shared_ptr<Armament> helm
 
 	helmet = helmet_; 
 	helmet->setSize(itemSize, itemSize);
-	helmet->setPosition(sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 12.f));
+	helmet->setPosition(helmetPos);
 
 	return oldArmament;
 };
@@ -640,7 +637,7 @@ std::shared_ptr<Armament> EquipmentSet::setHarness(std::shared_ptr<Armament> har
 
 	harness = harness_; 
 	harness->setSize(itemSize, itemSize);
-	harness->setPosition(sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 59.f));
+	harness->setPosition(harnessPos);
 
 	return oldArmament;
 };
@@ -651,7 +648,7 @@ std::shared_ptr<Armament> EquipmentSet::setCuisse(std::shared_ptr<Armament> cuis
 
 	cuisse = cuisse_; 
 	cuisse->setSize(itemSize, itemSize);
-	cuisse->setPosition(sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 178.f));
+	cuisse->setPosition(cuissePos);
 
 
 	return oldArmament;
@@ -663,7 +660,7 @@ std::shared_ptr<Armament> EquipmentSet::setGauntlets(std::shared_ptr<Armament> g
 
 	gauntlets = gauntlets_; 
 	gauntlets->setSize(itemSize, itemSize);
-	gauntlets->setPosition(sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 42.f));
+	gauntlets->setPosition(gauntletsPos);
 
 	return oldArmament;
 };
@@ -674,7 +671,7 @@ std::shared_ptr<Armament> EquipmentSet::setBoots(std::shared_ptr<Armament> boots
 
 	boots = boots_; 
 	boots->setSize(itemSize, itemSize);
-	boots->setPosition(sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 207.f));
+	boots->setPosition(bootsPos);
 
 	return oldArmament;
 };
@@ -685,7 +682,7 @@ std::shared_ptr<Potion> EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_
 
 	potion1 = potion_; 
 	potion1->setSize(itemSize, itemSize);
-	potion1->setPosition(sf::Vector2f(potionOffsets.x + 178.f, potionOffsets.y + 2.f));
+	potion1->setPosition(potion1Pos);
 
 	return oldPotion;
 };
@@ -696,7 +693,7 @@ std::shared_ptr<Potion> EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_
 
 	potion2 = potion_; 
 	potion2->setSize(itemSize, itemSize);
-	potion2->setPosition(sf::Vector2f(potionOffsets.x + 105.f, potionOffsets.y + 2.f));
+	potion2->setPosition(potion2Pos);
 
 	return oldPotion;
 };
@@ -707,7 +704,7 @@ std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_
 
 	potion3 = potion_; 
 	potion3->setSize(itemSize, itemSize);
-	potion3->setPosition(sf::Vector2f(potionOffsets.x + 33.f, potionOffsets.y + 2.f));
+	potion3->setPosition(potion3Pos);
 
 	return oldPotion;
 };
@@ -859,4 +856,87 @@ void Player::setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionO
 {
 	setOne->setOffsets(armorOffsets, potionOffsets);
 	setTwo->setOffsets(armorOffsets, potionOffsets);
+}
+
+void EquipmentSet::setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_) {
+
+	armorOffsets = armorOffsets_;
+	potionOffsets = potionOffsets_;
+
+	sf::Vector2f primaryWeaponPos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 110.f);
+	sf::Vector2f secondaryWeaponPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 110.f);
+	sf::Vector2f helmetPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 12.f);
+	sf::Vector2f harnessPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 59.f);
+	sf::Vector2f cuissePos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 178.f);
+	sf::Vector2f gauntletsPos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 42.f);
+	sf::Vector2f bootsPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 207.f);
+	sf::Vector2f potion1Pos = sf::Vector2f(potionOffsets.x + 178.f, potionOffsets.y + 2.f);
+	sf::Vector2f potion2Pos = sf::Vector2f(potionOffsets.x + 105.f, potionOffsets.y + 2.f);
+	sf::Vector2f potion3Pos = sf::Vector2f(potionOffsets.x + 33.f, potionOffsets.y + 2.f);
+}
+
+std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos)
+{
+	return nullptr;
+}
+
+std::shared_ptr<RenderableObject> Player::getInventoryItemAtPixels(sf::Vector2i pos, bool remove)
+{
+	sf::Vector2i relativePos;
+
+	relativePos.x = static_cast<int>(pos.x - horSplitAbs - inventoryLeftPadding);
+	relativePos.y = static_cast<int>(pos.y - verRightSplitAbs - inventoryTopPadding);
+
+	if (relativePos.x < 0 || relativePos.y < 0)
+	{
+		return nullptr;
+	}
+
+	unsigned int colIdx = relativePos.x / static_cast<unsigned int>(2 * tileSize + inventorySpacing);
+	unsigned int rowIdx = relativePos.y / static_cast<unsigned int>(2 * tileSize + inventorySpacing);
+
+	unsigned int itemX = relativePos.x % inventoryHorItemCount;
+
+	if (itemX > 2 * tileSize) // clicked between two items
+	{
+		return nullptr; 
+	}
+
+	unsigned int itemY = relativePos.y % inventoryHorItemCount;
+
+	if (itemY > 2 * tileSize) // clicked between two items
+	{
+		return nullptr;
+	}
+
+	if (colIdx >= inventoryHorItemCount)
+	{
+		return nullptr; // clicked right of allowed items
+	}
+
+	if (rowIdx >= maxInventorySize / inventoryHorItemCount)
+	{
+		return nullptr;
+	}
+
+	unsigned int idx = colIdx + inventoryHorItemCount * rowIdx;
+
+	if (idx >= inventory.size())
+	{
+		return nullptr; // no item at this inventory position
+	}
+
+	std::shared_ptr<RenderableObject> retObj = inventory.at(idx);
+
+	if (remove)
+	{
+		inventory.erase(inventory.begin() + idx);
+
+		for (unsigned int i = idx; i < inventory.size(); i++)
+		{
+			setPositionInInventory(i, inventory.at(i));
+		}
+	}
+
+	return retObj;
 }

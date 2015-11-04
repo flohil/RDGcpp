@@ -34,6 +34,7 @@ private:
 	const float draggingThreshold = 0.15f; // in seconds
 	bool dragging = false;
 	bool mouseDeterminationTriggered = false;
+	sf::Vector2i dragStartPos;
 
 	// gui
 	float horSplit;

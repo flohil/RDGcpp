@@ -22,7 +22,11 @@ public:
 	std::vector<std::vector<std::shared_ptr<RenderableObject>>> getOverlay() const { return overlay; };
 	std::shared_ptr<RenderableObject> getOverlayObject(Point pos) const { return overlay[pos.y][pos.x]; };
 	std::shared_ptr<Room> getRoom(Point pos) { return rooms[pos.y][pos.x]; };
-	void setOverlayObject(Point pos, std::shared_ptr<RenderableObject> obj) { overlay[pos.y][pos.x] = obj; };
+	std::shared_ptr<RenderableObject> setOverlayObject(Point pos, std::shared_ptr<RenderableObject> obj) { 
+		std::shared_ptr<RenderableObject> prevObj = overlay[pos.y][pos.x];
+		overlay[pos.y][pos.x] = obj;
+		return prevObj;
+	};
 	bool isFieldPassable(Point fieldPos) const;
 	void draw(sf::RenderWindow& window, float deltaTime);
 	void openTreasureChamber();
