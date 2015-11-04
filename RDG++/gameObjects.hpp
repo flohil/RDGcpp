@@ -35,6 +35,8 @@ private:
 	unsigned int itemSize;
 	sf::Vector2f armorOffsets;
 	sf::Vector2f potionOffsets;
+	int horSplitAbs;
+	int verRightSplitAbs;
 
 	//positions - left, top
 	sf::Vector2f primaryWeaponPos;
@@ -80,7 +82,7 @@ public:
 
 	std::list<std::shared_ptr<RenderableObject>> setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot);
 
-	void setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_);
+	void setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, int horSplitAbs_, int verRightSplitAbs_);
 	void setItemSize(unsigned int itemSize_) { itemSize = itemSize_; };
 	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos);
 
@@ -218,7 +220,7 @@ public:
 			activeSet = setTwo;
 		}
 	};
-	void setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets);
+	void setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, int horSplitAbs, int verRightSplitAbs);
 	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos) { return activeSet->getItemAtPixels(pos); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos, bool remove);

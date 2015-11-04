@@ -31,7 +31,7 @@ private:
 
 	std::shared_ptr<RenderableObject> draggedItem = nullptr;
 	float draggingAccumulator = 0.f;
-	const float draggingThreshold = 0.15f; // in seconds
+	const float draggingThreshold = 0.25f; // in seconds
 	bool dragging = false;
 	bool mouseDeterminationTriggered = false;
 	sf::Vector2i dragStartPos;

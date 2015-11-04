@@ -852,31 +852,83 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 	return retList;
 }
 
-void Player::setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets)
+void Player::setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, int horSplitAbs, int verRightSplitAbs)
 {
-	setOne->setOffsets(armorOffsets, potionOffsets);
-	setTwo->setOffsets(armorOffsets, potionOffsets);
+	setOne->setOffsets(armorOffsets, potionOffsets, horSplitAbs, verRightSplitAbs);
+	setTwo->setOffsets(armorOffsets, potionOffsets, horSplitAbs, verRightSplitAbs);
 }
 
-void EquipmentSet::setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_) {
+void EquipmentSet::setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, int horSplitAbs_, int verRightSplitAbs_) {
 
 	armorOffsets = armorOffsets_;
 	potionOffsets = potionOffsets_;
+	horSplitAbs = horSplitAbs_;
+	verRightSplitAbs = verRightSplitAbs_;
 
-	sf::Vector2f primaryWeaponPos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 110.f);
-	sf::Vector2f secondaryWeaponPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 110.f);
-	sf::Vector2f helmetPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 12.f);
-	sf::Vector2f harnessPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 59.f);
-	sf::Vector2f cuissePos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 178.f);
-	sf::Vector2f gauntletsPos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 42.f);
-	sf::Vector2f bootsPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 207.f);
-	sf::Vector2f potion1Pos = sf::Vector2f(potionOffsets.x + 178.f, potionOffsets.y + 2.f);
-	sf::Vector2f potion2Pos = sf::Vector2f(potionOffsets.x + 105.f, potionOffsets.y + 2.f);
-	sf::Vector2f potion3Pos = sf::Vector2f(potionOffsets.x + 33.f, potionOffsets.y + 2.f);
+	primaryWeaponPos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 110.f);
+	secondaryWeaponPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 110.f);
+	helmetPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 12.f);
+	harnessPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 59.f);
+	cuissePos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 178.f);
+	gauntletsPos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 42.f);
+	bootsPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 207.f);
+	potion1Pos = sf::Vector2f(potionOffsets.x + 178.f, potionOffsets.y + 2.f);
+	potion2Pos = sf::Vector2f(potionOffsets.x + 105.f, potionOffsets.y + 2.f);
+	potion3Pos = sf::Vector2f(potionOffsets.x + 33.f, potionOffsets.y + 2.f);
 }
 
 std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos)
 {
+	sf::Vector2i relPos;
+
+	relPos.x = pos.x - horSplitAbs;
+	relPos.y = pos.y;
+
+	/*std::cout << "relPos: x = " << relPos.x << ", y =  << " << relPos.y << std::endl;
+	std::cout << "primaryWeaponPos: x = " << primaryWeaponPos.x << ", " << primaryWeaponPos.y << std::endl;
+	std::cout << "itemSize: " << itemSize << std::endl;*/
+
+	if (relPos.x >= primaryWeaponPos.x && relPos.y >= primaryWeaponPos.y && relPos.x <= (primaryWeaponPos.x + itemSize) && relPos.y <= (primaryWeaponPos.y + itemSize))
+	{
+		return primaryWeapon;
+	}
+	if (relPos.x >= secondaryWeaponPos.x && relPos.y >= secondaryWeaponPos.y && relPos.x <= (secondaryWeaponPos.x + itemSize) && relPos.y <= (secondaryWeaponPos.y + itemSize))
+	{
+		return secondaryWeapon;
+	}
+	if (relPos.x >= bootsPos.x && relPos.y >= bootsPos.y && relPos.x <= (bootsPos.x + itemSize) && relPos.y <= (bootsPos.y + itemSize))
+	{
+		return boots;
+	}
+	if (relPos.x >= cuissePos.x && relPos.y >= cuissePos.y && relPos.x <= (cuissePos.x + itemSize) && relPos.y <= (cuissePos.y + itemSize))
+	{
+		return cuisse;
+	}
+	if (relPos.x >= gauntletsPos.x && relPos.y >= gauntletsPos.y && relPos.x <= (gauntletsPos.x + itemSize) && relPos.y <= (gauntletsPos.y + itemSize))
+	{
+		return gauntlets;
+	}
+	if (relPos.x >= harnessPos.x && relPos.y >= harnessPos.y && relPos.x <= (harnessPos.x + itemSize) && relPos.y <= (harnessPos.y + itemSize))
+	{
+		return harness;
+	}
+	if (relPos.x >= helmetPos.x && relPos.y >= helmetPos.y && relPos.x <= (helmetPos.x + itemSize) && relPos.y <= (helmetPos.y + itemSize))
+	{
+		return helmet;
+	}
+	if (relPos.x >= potion1Pos.x && relPos.y >= potion1Pos.y && relPos.x <= (potion1Pos.x + itemSize) && relPos.y <= (potion1Pos.y + itemSize))
+	{
+		return potion1;
+	}
+	if (relPos.x >= potion2Pos.x && relPos.y >= potion2Pos.y && relPos.x <= (potion2Pos.x + itemSize) && relPos.y <= (potion2Pos.y + itemSize))
+	{
+		return potion2;
+	}
+	if (relPos.x >= potion3Pos.x && relPos.y >= potion3Pos.y && relPos.x <= (potion3Pos.x + itemSize) && relPos.y <= (potion3Pos.y + itemSize))
+	{
+		return potion3;
+	}
+
 	return nullptr;
 }
 
