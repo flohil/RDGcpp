@@ -88,6 +88,11 @@ struct EquipHotspots
 	enum Enum { LEFT, RIGHT, POTION1, POTION2, POTION3, UNKNOWN };
 };
 
+struct MouseEvent
+{
+	enum Enum { CLICK, DRAGSTART, DRAGRELEASE, DRAGGING, UNKNOWN };
+};
+
 
 struct Point {
 	unsigned int x;

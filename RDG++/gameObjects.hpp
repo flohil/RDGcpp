@@ -186,7 +186,7 @@ public:
 	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_);
 	void update(const float deltaTime);
 	void handleInput(sf::Event event);
-	bool putInInventar(std::shared_ptr<RenderableObject> object);
+	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object); // return object if inventory is full
 	Point getPlayerPosition() const { return playerPosition; };
 	sf::Vector2f getPixelPosition() const { return RenderableObject::getPosition(); };
 	DifficultyLevel::Enum getLevel() const { return DifficultyLevel::UNKNOWN; };

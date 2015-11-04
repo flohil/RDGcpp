@@ -26,6 +26,11 @@ public:
 	bool isFieldPassable(Point fieldPos) const;
 	void draw(sf::RenderWindow& window, float deltaTime);
 	void openTreasureChamber();
+	void closeTreasureChamber();
+	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pixelPos) { return handleItemAtPixels(pixelPos, false, nullptr); };
+	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pixelPos, bool remove) { return handleItemAtPixels(pixelPos, remove, nullptr); };
+	std::shared_ptr<RenderableObject> setItemAtPixels(sf::Vector2i pixelPos, std::shared_ptr<RenderableObject> obj) { return handleItemAtPixels(pixelPos, false, obj); };
+	std::shared_ptr<RenderableObject> handleItemAtPixels(sf::Vector2i pixelPos, bool remove, std::shared_ptr<RenderableObject> obj);
 
 private:
 
@@ -66,6 +71,8 @@ private:
 	// treasure chamber open doors positions
 	Point treasureDoorOne;
 	Point treasureDoorTwo;
+	float treasureDoorOneAngle;
+	float treasureDoorTwoAngle;
 	bool treasureDoorOpened = false;
 
 	void fillWithRooms();

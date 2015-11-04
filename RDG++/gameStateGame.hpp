@@ -29,11 +29,21 @@ private:
 	sf::Sprite armorSprite;
 	sf::Sprite potionSprite;
 
+	std::shared_ptr<RenderableObject> draggedItem = nullptr;
+	float draggingAccumulator = 0.f;
+	const float draggingThreshold = 0.15f; // in seconds
+	bool dragging = false;
+	bool mouseDeterminationTriggered = false;
+
 	// gui
 	float horSplit;
 	float rightVerSplit;
 	float verSplit;
 	float bottomHorSplit;
+	int horSplitAbs;
+	int rightVerSplitAbs;
+	int verSplitAbs;
+	int bottomHorSplitAbs;
 
 	float armorHeight;
 	float armorTopOffset;
@@ -58,6 +68,7 @@ private:
 	tgui::Button::Ptr set2Button;
 
 	void changeSet(unsigned int numerator);
+	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType);
 
 public:
 

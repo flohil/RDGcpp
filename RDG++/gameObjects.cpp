@@ -466,31 +466,12 @@ void Player::handleInput(sf::Event event)
 			{
 				case ObjectType::KEY:
 					OutputFormatter::chat(chatBox, "Found key for treasure chamber", sf::Color::White);
-					std::cout << "found treasure chamber key " << object->getName() << std::endl;
-					if (putInInventar(object))
-					{
-						map->setOverlayObject(facingPoint, nullptr);
-						map->openTreasureChamber();
-					} 
-					else
-					{
-						OutputFormatter::chat(chatBox, "Inventory full", sf::Color::White);
-					}
+					map->setOverlayObject(facingPoint, putInInventory(object));
 					break;
 				case ObjectType::ITEM:
-					std::cout << "putting into inventary " << object->getName() << std::endl;
-					if (putInInventar(object))
-					{
-						OutputFormatter::chat(chatBox, "Picked up " + object->getName(), sf::Color::White);
-						map->setOverlayObject(facingPoint, nullptr);
-					}
-					else
-					{
-						OutputFormatter::chat(chatBox, "Inventory full", sf::Color::White);
-					}
+					map->setOverlayObject(facingPoint, putInInventory(object));
 					break;
 				case ObjectType::CREATURE:
-					std::cout << "starting fight against " << object->getName() << std::endl;
 					OutputFormatter::chat(chatBox, "Started fight against " + object->getName(), sf::Color::White);
 					//startFight(this, std::dynamic_pointer_cast<Creature>(object));
 					break;
@@ -501,19 +482,24 @@ void Player::handleInput(sf::Event event)
 	}
 }
 
-bool Player::putInInventar(std::shared_ptr<RenderableObject> object)
+std::shared_ptr<RenderableObject> Player::putInInventory(std::shared_ptr<RenderableObject> object)
 {
-	if (inventory.size() > maxInventorySize - 1)
+	if (inventory.size() >= maxInventorySize)
 	{
-		return false;
+		OutputFormatter::chat(chatBox, "Inventory is full!", sf::Color::White);
+		return object;
 	}
 	else
 	{
+		if (object->getObjectType() == ObjectType::KEY)
+		{
+			map->openTreasureChamber();
+		}
 		object->setSize(tileSize * 2, tileSize * 2);
 		setPositionInInventory(inventory.size(), object);
 		inventory.push_back(object);
-		std::cout << "inventory now contains " << inventory.size() << " objects " << std::endl;
-		return true;
+		OutputFormatter::chat(chatBox, "Picked up " + object->getName(), sf::Color::White);
+		return nullptr;
 	}
 }
 

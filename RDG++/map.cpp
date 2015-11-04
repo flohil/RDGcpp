@@ -241,13 +241,17 @@ void Map::setDoors(Point roomIndizes, ViewingDirections::Enum dir)
 	// treasure chamber
 	if (roomIndizes.x == maze->getTreasurePos().x && roomIndizes.y == maze->getTreasurePos().y)
 	{
-		placeInBackground(Point{ doorx1, doory1 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f)));
-		placeInOverlay(Point{ doorx1, doory1 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundOne", ObjectType::TILE, angle + 180.f)));
-		placeInBackground(Point{ doorx2, doory2 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle)));
-		placeInOverlay(Point{ doorx2, doory2 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundTwo", ObjectType::TILE, angle)));
+		treasureDoorOneAngle = angle + 180.f;
+		treasureDoorTwoAngle = angle;
+
+		placeInBackground(Point{ doorx1, doory1 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundOne", ObjectType::TILE, treasureDoorOneAngle)));
+		placeInOverlay(Point{ doorx1, doory1 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundOne", ObjectType::TILE, treasureDoorOneAngle)));
+		placeInBackground(Point{ doorx2, doory2 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundTwo", ObjectType::TILE, treasureDoorTwoAngle)));
+		placeInOverlay(Point{ doorx2, doory2 }, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundTwo", ObjectType::TILE, treasureDoorTwoAngle)));
 
 		treasureDoorOne = Point{ doorx1, doory1 };
 		treasureDoorTwo = Point{ doorx2, doory2 };
+
 	}
 	// normal door
 	else
@@ -550,6 +554,15 @@ void Map::openTreasureChamber()
 	}
 }
 
+void Map::closeTreasureChamber()
+{
+	treasureDoorOpened = false;
+	placeInBackground(treasureDoorOne, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundOne", ObjectType::TILE, treasureDoorOneAngle)));
+	placeInOverlay(treasureDoorOne, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundOne", ObjectType::TILE, treasureDoorOneAngle)));
+	placeInBackground(treasureDoorTwo, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundTwo", ObjectType::TILE, treasureDoorTwoAngle)));
+	placeInOverlay(treasureDoorTwo, std::shared_ptr<RenderableObject>(new RenderableObject("doorGroundTwo", ObjectType::TILE, treasureDoorTwoAngle)));
+}
+
 std::shared_ptr<RenderableObject> Map::placeInOverlay(Point pos, std::shared_ptr<RenderableObject> obj)
 {
 	std::shared_ptr<RenderableObject> oldObj = overlay[pos.y][pos.x];
@@ -584,4 +597,38 @@ std::shared_ptr<RenderableObject> Map::placeInBackground(Point pos, std::shared_
 	background[pos.y][pos.x] = obj;
 
 	return oldObj;
+}
+
+std::shared_ptr<RenderableObject> Map::handleItemAtPixels(sf::Vector2i pixelPos, bool remove, std::shared_ptr<RenderableObject> obj)
+{
+	sf::Vector2u pos;
+
+	if (pixelPos.x < 0 || pixelPos.y < 0)
+	{
+		return nullptr;
+	}
+
+	pos.x = static_cast<unsigned int>(pixelPos.x / settings->tileSize);
+	pos.y = static_cast<unsigned int>(pixelPos.y / settings->tileSize);
+
+	if (pos.y > overlay.size() || pos.x > overlay[0].size())
+	{
+		return nullptr;
+	}
+	else
+	{
+		std::shared_ptr<RenderableObject> retObj = overlay[pos.y][pos.x];
+
+		if (remove)
+		{
+			overlay[pos.y][pos.x] = nullptr;
+		}
+
+		if (obj != nullptr)
+		{
+			overlay[pos.y][pos.x] = nullptr;
+		}
+
+		return retObj;
+	}
 }

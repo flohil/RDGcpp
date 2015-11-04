@@ -29,6 +29,11 @@ GameState(game_)
 	verSplit = 0.75f;
 	bottomHorSplit = 0.5f; // relative to horSplit
 
+	horSplitAbs = static_cast<int>(horSplit * size.x);
+	rightVerSplitAbs = static_cast<int>(rightVerSplit * size.y);
+	verSplitAbs = static_cast<int>(verSplit * size.y);
+	bottomHorSplitAbs = static_cast<int>(bottomHorSplit * size.y);
+
 	float armorImageHeight = size.x * (1.f - horSplit);
 	
 	// for aspect Ratio 16:9
@@ -95,18 +100,6 @@ GameState(game_)
 
 	player->init(map, settings->tileSize, chatbox);
 
-	// test fill set
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Boots"), EquipHotspots::LEFT);
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Cuisse"), EquipHotspots::LEFT);
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Gauntlets"), EquipHotspots::RIGHT);
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Harness"), EquipHotspots::RIGHT);
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->armamentFactory->create("Leather Helmet"), EquipHotspots::LEFT);
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->weaponFactory->create("Dagger"), EquipHotspots::LEFT);
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->weaponFactory->create("Axt"), EquipHotspots::RIGHT);
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->potionFactory->create("Antidote"), EquipHotspots::POTION1);
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->potionFactory->create("Antidote"), EquipHotspots::POTION2);
-	player->getEquipmentSet()->setItem(game.getPrototypeStorage()->potionFactory->create("Antidote"), EquipHotspots::POTION3);
-
 	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 }
 
@@ -143,6 +136,19 @@ void GameStateGame::update(const float deltaTime)
 	player->update(deltaTime);
 	map->update(deltaTime);
 	adaptMapViewport();
+
+	if (mouseDeterminationTriggered)
+	{
+		draggingAccumulator += deltaTime;
+
+		if (draggingAccumulator >= draggingThreshold)
+		{
+			dragging = true;
+			handleMouseEvent(sf::Mouse::getPosition(game.window), MouseEvent::DRAGSTART);
+			mouseDeterminationTriggered = false;
+			draggingAccumulator = 0.f;
+		}
+	}
 
 	return;
 }
@@ -226,6 +232,31 @@ void GameStateGame::handleInput()
 				player->handleInput(event);
 			}
 		}
+		else if (event.type == sf::Event::MouseButtonPressed)
+		{
+			if (event.mouseButton.button == sf::Mouse::Left)
+			{
+				mouseDeterminationTriggered = true;
+			}
+		}
+		else if (event.type == sf::Event::MouseButtonReleased)
+		{
+			if (event.mouseButton.button == sf::Mouse::Left)
+			{
+				if (!dragging)
+				{
+					handleMouseEvent(sf::Mouse::getPosition(game.window), MouseEvent::CLICK);
+				}
+				else
+				{
+					handleMouseEvent(sf::Mouse::getPosition(game.window), MouseEvent::DRAGRELEASE);
+				}
+
+				mouseDeterminationTriggered = false;
+				draggingAccumulator = 0.f;
+				dragging = false;
+			}
+		}
 
 		chatGui.handleEvent(event);
 		// detailsGui.handleEvent(event);
@@ -245,7 +276,6 @@ void GameStateGame::pauseGame()
 
 void GameStateGame::loadGui()
 {
-
 	chatGui.removeAllWidgets();
 	chatGui.setWindow(game.window);
 
@@ -370,6 +400,42 @@ void GameStateGame::changeSet(unsigned int numerator)
 	{
 		set1Button->setOpacity(inactiveOpacity);
 		set2Button->setOpacity(activeOpacity);
+	}
+}
+
+void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType)
+{
+	// scale mouse position
+	sf::Vector2i pos;
+
+	pos.x = static_cast<int>(pos_.x * static_cast<float>(size.x / settings->width));
+	pos.y = static_cast<int>(pos_.y * static_cast<float>(size.y / settings->height));
+
+	std::cout << "mouseEvent: pos = " << pos.x << ", " << pos.y << ", type: " << eventType << std::endl;
+
+
+
+	if (pos.x < horSplitAbs && pos.y < verSplitAbs)
+	{
+		std::cout << "inside map" << std::endl;
+		if (eventType == MouseEvent::CLICK)
+		{
+			std::cout << map->getItemAtPixels(pos) << std::endl;
+		}
+		else if (eventType == MouseEvent::DRAGRELEASE)
+		{
+			
+		}
+	}
+	else if (pos.x > horSplitAbs && pos.y < rightVerSplitAbs)
+	{
+		std::cout << "inside armor" << std::endl;
+
+		std::cout << rightVerSplitAbs << std::endl;
+	}
+	else if (pos.x > horSplitAbs && pos.y >= rightVerSplitAbs)
+	{
+		std::cout << "inside inventory" << std::endl;
 	}
 }
 
