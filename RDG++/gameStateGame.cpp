@@ -83,10 +83,6 @@ GameState(game_)
 	armorSprite.setTexture(ResourceManager::getInstance().getTexture("armorBackground"));
 	potionSprite.setTexture(ResourceManager::getInstance().getTexture("potionBar"));
 
-	std::cout << "armorView x = " << armorView.getSize().x << ", y = " << armorView.getSize().y << std::endl;
-	std::cout << "armorView center x = " << armorView.getCenter().x << ", y = " << armorView.getCenter().y << std::endl;
-	std::cout << "armorView viewport left = " << armorView.getViewport().left << ", top = " << armorView.getViewport().top << ", width = " << armorView.getViewport().width << ", height = " << armorView.getViewport().height << std::endl;
-
 	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
 

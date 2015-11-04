@@ -577,8 +577,6 @@ void Player::drawEquipment(sf::RenderWindow& window, const float deltaTime) cons
 	}
 	if (set->getPotion3() != nullptr)
 	{
-		std::cout << "potion3: " << set->getPotion3()->getName() << std::endl;
-		std::cout << "  pos: " << set->getPotion3()->getPosition().x << " - " << set->getPotion3()->getPosition().y << std::endl;
 		set->getPotion3()->draw(window, deltaTime);
 	}
 }
@@ -616,84 +614,90 @@ float EquipmentSet::getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAtt
 
 std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> weapon_)
 { 
-	weapon_->setSize(itemSize, itemSize);
+	std::shared_ptr<Weapon> oldWeapon = primaryWeapon;
 	primaryWeapon = weapon_; 
 
-	return primaryWeapon;
+	return oldWeapon;
 };
 
 std::shared_ptr<Weapon> EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon> weapon_)
 { 
-	weapon_->setSize(itemSize, itemSize);
+	std::shared_ptr<Weapon> oldWeapon = secondaryWeapon;
 	secondaryWeapon = weapon_;
 
-	return secondaryWeapon;
+	return oldWeapon;
 };
 
 std::shared_ptr<Armament> EquipmentSet::setHelmet(std::shared_ptr<Armament> helmet_) 
 { 
-	helmet_->setSize(itemSize, itemSize);
-	helmet_->setPosition(sf::Vector2f(50.f, 50.f));
+	std::shared_ptr<Armament> oldArmament = helmet;
+
 	helmet = helmet_; 
 
-	return helmet;
+	return oldArmament;
 };
 
 std::shared_ptr<Armament> EquipmentSet::setHarness(std::shared_ptr<Armament> harness_)
 { 
-	harness_->setSize(itemSize, itemSize);
+	std::shared_ptr<Armament> oldArmament = harness;
+
 	harness = harness_; 
 
-	return harness;
+	return oldArmament;
 };
 
 std::shared_ptr<Armament> EquipmentSet::setCuisse(std::shared_ptr<Armament> cuisse_)
 { 
-	cuisse_->setSize(itemSize, itemSize);
+	std::shared_ptr<Armament> oldArmament = cuisse;
+
 	cuisse = cuisse_; 
 
-	return cuisse;
+	return oldArmament;
 };
 
 std::shared_ptr<Armament> EquipmentSet::setGauntlets(std::shared_ptr<Armament> gauntlets_)
 { 
-	gauntlets_->setSize(itemSize, itemSize);
+	std::shared_ptr<Armament> oldArmament = gauntlets;
+
 	gauntlets = gauntlets_; 
 
-	return gauntlets;
+	return oldArmament;
 };
 
 std::shared_ptr<Armament> EquipmentSet::setBoots(std::shared_ptr<Armament> boots_)
 { 
-	boots_->setSize(itemSize, itemSize);
+	std::shared_ptr<Armament> oldArmament = boots;
+
 	boots = boots_; 
 
-	return boots;
+	return oldArmament;
 };
 
 std::shared_ptr<Potion> EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_)
 { 
-	potion_->setSize(itemSize, itemSize);
+	std::shared_ptr<Potion> oldPotion = potion1;
+
 	potion1 = potion_; 
 
-	return potion1;
+	return oldPotion;
 };
 
 std::shared_ptr<Potion> EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_)
 { 
-	potion_->setSize(itemSize, itemSize);
+	std::shared_ptr<Potion> oldPotion = potion2;
+
 	potion2 = potion_; 
 
-	return potion2;
+	return oldPotion;
 };
 
 std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_)
 { 
-	potion_->setSize(itemSize, itemSize);
-	potion_->setPosition(sf::Vector2f(10.f, 10.f));
+	std::shared_ptr<Potion> oldPotion = potion3;
+
 	potion3 = potion_; 
 
-	return potion3;
+	return oldPotion;
 };
 
 std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot)
