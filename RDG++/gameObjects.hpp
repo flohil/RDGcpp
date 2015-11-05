@@ -35,6 +35,8 @@ private:
 	unsigned int itemSize;
 	sf::Vector2f armorOffsets;
 	sf::Vector2f potionOffsets;
+	sf::Vector2f armorDims;
+	sf::Vector2f potionDims;
 	int horSplitAbs;
 	int verRightSplitAbs;
 
@@ -49,6 +51,8 @@ private:
 	sf::Vector2f potion1Pos;
 	sf::Vector2f potion2Pos;
 	sf::Vector2f potion3Pos;
+
+	std::list<std::shared_ptr<RenderableObject>> setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot);
 
 public:
 
@@ -80,11 +84,10 @@ public:
 	std::shared_ptr<Potion> setPotion2(std::shared_ptr<Potion> potion_);
 	std::shared_ptr<Potion> setPotion3(std::shared_ptr<Potion> potion_);
 
-	std::list<std::shared_ptr<RenderableObject>> setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot);
-
-	void setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, int horSplitAbs_, int verRightSplitAbs_);
+	void setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs_, int verRightSplitAbs_);
 	void setItemSize(unsigned int itemSize_) { itemSize = itemSize_; };
-	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos);
+	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos, bool remove);
+	std::shared_ptr<RenderableObject> setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj);
 
 	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
 };
@@ -123,6 +126,7 @@ public:
 	void setVisible(const bool visible_) { visible = visible_; };
 	void setRotation(const float angle_) { sprite.setRotation(angle_); };
 	void setPosition(const sf::Vector2f pos_); 
+	void setCenteredPosition(const sf::Vector2i pos_);
 	void setSize(const unsigned int width, const unsigned int height);
 	void setScale(const sf::Vector2f scale_);
 	void draw(sf::RenderWindow& window, float deltaTime);
@@ -197,8 +201,9 @@ public:
 
 	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_, int horSplitAbs_, int rightVerSplitAbs_);
 	void update(const float deltaTime);
-	void handleInput(sf::Event event);
-	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object); // return object if inventory is full
+	void handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem);
+	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object) { return putInInventory(object, true); };
+	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object, bool output); // return object if inventory is full
 	Point getPlayerPosition() const { return playerPosition; };
 	ViewingDirections::Enum getFacingDir() const { return facingDir; };
 	sf::Vector2f getPixelPosition() const { return RenderableObject::getPosition(); };
@@ -220,8 +225,9 @@ public:
 			activeSet = setTwo;
 		}
 	};
-	void setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, int horSplitAbs, int verRightSplitAbs);
-	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos) { return activeSet->getItemAtPixels(pos); };
+	void setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs, int verRightSplitAbs);
+	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos) { return activeSet->getItemAtPixels(pos, false); };
+	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos, bool remove) { return activeSet->getItemAtPixels(pos, remove); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos, bool remove);
 

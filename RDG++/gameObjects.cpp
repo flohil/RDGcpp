@@ -88,6 +88,23 @@ void RenderableObject::setPosition(const sf::Vector2f pos_)
 	sprite.setPosition(finalPos);
 }
 
+
+void RenderableObject::setCenteredPosition(const sf::Vector2i pos_)
+{
+	sf::Vector2f floatPos;
+
+	floatPos.x = static_cast<float>(pos_.x);
+	floatPos.y = static_cast<float>(pos_.y);
+
+	finalPos.x = floatPos.x;
+	finalPos.y = floatPos.y;
+
+	rawPos.x = finalPos.x - size.x * 0.5f;
+	rawPos.y = finalPos.y - size.y * 0.5f;
+
+	sprite.setPosition(floatPos);
+}
+
 void RenderableObject::draw(sf::RenderWindow& window, float deltaTime)
 {	
 	if (visible)
@@ -449,7 +466,7 @@ void Player::move(const float deltaTime)
 	}
 }
 
-void Player::handleInput(sf::Event event)
+void Player::handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem)
 {
 
 	if (event.key.code == sf::Keyboard::E)
@@ -464,8 +481,10 @@ void Player::handleInput(sf::Event event)
 		{
 			std::cout << "in front of player: " << object->getName() << std::endl;
 
-			switch (object->getObjectType())
+			if (draggedItem == nullptr)
 			{
+				switch (object->getObjectType())
+				{
 				case ObjectType::KEY:
 					OutputFormatter::chat(chatBox, "Found key for treasure chamber", sf::Color::White);
 					map->setOverlayObject(facingPoint, putInInventory(object));
@@ -479,16 +498,20 @@ void Player::handleInput(sf::Event event)
 					break;
 				default:
 					break;
+				}
 			}
 		}
 	}
 }
 
-std::shared_ptr<RenderableObject> Player::putInInventory(std::shared_ptr<RenderableObject> object)
+std::shared_ptr<RenderableObject> Player::putInInventory(std::shared_ptr<RenderableObject> object, bool output)
 {
 	if (inventory.size() >= maxInventorySize)
 	{
-		OutputFormatter::chat(chatBox, "Inventory is full!", sf::Color::White);
+		if (output)
+		{
+			OutputFormatter::chat(chatBox, "Inventory is full!", sf::Color::White);
+		}
 		return object;
 	}
 	else
@@ -500,7 +523,10 @@ std::shared_ptr<RenderableObject> Player::putInInventory(std::shared_ptr<Rendera
 		object->setSize(tileSize * 2, tileSize * 2);
 		setPositionInInventory(inventory.size(), object);
 		inventory.push_back(object);
-		OutputFormatter::chat(chatBox, "Picked up " + object->getName(), sf::Color::White);
+		if (output)
+		{
+			OutputFormatter::chat(chatBox, "Picked up " + object->getName(), sf::Color::White);
+		}
 		return nullptr;
 	}
 }
@@ -852,18 +878,23 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 	return retList;
 }
 
-void Player::setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, int horSplitAbs, int verRightSplitAbs)
+void Player::setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs, int verRightSplitAbs)
 {
-	setOne->setOffsets(armorOffsets, potionOffsets, horSplitAbs, verRightSplitAbs);
-	setTwo->setOffsets(armorOffsets, potionOffsets, horSplitAbs, verRightSplitAbs);
+	setOne->setOffsets(armorOffsets, potionOffsets, armorDims_, potionDims_, horSplitAbs, verRightSplitAbs);
+	setTwo->setOffsets(armorOffsets, potionOffsets, armorDims_, potionDims_, horSplitAbs, verRightSplitAbs);
 }
 
-void EquipmentSet::setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, int horSplitAbs_, int verRightSplitAbs_) {
+void EquipmentSet::setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs_, int verRightSplitAbs_) {
 
 	armorOffsets = armorOffsets_;
 	potionOffsets = potionOffsets_;
+	armorDims = armorDims_;
+	potionDims = potionDims_;
 	horSplitAbs = horSplitAbs_;
 	verRightSplitAbs = verRightSplitAbs_;
+
+	std::cout << "armorDims: " << armorDims.x << " x " << armorDims.y << std::endl;
+	std::cout << "potionDims: " << potionDims.x << " x " << potionDims.y << std::endl;
 
 	primaryWeaponPos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 110.f);
 	secondaryWeaponPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 110.f);
@@ -877,59 +908,96 @@ void EquipmentSet::setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOff
 	potion3Pos = sf::Vector2f(potionOffsets.x + 33.f, potionOffsets.y + 2.f);
 }
 
-std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos)
+std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos, bool remove)
 {
 	sf::Vector2i relPos;
+	std::shared_ptr<RenderableObject> retObj = nullptr;
 
 	relPos.x = pos.x - horSplitAbs;
 	relPos.y = pos.y;
 
-	/*std::cout << "relPos: x = " << relPos.x << ", y =  << " << relPos.y << std::endl;
-	std::cout << "primaryWeaponPos: x = " << primaryWeaponPos.x << ", " << primaryWeaponPos.y << std::endl;
-	std::cout << "itemSize: " << itemSize << std::endl;*/
-
 	if (relPos.x >= primaryWeaponPos.x && relPos.y >= primaryWeaponPos.y && relPos.x <= (primaryWeaponPos.x + itemSize) && relPos.y <= (primaryWeaponPos.y + itemSize))
 	{
-		return primaryWeapon;
+		retObj = primaryWeapon;
+		if (remove)
+		{
+			primaryWeapon = nullptr;
+		}
 	}
-	if (relPos.x >= secondaryWeaponPos.x && relPos.y >= secondaryWeaponPos.y && relPos.x <= (secondaryWeaponPos.x + itemSize) && relPos.y <= (secondaryWeaponPos.y + itemSize))
+	else if (relPos.x >= secondaryWeaponPos.x && relPos.y >= secondaryWeaponPos.y && relPos.x <= (secondaryWeaponPos.x + itemSize) && relPos.y <= (secondaryWeaponPos.y + itemSize))
 	{
-		return secondaryWeapon;
+		retObj = secondaryWeapon;
+		if (remove)
+		{
+			secondaryWeapon = nullptr;
+		}
 	}
-	if (relPos.x >= bootsPos.x && relPos.y >= bootsPos.y && relPos.x <= (bootsPos.x + itemSize) && relPos.y <= (bootsPos.y + itemSize))
+	else if (relPos.x >= bootsPos.x && relPos.y >= bootsPos.y && relPos.x <= (bootsPos.x + itemSize) && relPos.y <= (bootsPos.y + itemSize))
 	{
-		return boots;
+		retObj = boots;
+		if (remove)
+		{
+			boots = nullptr;
+		}
 	}
-	if (relPos.x >= cuissePos.x && relPos.y >= cuissePos.y && relPos.x <= (cuissePos.x + itemSize) && relPos.y <= (cuissePos.y + itemSize))
+	else if (relPos.x >= cuissePos.x && relPos.y >= cuissePos.y && relPos.x <= (cuissePos.x + itemSize) && relPos.y <= (cuissePos.y + itemSize))
 	{
-		return cuisse;
+		retObj = cuisse;
+		if (remove)
+		{
+			cuisse = nullptr;
+		}
 	}
-	if (relPos.x >= gauntletsPos.x && relPos.y >= gauntletsPos.y && relPos.x <= (gauntletsPos.x + itemSize) && relPos.y <= (gauntletsPos.y + itemSize))
+	else if (relPos.x >= gauntletsPos.x && relPos.y >= gauntletsPos.y && relPos.x <= (gauntletsPos.x + itemSize) && relPos.y <= (gauntletsPos.y + itemSize))
 	{
-		return gauntlets;
+		retObj = gauntlets;
+		if (remove)
+		{
+			gauntlets = nullptr;
+		}
 	}
-	if (relPos.x >= harnessPos.x && relPos.y >= harnessPos.y && relPos.x <= (harnessPos.x + itemSize) && relPos.y <= (harnessPos.y + itemSize))
+	else if (relPos.x >= harnessPos.x && relPos.y >= harnessPos.y && relPos.x <= (harnessPos.x + itemSize) && relPos.y <= (harnessPos.y + itemSize))
 	{
-		return harness;
+		retObj = harness;
+		if (remove)
+		{
+			harness = nullptr;
+		}
 	}
-	if (relPos.x >= helmetPos.x && relPos.y >= helmetPos.y && relPos.x <= (helmetPos.x + itemSize) && relPos.y <= (helmetPos.y + itemSize))
+	else if (relPos.x >= helmetPos.x && relPos.y >= helmetPos.y && relPos.x <= (helmetPos.x + itemSize) && relPos.y <= (helmetPos.y + itemSize))
 	{
-		return helmet;
+		retObj = helmet;
+		if (remove)
+		{
+			helmet = nullptr;
+		}
 	}
-	if (relPos.x >= potion1Pos.x && relPos.y >= potion1Pos.y && relPos.x <= (potion1Pos.x + itemSize) && relPos.y <= (potion1Pos.y + itemSize))
+	else if (relPos.x >= potion1Pos.x && relPos.y >= potion1Pos.y && relPos.x <= (potion1Pos.x + itemSize) && relPos.y <= (potion1Pos.y + itemSize))
 	{
-		return potion1;
+		retObj = potion1;
+		if (remove)
+		{
+			potion1 = nullptr;
+		}
 	}
-	if (relPos.x >= potion2Pos.x && relPos.y >= potion2Pos.y && relPos.x <= (potion2Pos.x + itemSize) && relPos.y <= (potion2Pos.y + itemSize))
+	else if (relPos.x >= potion2Pos.x && relPos.y >= potion2Pos.y && relPos.x <= (potion2Pos.x + itemSize) && relPos.y <= (potion2Pos.y + itemSize))
 	{
-		return potion2;
+		retObj = potion2;
+		if (remove)
+		{
+			potion2 = nullptr;
+		}
 	}
-	if (relPos.x >= potion3Pos.x && relPos.y >= potion3Pos.y && relPos.x <= (potion3Pos.x + itemSize) && relPos.y <= (potion3Pos.y + itemSize))
+	else if (relPos.x >= potion3Pos.x && relPos.y >= potion3Pos.y && relPos.x <= (potion3Pos.x + itemSize) && relPos.y <= (potion3Pos.y + itemSize))
 	{
-		return potion3;
+		retObj = potion3;
+		if (remove)
+		{
+			potion3 = nullptr;
+		}
 	}
 
-	return nullptr;
+	return retObj;
 }
 
 std::shared_ptr<RenderableObject> Player::getInventoryItemAtPixels(sf::Vector2i pos, bool remove)
@@ -991,4 +1059,38 @@ std::shared_ptr<RenderableObject> Player::getInventoryItemAtPixels(sf::Vector2i 
 	}
 
 	return retObj;
+}
+
+std::shared_ptr<RenderableObject> EquipmentSet::setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj)
+{
+	EquipHotspots::Enum hotspot;
+
+	if (pos.x >= armorOffsets.x || pos.x <= (armorOffsets.x + armorDims.x) || pos.y >= armorOffsets.y || pos.y <= (armorOffsets.y + armorDims.y)) //inside armor
+	{
+		if (pos.x >= armorOffsets.x + (armorDims.x * 0.5f)){
+			hotspot = EquipHotspots::RIGHT;
+		}
+		else
+		{
+			hotspot = EquipHotspots::LEFT;
+		}
+	}
+	if (pos.x >= potionOffsets.x || pos.x <= (potionOffsets.x + potionDims.x) || pos.y >= potionOffsets.y || pos.y <= (potionOffsets.y + potionDims.y)) //inside potions
+	{
+		if (pos.x >= potionOffsets.x && pos.x < potionOffsets.x + (potionDims.x * 0.33f)){
+			hotspot = EquipHotspots::POTION1;
+		}
+		else if (pos.x >= potionOffsets.x + (potionDims.x * 0.33f) && pos.x < potionOffsets.x + (potionDims.x * 0.66f))
+		{
+			hotspot = EquipHotspots::POTION2;
+		}
+		else if (pos.x >= potionOffsets.x + (potionDims.x * 0.66f) && pos.x < potionOffsets.x + potionDims.x)
+		{
+			hotspot = EquipHotspots::POTION3;
+		}
+	}
+
+	std::cout << "hotspot: " << hotspot << std::endl;
+
+	return nullptr;
 }

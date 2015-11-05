@@ -65,17 +65,20 @@ GameState(game_)
 	chatView.setViewport(sf::FloatRect(0.f, verSplit, horSplit * bottomHorSplit, (1.f - verSplit)));
 	detailsView.setViewport(sf::FloatRect(horSplit * bottomHorSplit, verSplit, (horSplit - horSplit * bottomHorSplit), (1.f - verSplit)));
 	inventoryView.setViewport(sf::FloatRect(horSplit, rightVerSplit, (1.f - horSplit), (1.f - rightVerSplit)));
+	completeView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
 
 	mapView.setSize(viewportSize);
 	armorView.setSize(armorViewSize);
 	chatView.setSize(chatViewSize);
 	detailsView.setSize(detailsViewSize);
 	inventoryView.setSize(inventoryViewSize);
+	completeView.setSize(size);
 	mapView.setCenter(viewportSize * 0.5f);
 	armorView.setCenter(armorViewSize * 0.5f);
 	chatView.setCenter(chatViewSize * 0.5f);
 	detailsView.setCenter(detailsViewSize * 0.5f);
 	inventoryView.setCenter(inventoryViewSize * 0.5f);
+	completeView.setCenter(size * 0.5f);
 
 	// for camera center adaption
 	borderMargin.x = static_cast<float>(settings->tileSize * (settings->ROOM_WIDTH + 1));
@@ -140,6 +143,12 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.setView(detailsView);
 	detailsGui.draw();
 
+	game.window.setView(completeView);
+	if (draggedItem != nullptr && dragging)
+	{
+		draggedItem->draw(game.window, deltaTime);
+	}
+
 	return;
 }
 
@@ -151,14 +160,21 @@ void GameStateGame::update(const float deltaTime)
 
 	if (mouseDeterminationTriggered)
 	{
-		draggingAccumulator += deltaTime;
+		sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
 
-		if (draggingAccumulator >= draggingThreshold)
+		if (mousePos.x != lastClickPos.x || mousePos.y != lastClickPos.y)
 		{
 			dragging = true;
-			handleMouseEvent(sf::Mouse::getPosition(game.window), MouseEvent::DRAGSTART);
+			handleMouseEvent(lastClickPos, MouseEvent::DRAGSTART);
 			mouseDeterminationTriggered = false;
-			draggingAccumulator = 0.f;
+		}
+	}
+
+	if (dragging)
+	{
+		if (draggedItem != nullptr)
+		{
+			draggedItem->setCenteredPosition(sf::Mouse::getPosition(game.window));
 		}
 	}
 
@@ -241,7 +257,7 @@ void GameStateGame::handleInput()
 			}
 			else
 			{
-				player->handleInput(event);
+				player->handleInput(event, draggedItem);
 			}
 		}
 		else if (event.type == sf::Event::MouseButtonPressed)
@@ -249,6 +265,7 @@ void GameStateGame::handleInput()
 			if (event.mouseButton.button == sf::Mouse::Left)
 			{
 				mouseDeterminationTriggered = true;
+				lastClickPos = sf::Mouse::getPosition(game.window);
 			}
 		}
 		else if (event.type == sf::Event::MouseButtonReleased)
@@ -265,7 +282,6 @@ void GameStateGame::handleInput()
 				}
 
 				mouseDeterminationTriggered = false;
-				draggingAccumulator = 0.f;
 				dragging = false;
 			}
 		}
@@ -368,12 +384,20 @@ void GameStateGame::loadGui()
 	potionTopOffset = rightVerSplit * size.y - 47.f;
 	potionLeftOffset = -2.f;
 
-	player->setEquipmentOffsets(sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset), horSplitAbs, rightVerSplitAbs);
-
 	armorSprite.setPosition(armorLeftOffset, armorTopOffset);
 	armorSprite.setScale(sf::Vector2f(0.7f, 0.7f));
 	potionSprite.setPosition(potionLeftOffset, rightVerSplit * size.y - 47.f);
 	potionSprite.setScale(sf::Vector2f(1.1f, 1.1f));
+
+	sf::Vector2f armorDims;
+	sf::Vector2f potionDims;
+
+	armorDims.x = armorSprite.getGlobalBounds().width;
+	armorDims.y = armorSprite.getGlobalBounds().height;
+	potionDims.x = potionSprite.getGlobalBounds().width;
+	potionDims.y = potionSprite.getGlobalBounds().height;
+
+	player->setEquipmentOffsets(sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset), armorDims, potionDims, horSplitAbs, rightVerSplitAbs);
 
 	armorGui.setView(armorView);
 
@@ -428,9 +452,8 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		dragStartPos = pos; // in case anything goes wrong when dropping an item, return it to former position
 	}
 
-	if (pos.x < horSplitAbs && pos.y < verSplitAbs)
+	if (pos.x < horSplitAbs && pos.y < verSplitAbs) // inside map
 	{
-		std::cout << "inside map" << std::endl;
 		if (eventType == MouseEvent::CLICK)
 		{
 			std::cout << map->getItemAtPixels(pos) << std::endl;
@@ -442,6 +465,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 				Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
 				if (map->getOverlayObject(facingPoint) == nullptr)
 				{
+					OutputFormatter::chat(chatbox, "Dropped " + draggedItem->getName(), sf::Color::White);
 					map->setOverlayObject(facingPoint, draggedItem); // place dragged item on map if there is a free tile in front of the player
 					draggedItem = nullptr;
 				}
@@ -450,27 +474,61 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 					handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE); // return dragged item to where it came from if there is no free tile in front of the player
 				}
 			}
+			dragging = false;
 		}
 	}
-	else if (pos.x > horSplitAbs && pos.y < rightVerSplitAbs)
+	else if (pos.x > horSplitAbs && pos.y < rightVerSplitAbs) // inside armor
 	{
-		std::cout << "inside armor" << std::endl;
+		if (eventType == MouseEvent::DRAGSTART)
+		{
+			draggedItem = player->getArmorItemAtPixels(pos, true);
 
-		if (eventType == MouseEvent::CLICK)
+			std::cout << "draggedItem: " << draggedItem << std::endl;
+
+			if (draggedItem != nullptr)
+			{
+				draggedItem->setSize(settings->tileSize, settings->tileSize);
+			}
+		}
+		else if (eventType == MouseEvent::CLICK)
 		{
 			std::cout << player->getArmorItemAtPixels(pos) << std::endl;
 		}
+		else if (eventType == MouseEvent::DRAGRELEASE)
+		{
+			player->getEquipmentSet()->setItemAtPixels(pos, draggedItem);
+		}
 	}
-	else if (pos.x > horSplitAbs && pos.y >= rightVerSplitAbs)
+	else if (pos.x > horSplitAbs && pos.y >= rightVerSplitAbs) // inside inventory
 	{
-		std::cout << "inside inventory" << std::endl;
-		if (eventType == MouseEvent::CLICK)
+		if (eventType == MouseEvent::DRAGSTART)
+		{
+			draggedItem = player->getInventoryItemAtPixels(pos, true);
+
+			if (draggedItem != nullptr)
+			{
+				draggedItem->setSize(settings->tileSize, settings->tileSize);
+			}
+		}
+		else if(eventType == MouseEvent::CLICK)
 		{
 			std::cout << player->getInventoryItemAtPixels(pos) << std::endl;
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
 		{
-			player->getInventoryItemAtPixels(pos, true);
+			if ((draggedItem = player->putInInventory(draggedItem, false)) != nullptr)
+			{
+				handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE);
+			}
+			dragging = false;
+		}
+	}
+	else
+	{
+		if (eventType == MouseEvent::DRAGRELEASE)
+		{
+			handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE);
+			dragging = false;
 		}
 	}
 }

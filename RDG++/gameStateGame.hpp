@@ -15,6 +15,7 @@ private:
 	sf::View inventoryView;
 	sf::View armorView;
 	sf::View detailsView;
+	sf::View completeView; // for dragging
 	Map* map;
 	std::shared_ptr<Player> player;
 	sf::Vector2f borderMargin;
@@ -34,6 +35,7 @@ private:
 	const float draggingThreshold = 0.25f; // in seconds
 	bool dragging = false;
 	bool mouseDeterminationTriggered = false;
+	sf::Vector2i lastClickPos;
 	sf::Vector2i dragStartPos;
 
 	// gui
