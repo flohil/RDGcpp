@@ -632,11 +632,6 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 	primaryWeapon->setSize(itemSize, itemSize);
 	primaryWeapon->setPosition(primaryWeaponPos);
 
-	if (primaryWeapon != oldWeapon)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + primaryWeapon->getName(), sf::Color::White);
-	}
-
 	return oldWeapon;
 };
 
@@ -647,11 +642,6 @@ std::shared_ptr<Weapon> EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon>
 	secondaryWeapon = weapon_;
 	secondaryWeapon->setSize(itemSize, itemSize);
 	secondaryWeapon->setPosition(secondaryWeaponPos);
-
-	if (secondaryWeapon != oldWeapon)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + secondaryWeapon->getName(), sf::Color::White);
-	}
 
 	return oldWeapon;
 };
@@ -664,11 +654,6 @@ std::shared_ptr<Armament> EquipmentSet::setHelmet(std::shared_ptr<Armament> helm
 	helmet->setSize(itemSize, itemSize);
 	helmet->setPosition(helmetPos);
 
-	if (helmet != oldArmament)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + helmet->getName(), sf::Color::White);
-	}
-
 	return oldArmament;
 };
 
@@ -679,11 +664,6 @@ std::shared_ptr<Armament> EquipmentSet::setHarness(std::shared_ptr<Armament> har
 	harness = harness_; 
 	harness->setSize(itemSize, itemSize);
 	harness->setPosition(harnessPos);
-
-	if (harness != oldArmament)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + harness->getName(), sf::Color::White);
-	}
 
 	return oldArmament;
 };
@@ -696,10 +676,6 @@ std::shared_ptr<Armament> EquipmentSet::setCuisse(std::shared_ptr<Armament> cuis
 	cuisse->setSize(itemSize, itemSize);
 	cuisse->setPosition(cuissePos);
 
-	if (cuisse != oldArmament)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + cuisse->getName(), sf::Color::White);
-	}
 
 	return oldArmament;
 };
@@ -712,11 +688,6 @@ std::shared_ptr<Armament> EquipmentSet::setGauntlets(std::shared_ptr<Armament> g
 	gauntlets->setSize(itemSize, itemSize);
 	gauntlets->setPosition(gauntletsPos);
 
-	if (gauntlets != oldArmament)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + gauntlets->getName(), sf::Color::White);
-	}
-
 	return oldArmament;
 };
 
@@ -727,11 +698,6 @@ std::shared_ptr<Armament> EquipmentSet::setBoots(std::shared_ptr<Armament> boots
 	boots = boots_; 
 	boots->setSize(itemSize, itemSize);
 	boots->setPosition(bootsPos);
-
-	if (boots != oldArmament)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + boots->getName(), sf::Color::White);
-	}
 
 	return oldArmament;
 };
@@ -744,11 +710,6 @@ std::shared_ptr<Potion> EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_
 	potion1->setSize(itemSize, itemSize);
 	potion1->setPosition(potion1Pos);
 
-	if (potion1 != oldPotion)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + potion1->getName(), sf::Color::White);
-	}
-
 	return oldPotion;
 };
 
@@ -760,11 +721,6 @@ std::shared_ptr<Potion> EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_
 	potion2->setSize(itemSize, itemSize);
 	potion2->setPosition(potion2Pos);
 
-	if (potion2 != oldPotion)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + potion2->getName(), sf::Color::White);
-	}
-
 	return oldPotion;
 };
 
@@ -775,11 +731,6 @@ std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_
 	potion3 = potion_; 
 	potion3->setSize(itemSize, itemSize);
 	potion3->setPosition(potion3Pos);
-
-	if (potion3 != oldPotion)
-	{
-		OutputFormatter::chat(chatbox, "Equipped " + potion3->getName(), sf::Color::White);
-	}
 
 	return oldPotion;
 };
@@ -1162,6 +1113,7 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 
 	if (obj->getObjectType() != ObjectType::ITEM || hotspot == EquipHotspots::UNKNOWN)
 	{
+		std::cout << "do not equip unknown item " << std::endl;
 		retObjs.push_back(obj);
 		return retObjs; // do not allow key to be dropped in equipment
 	}

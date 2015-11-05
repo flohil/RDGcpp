@@ -452,6 +452,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	if (eventType == MouseEvent::DRAGSTART)
 	{
 		dragStartPos = pos; // in case anything goes wrong when dropping an item, return it to former position
+		draggedFromEquipment = false;
 	}
 
 	if (pos.x < horSplitAbs && pos.y < verSplitAbs) // inside map
@@ -496,6 +497,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			if (draggedItem != nullptr)
 			{
 				draggedItem->setSize(settings->tileSize, settings->tileSize);
+				draggedFromEquipment = true;
 			}
 		}
 		else if (eventType == MouseEvent::CLICK)
@@ -504,12 +506,29 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
 		{
+			std::cout << "draggedItem: " << draggedItem << std::endl;
+
+			std::shared_ptr<RenderableObject> oldDraggedItem = draggedItem;
+
 			std::list<std::shared_ptr<RenderableObject>> retObjs = player->getEquipmentSet()->setItemAtPixels(pos, draggedItem);
+			bool contains = false;
+
+			std::cout << "  RETURNED: - " << retObjs.size() << std::endl;
 
 			for (std::shared_ptr<RenderableObject> obj : retObjs)
 			{
+				if (obj == oldDraggedItem)
+				{
+					contains = true;
+				}
+				std::cout << obj << std::endl;
 				draggedItem = obj;
 				handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE);
+			}
+
+			if (!contains)
+			{
+				OutputFormatter::chat(chatbox, "Equipped " + oldDraggedItem->getName(), sf::Color::White);
 			}
 
 			dragging = false;
@@ -533,9 +552,14 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
 		{
+			std::string oldDraggedItemName = draggedItem->getName();
 			if ((draggedItem = player->putInInventory(draggedItem, false)) != nullptr)
 			{
 				handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE);
+			}
+			else if (draggedFromEquipment)
+			{
+				OutputFormatter::chat(chatbox, "Unequipped " + oldDraggedItemName, sf::Color::White);
 			}
 			dragging = false;
 		}

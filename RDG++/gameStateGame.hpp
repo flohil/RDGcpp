@@ -31,9 +31,9 @@ private:
 	sf::Sprite potionSprite;
 
 	std::shared_ptr<RenderableObject> draggedItem = nullptr;
-	float draggingAccumulator = 0.f;
-	const float draggingThreshold = 0.25f; // in seconds
 	bool dragging = false;
+	bool draggedFromEquipment;
+
 	bool mouseDeterminationTriggered = false;
 	sf::Vector2i lastClickPos;
 	sf::Vector2i dragStartPos;
