@@ -335,6 +335,8 @@ void GameStateGame::loadGui()
 	chatbox->setLinesStartFromTop();
 	chatGui.add(chatbox, "log");
 
+	player->setChatbox(chatbox);
+
 	chatGui.setView(chatView);
 
 	detailsbox = theme->load("ChatBox");
@@ -454,7 +456,12 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 	if (pos.x < horSplitAbs && pos.y < verSplitAbs) // inside map
 	{
-		if (eventType == MouseEvent::CLICK)
+		if (eventType == MouseEvent::DRAGSTART)
+		{
+			draggedItem = nullptr;
+			dragging = false;
+		}
+		else if (eventType == MouseEvent::CLICK)
 		{
 			std::cout << map->getItemAtPixels(pos) << std::endl;
 		}
@@ -471,6 +478,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 				}
 				else
 				{
+					OutputFormatter::chat(chatbox, "Could not drop " + draggedItem->getName(), sf::Color::White);
 					handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE); // return dragged item to where it came from if there is no free tile in front of the player
 				}
 			}
@@ -496,7 +504,16 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
 		{
-			player->getEquipmentSet()->setItemAtPixels(pos, draggedItem);
+			std::list<std::shared_ptr<RenderableObject>> retObjs = player->getEquipmentSet()->setItemAtPixels(pos, draggedItem);
+
+			for (std::shared_ptr<RenderableObject> obj : retObjs)
+			{
+				draggedItem = obj;
+				handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE);
+			}
+
+			dragging = false;
+			draggedItem = nullptr;
 		}
 	}
 	else if (pos.x > horSplitAbs && pos.y >= rightVerSplitAbs) // inside inventory

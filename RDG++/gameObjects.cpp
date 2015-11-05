@@ -632,6 +632,11 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 	primaryWeapon->setSize(itemSize, itemSize);
 	primaryWeapon->setPosition(primaryWeaponPos);
 
+	if (primaryWeapon != oldWeapon)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + primaryWeapon->getName(), sf::Color::White);
+	}
+
 	return oldWeapon;
 };
 
@@ -642,6 +647,11 @@ std::shared_ptr<Weapon> EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon>
 	secondaryWeapon = weapon_;
 	secondaryWeapon->setSize(itemSize, itemSize);
 	secondaryWeapon->setPosition(secondaryWeaponPos);
+
+	if (secondaryWeapon != oldWeapon)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + secondaryWeapon->getName(), sf::Color::White);
+	}
 
 	return oldWeapon;
 };
@@ -654,6 +664,11 @@ std::shared_ptr<Armament> EquipmentSet::setHelmet(std::shared_ptr<Armament> helm
 	helmet->setSize(itemSize, itemSize);
 	helmet->setPosition(helmetPos);
 
+	if (helmet != oldArmament)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + helmet->getName(), sf::Color::White);
+	}
+
 	return oldArmament;
 };
 
@@ -664,6 +679,11 @@ std::shared_ptr<Armament> EquipmentSet::setHarness(std::shared_ptr<Armament> har
 	harness = harness_; 
 	harness->setSize(itemSize, itemSize);
 	harness->setPosition(harnessPos);
+
+	if (harness != oldArmament)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + harness->getName(), sf::Color::White);
+	}
 
 	return oldArmament;
 };
@@ -676,6 +696,10 @@ std::shared_ptr<Armament> EquipmentSet::setCuisse(std::shared_ptr<Armament> cuis
 	cuisse->setSize(itemSize, itemSize);
 	cuisse->setPosition(cuissePos);
 
+	if (cuisse != oldArmament)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + cuisse->getName(), sf::Color::White);
+	}
 
 	return oldArmament;
 };
@@ -688,6 +712,11 @@ std::shared_ptr<Armament> EquipmentSet::setGauntlets(std::shared_ptr<Armament> g
 	gauntlets->setSize(itemSize, itemSize);
 	gauntlets->setPosition(gauntletsPos);
 
+	if (gauntlets != oldArmament)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + gauntlets->getName(), sf::Color::White);
+	}
+
 	return oldArmament;
 };
 
@@ -698,6 +727,11 @@ std::shared_ptr<Armament> EquipmentSet::setBoots(std::shared_ptr<Armament> boots
 	boots = boots_; 
 	boots->setSize(itemSize, itemSize);
 	boots->setPosition(bootsPos);
+
+	if (boots != oldArmament)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + boots->getName(), sf::Color::White);
+	}
 
 	return oldArmament;
 };
@@ -710,6 +744,11 @@ std::shared_ptr<Potion> EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_
 	potion1->setSize(itemSize, itemSize);
 	potion1->setPosition(potion1Pos);
 
+	if (potion1 != oldPotion)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + potion1->getName(), sf::Color::White);
+	}
+
 	return oldPotion;
 };
 
@@ -721,6 +760,11 @@ std::shared_ptr<Potion> EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_
 	potion2->setSize(itemSize, itemSize);
 	potion2->setPosition(potion2Pos);
 
+	if (potion2 != oldPotion)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + potion2->getName(), sf::Color::White);
+	}
+
 	return oldPotion;
 };
 
@@ -731,6 +775,11 @@ std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_
 	potion3 = potion_; 
 	potion3->setSize(itemSize, itemSize);
 	potion3->setPosition(potion3Pos);
+
+	if (potion3 != oldPotion)
+	{
+		OutputFormatter::chat(chatbox, "Equipped " + potion3->getName(), sf::Color::White);
+	}
 
 	return oldPotion;
 };
@@ -1061,36 +1110,79 @@ std::shared_ptr<RenderableObject> Player::getInventoryItemAtPixels(sf::Vector2i 
 	return retObj;
 }
 
-std::shared_ptr<RenderableObject> EquipmentSet::setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj)
+std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj)
 {
-	EquipHotspots::Enum hotspot;
+	std::list<std::shared_ptr<RenderableObject>> retObjs;
+	EquipHotspots::Enum hotspot = EquipHotspots::UNKNOWN;
 
-	if (pos.x >= armorOffsets.x || pos.x <= (armorOffsets.x + armorDims.x) || pos.y >= armorOffsets.y || pos.y <= (armorOffsets.y + armorDims.y)) //inside armor
+	sf::Vector2f armorOffsetsAbs;
+	sf::Vector2f potionOffsetsAbs;
+
+	armorOffsetsAbs.x = armorOffsets.x + horSplitAbs;
+	armorOffsetsAbs.y = armorOffsets.y;
+
+	potionOffsetsAbs.x = potionOffsets.x + horSplitAbs;
+	potionOffsetsAbs.y = potionOffsets.y;
+
+	std::cout << "pos: x =  " << pos.x << ", y = " << pos.y << std::endl;
+	std::cout << "armorBounds: left =  " << armorOffsetsAbs.x << ", right = " << (armorOffsetsAbs.x + armorDims.x) << ", top = " << armorOffsetsAbs.y << ", bottom = " << (armorOffsetsAbs.y + armorDims.y) << std::endl;
+	std::cout << "potionBounds: left =  " << potionOffsetsAbs.x << ", right = " << (potionOffsetsAbs.x + potionDims.x) << ", top = " << potionOffsetsAbs.y << ", bottom = " << (potionOffsetsAbs.y + potionDims.y) << std::endl;
+
+	if (pos.x >= armorOffsetsAbs.x && pos.x <= (armorOffsetsAbs.x + armorDims.x) && pos.y >= armorOffsetsAbs.y && pos.y <= (armorOffsetsAbs.y + armorDims.y)) //inside armor
 	{
-		if (pos.x >= armorOffsets.x + (armorDims.x * 0.5f)){
+		if (pos.x >= armorOffsetsAbs.x + (armorDims.x * 0.5f)){
 			hotspot = EquipHotspots::RIGHT;
+			std::cout << "right" << std::endl;
 		}
 		else
 		{
 			hotspot = EquipHotspots::LEFT;
+			std::cout << "left" << std::endl;
 		}
 	}
-	if (pos.x >= potionOffsets.x || pos.x <= (potionOffsets.x + potionDims.x) || pos.y >= potionOffsets.y || pos.y <= (potionOffsets.y + potionDims.y)) //inside potions
+	if (pos.x >= potionOffsetsAbs.x && pos.x <= (potionOffsetsAbs.x + potionDims.x) && pos.y >= potionOffsetsAbs.y && pos.y <= (potionOffsetsAbs.y + potionDims.y)) //inside potions
 	{
-		if (pos.x >= potionOffsets.x && pos.x < potionOffsets.x + (potionDims.x * 0.33f)){
-			hotspot = EquipHotspots::POTION1;
+		if (pos.x >= potionOffsetsAbs.x && pos.x < potionOffsetsAbs.x + (potionDims.x * 0.33f)){
+			hotspot = EquipHotspots::POTION3;
+			std::cout << "potion1" << std::endl;
 		}
-		else if (pos.x >= potionOffsets.x + (potionDims.x * 0.33f) && pos.x < potionOffsets.x + (potionDims.x * 0.66f))
+		else if (pos.x >= potionOffsetsAbs.x + (potionDims.x * 0.33f) && pos.x < potionOffsetsAbs.x + (potionDims.x * 0.66f))
 		{
 			hotspot = EquipHotspots::POTION2;
+			std::cout << "potion2" << std::endl;
 		}
-		else if (pos.x >= potionOffsets.x + (potionDims.x * 0.66f) && pos.x < potionOffsets.x + potionDims.x)
+		else if (pos.x >= potionOffsetsAbs.x + (potionDims.x * 0.66f) && pos.x < potionOffsetsAbs.x + potionDims.x)
 		{
-			hotspot = EquipHotspots::POTION3;
+			hotspot = EquipHotspots::POTION1;
+			std::cout << "potion3" << std::endl;
 		}
 	}
 
 	std::cout << "hotspot: " << hotspot << std::endl;
 
-	return nullptr;
+	if (obj->getObjectType() != ObjectType::ITEM || hotspot == EquipHotspots::UNKNOWN)
+	{
+		retObjs.push_back(obj);
+		return retObjs; // do not allow key to be dropped in equipment
+	}
+
+	std::shared_ptr<Item> item = std::dynamic_pointer_cast<Item>(obj);
+
+	if (item->getItemType() == ItemType::POTION && hotspot != EquipHotspots::POTION1 && hotspot != EquipHotspots::POTION2 && hotspot != EquipHotspots::POTION3) // potion dragged on armament
+	{
+		std::cout << "dragged into armor" << std::endl;
+		retObjs.push_back(obj);
+		return retObjs;
+	}
+
+	if ((item->getItemType() == ItemType::ARMAMENT || item->getItemType() == ItemType::WEAPON) && hotspot != EquipHotspots::LEFT && hotspot != EquipHotspots::RIGHT)
+	{
+		std::cout << "dragged into potions" << std::endl;
+		retObjs.push_back(obj);
+		return retObjs;
+	}
+
+	retObjs = setItem(item, hotspot);
+
+	return retObjs;
 }
