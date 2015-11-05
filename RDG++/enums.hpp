@@ -157,6 +157,7 @@ public:
 	static RoomTypes::Enum mapRoomTypes(std::string input);
 	static ArmamentType::Enum mapArmamentType(std::string input);
 
+	static std::string mapClassesName(Classes::Enum input);
 	static std::string mapRoomNames(RoomTypes::Enum input);
 	static std::string mapArmamentTypeNames(ArmamentType::Enum input);
 	static std::string mapLevelName(Classes::Enum input);

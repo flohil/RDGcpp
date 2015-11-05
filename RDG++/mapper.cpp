@@ -235,6 +235,25 @@ ArmamentType::Enum EnumMapper::mapArmamentType(std::string input)
 	}
 }
 
+std::string EnumMapper::mapClassesName(Classes::Enum input)
+{
+	switch (input)
+	{
+		case Classes::NONE:
+			return "none";
+		case Classes::WEAK:
+			return "weak";
+		case Classes::MEDIUM:
+			return "medium";
+		case Classes::STRONG:
+			return "strong";
+		case Classes::UNKNOWN:
+			return "unknown";
+		default:
+			return "unknown";
+	}
+}
+
 std::string EnumMapper::mapRoomNames(RoomTypes::Enum input)
 {
 	switch (input)

@@ -7,6 +7,78 @@
 #include "easylogging++.hpp"
 #include "OutputFormatter.hpp"
 
+DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj)
+{
+	std::cout << "constructing detailsBag for GameObject " << obj->getName() << std::endl;
+
+	if (obj->getObjectType() == ObjectType::KEY)
+	{
+		name = obj->getName();
+		std::vector<std::string> row;
+		row.push_back("description");
+		row.push_back("unlocks treasure chamber door");
+	}
+	else if (obj->getObjectType() == ObjectType::ITEM)
+	{
+		std::shared_ptr<Item> item = std::dynamic_pointer_cast<Item>(obj);
+
+		name = item->getName();
+
+		if (item->getItemType() == ItemType::ARMAMENT)
+		{
+			std::shared_ptr<Armament> armament = std::dynamic_pointer_cast<Armament>(item);
+		}
+		else if (item->getItemType() == ItemType::WEAPON)
+		{
+			std::shared_ptr<Weapon> wepaon = std::dynamic_pointer_cast<Weapon>(item);
+		}
+		else if (item->getItemType() == ItemType::POTION)
+		{
+			std::shared_ptr<Potion> potion = std::dynamic_pointer_cast<Potion>(item);
+
+			std::string description = potion->getDescription();
+			size_t findN = description.find(" n ");
+			size_t findX = description.find(" x ");
+
+			// replace n
+			if (findN != std::string::npos)
+			{
+				description.replace(findN + 1, 1, std::to_string(potion->getDuration()));
+			}
+			if (findX != std::string::npos)
+			{
+				description.replace(findX + 1, 1, std::to_string(potion->getStrength()));
+			}
+
+			std::cout << "description: " << description << std::endl;
+
+			//std::vector<std::string> row;
+			//row.push_back("description");
+			//row.push_back(description);
+			//details.push_back(row);
+
+			//std::vector<std::string> row2;
+			//row.push_back("item class");
+			//row.push_back(EnumMapper::mapClassesName(potion->getItemClass()));
+		}
+	}
+	else if (obj->getObjectType() == ObjectType::CREATURE)
+	{
+		std::shared_ptr<Creature> creature = std::dynamic_pointer_cast<Creature>(obj);
+
+		if (creature->getCreatureType() == CreatureType::MONSTER)
+		{
+			std::shared_ptr<Monster> monster = std::dynamic_pointer_cast<Monster>(creature);
+
+			name = monster->getName();
+		}
+	}
+	else
+	{
+		name = "";
+	}
+}
+
 GameStateGame::GameStateGame(Game& game_) :
 GameState(game_)
 {
@@ -403,22 +475,41 @@ void GameStateGame::loadGui()
 
 	armorGui.setView(armorView);
 
-	float detailsLeftMargin = 30.f;
-	float detailsTopMargin = 10.f;
-	float detailsWidth = detailsView.getSize().x - detailsLeftMargin * 2;
-	float detailsHeight = detailsView.getSize().y - detailsLeftMargin * 2;
+	// details stuff
 
-	tgui::VerticalLayout::Ptr detailsLayout = std::make_shared<tgui::VerticalLayout>();
-	tgui::HorizontalLayout::Ptr keysLayout = std::make_shared<tgui::HorizontalLayout>();
-	tgui::HorizontalLayout::Ptr valuesLayout = std::make_shared<tgui::HorizontalLayout>();
+	float detailsHeaderTopMargin = 4.f;
+	float detailsHeaderHeight = 27.f;
+	float detailsTopMargin = detailsHeaderTopMargin + detailsHeaderHeight;
+	unsigned int detailsHeaderTextSize = 18u;
+	unsigned int detailsLabelTextSize = 14u;
+	float detailsLineSpacing = 5.f;
+	unsigned int detailRows = 7u;
 
-	detailsLayout->setSize(detailsWidth, detailsHeight);
-	detailsLayout->setPosition(detailsLeftMargin, detailsTopMargin);
+	detailsMiddle = detailsView.getSize().x * 0.5f;
+	detailsKeyMiddle = detailsView.getSize().x * 0.25f;
+	detailsValueMiddle = detailsView.getSize().x * 0.75f;
 
-	/*keysLayout->setSize(detailsLayout->getSize().x * 0.5, detailsLayout->getSize().y);
-	valuesLayout->setSize(detailsLayout->getSize().x * 0.5, detailsLayout->getSize().y);*/
+	detailsHeader = std::make_shared<tgui::Label>();
+	detailsHeader->setAutoSize(true);
+	detailsHeader->setTextSize(detailsHeaderTextSize);
+	detailsHeader->setTextColor(sf::Color::White);
+	detailsHeader->setText("");
+	detailsGui.add(detailsHeader);
+	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeaderTopMargin);
 
-	tgui::Label::Ptr detailsTitleLabel = theme->load("Label");
+	for (unsigned int i = 0; i < detailRows; ++i)
+	{
+		for (unsigned int j = 0; j < 2; ++j)
+		{
+			tgui::Label::Ptr detailsLabel = std::make_shared<tgui::Label>();
+			detailsLabel->setAutoSize(true);
+			detailsLabel->setTextSize(detailsLabelTextSize);
+			detailsLabel->setTextColor(sf::Color::White);
+			detailsLabel->setText("");
+			detailsGui.add(detailsLabel);
+			detailsLabel->setPosition((detailsKeyMiddle + j * detailsMiddle) - detailsLabel->getSize().x * 0.5f, detailsTopMargin + i * (detailsLabel->getSize().y + detailsLineSpacing));
+		}
+	}
 }
 
 void GameStateGame::changeSet(unsigned int numerator)
@@ -464,7 +555,12 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if (eventType == MouseEvent::CLICK)
 		{
-			std::cout << map->getItemAtPixels(pos) << std::endl;
+			std::shared_ptr<RenderableObject> retObj = map->getItemAtPixels(pos);
+			
+			if (retObj != nullptr)
+			{
+				updateDetails(DetailsBag(retObj));
+			}
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
 		{
@@ -502,7 +598,12 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if (eventType == MouseEvent::CLICK)
 		{
-			std::cout << player->getArmorItemAtPixels(pos) << std::endl;
+			std::shared_ptr<RenderableObject> retObj = player->getArmorItemAtPixels(pos);
+
+			if (retObj != nullptr)
+			{
+				updateDetails(DetailsBag(retObj));
+			}
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
 		{
@@ -548,7 +649,12 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if(eventType == MouseEvent::CLICK)
 		{
-			std::cout << player->getInventoryItemAtPixels(pos) << std::endl;
+			std::shared_ptr<RenderableObject> retObj = player->getInventoryItemAtPixels(pos);
+
+			if (retObj != nullptr)
+			{
+				updateDetails(DetailsBag(retObj));
+			}
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
 		{
@@ -572,6 +678,37 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			dragging = false;
 		}
 	}
+}
+
+void GameStateGame::updateDetails(DetailsBag& detailsBag)
+{
+	detailsHeader->setText(detailsBag.getName());
+
+	for (unsigned int row = 0; row < detailsBag.getDetails().size(); ++row)
+	{
+		for (unsigned int col = 0; col < 2; ++col)
+		{
+			if (detailsBag.getDetails()[row][0] == "description") // print description over two cols and without key
+			{
+				if (col == 0)
+				{
+					details[row][col]->setText("");
+				}
+				else if (col == 1)
+				{
+					details[row][col]->setText(detailsBag.getDetails()[row][col]);
+					details[row][col]->setPosition(detailsMiddle - details[row][col]->getSize().x * 0.5f, details[row][col]->getPosition().y);
+				}
+			}
+			else
+			{
+				details[row][col]->setText(detailsBag.getDetails()[row][col]);
+				details[row][col]->setPosition((detailsKeyMiddle + col * detailsMiddle) - details[row][col]->getSize().x * 0.5f, details[row][col]->getPosition().y);
+			}
+		}
+	}
+
+	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeader->getPosition().y);
 }
 
 GameStateGame::~GameStateGame()

@@ -6,6 +6,22 @@
 #include "gameState.hpp"
 #include "map.hpp"
 
+class DetailsBag
+{
+public:
+
+	std::string getName() const { return name; };
+	std::vector<std::vector<std::string>> getDetails() const { return details; };
+
+	//consturctor for different item types and key and monsters
+	DetailsBag(std::shared_ptr<RenderableObject> obj);
+
+private:
+
+	std::string name;
+	std::vector<std::vector<std::string>> details;
+};
+
 class GameStateGame : public GameState
 {
 private:
@@ -70,8 +86,18 @@ private:
 	tgui::Button::Ptr set1Button;
 	tgui::Button::Ptr set2Button;
 
+	tgui::Label::Ptr detailsHeader;
+	tgui::Grid::Ptr detailsGrid;
+
+	float detailsMiddle;
+	float detailsKeyMiddle;
+	float detailsValueMiddle;
+
+	std::vector<std::vector<tgui::Label::Ptr>> details;
+
 	void changeSet(unsigned int numerator);
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType);
+	void updateDetails(DetailsBag& detailsBag);
 
 public:
 
