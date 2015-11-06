@@ -327,7 +327,7 @@ void EquipmentSet::setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOff
 	potion3Pos = sf::Vector2f(potionOffsets.x + 33.f, potionOffsets.y + 2.f);
 }
 
-std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos, bool remove)
+std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos, bool remove, bool usePotion)
 {
 	sf::Vector2i relPos;
 	std::shared_ptr<RenderableObject> retObj = nullptr;
@@ -335,63 +335,66 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 	relPos.x = pos.x - horSplitAbs;
 	relPos.y = pos.y;
 
-	if (relPos.x >= primaryWeaponPos.x && relPos.y >= primaryWeaponPos.y && relPos.x <= (primaryWeaponPos.x + itemSize) && relPos.y <= (primaryWeaponPos.y + itemSize))
+	if (!usePotion)
 	{
-		retObj = primaryWeapon;
-		if (remove)
+		if (relPos.x >= primaryWeaponPos.x && relPos.y >= primaryWeaponPos.y && relPos.x <= (primaryWeaponPos.x + itemSize) && relPos.y <= (primaryWeaponPos.y + itemSize))
 		{
-			primaryWeapon = nullptr;
+			retObj = primaryWeapon;
+			if (remove)
+			{
+				primaryWeapon = nullptr;
+			}
+		}
+		else if (relPos.x >= secondaryWeaponPos.x && relPos.y >= secondaryWeaponPos.y && relPos.x <= (secondaryWeaponPos.x + itemSize) && relPos.y <= (secondaryWeaponPos.y + itemSize))
+		{
+			retObj = secondaryWeapon;
+			if (remove)
+			{
+				secondaryWeapon = nullptr;
+			}
+		}
+		else if (relPos.x >= bootsPos.x && relPos.y >= bootsPos.y && relPos.x <= (bootsPos.x + itemSize) && relPos.y <= (bootsPos.y + itemSize))
+		{
+			retObj = boots;
+			if (remove)
+			{
+				boots = nullptr;
+			}
+		}
+		else if (relPos.x >= cuissePos.x && relPos.y >= cuissePos.y && relPos.x <= (cuissePos.x + itemSize) && relPos.y <= (cuissePos.y + itemSize))
+		{
+			retObj = cuisse;
+			if (remove)
+			{
+				cuisse = nullptr;
+			}
+		}
+		else if (relPos.x >= gauntletsPos.x && relPos.y >= gauntletsPos.y && relPos.x <= (gauntletsPos.x + itemSize) && relPos.y <= (gauntletsPos.y + itemSize))
+		{
+			retObj = gauntlets;
+			if (remove)
+			{
+				gauntlets = nullptr;
+			}
+		}
+		else if (relPos.x >= harnessPos.x && relPos.y >= harnessPos.y && relPos.x <= (harnessPos.x + itemSize) && relPos.y <= (harnessPos.y + itemSize))
+		{
+			retObj = harness;
+			if (remove)
+			{
+				harness = nullptr;
+			}
+		}
+		else if (relPos.x >= helmetPos.x && relPos.y >= helmetPos.y && relPos.x <= (helmetPos.x + itemSize) && relPos.y <= (helmetPos.y + itemSize))
+		{
+			retObj = helmet;
+			if (remove)
+			{
+				helmet = nullptr;
+			}
 		}
 	}
-	else if (relPos.x >= secondaryWeaponPos.x && relPos.y >= secondaryWeaponPos.y && relPos.x <= (secondaryWeaponPos.x + itemSize) && relPos.y <= (secondaryWeaponPos.y + itemSize))
-	{
-		retObj = secondaryWeapon;
-		if (remove)
-		{
-			secondaryWeapon = nullptr;
-		}
-	}
-	else if (relPos.x >= bootsPos.x && relPos.y >= bootsPos.y && relPos.x <= (bootsPos.x + itemSize) && relPos.y <= (bootsPos.y + itemSize))
-	{
-		retObj = boots;
-		if (remove)
-		{
-			boots = nullptr;
-		}
-	}
-	else if (relPos.x >= cuissePos.x && relPos.y >= cuissePos.y && relPos.x <= (cuissePos.x + itemSize) && relPos.y <= (cuissePos.y + itemSize))
-	{
-		retObj = cuisse;
-		if (remove)
-		{
-			cuisse = nullptr;
-		}
-	}
-	else if (relPos.x >= gauntletsPos.x && relPos.y >= gauntletsPos.y && relPos.x <= (gauntletsPos.x + itemSize) && relPos.y <= (gauntletsPos.y + itemSize))
-	{
-		retObj = gauntlets;
-		if (remove)
-		{
-			gauntlets = nullptr;
-		}
-	}
-	else if (relPos.x >= harnessPos.x && relPos.y >= harnessPos.y && relPos.x <= (harnessPos.x + itemSize) && relPos.y <= (harnessPos.y + itemSize))
-	{
-		retObj = harness;
-		if (remove)
-		{
-			harness = nullptr;
-		}
-	}
-	else if (relPos.x >= helmetPos.x && relPos.y >= helmetPos.y && relPos.x <= (helmetPos.x + itemSize) && relPos.y <= (helmetPos.y + itemSize))
-	{
-		retObj = helmet;
-		if (remove)
-		{
-			helmet = nullptr;
-		}
-	}
-	else if (relPos.x >= potion1Pos.x && relPos.y >= potion1Pos.y && relPos.x <= (potion1Pos.x + itemSize) && relPos.y <= (potion1Pos.y + itemSize))
+	if (relPos.x >= potion1Pos.x && relPos.y >= potion1Pos.y && relPos.x <= (potion1Pos.x + itemSize) && relPos.y <= (potion1Pos.y + itemSize))
 	{
 		retObj = potion1;
 		if (remove)

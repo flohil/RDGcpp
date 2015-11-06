@@ -46,7 +46,7 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj) : detailsPic(Resou
 			std::shared_ptr<Weapon> weapon = std::dynamic_pointer_cast<Weapon>(item);
 
 			addRow("item class", EnumMapper::mapClassesName(weapon->getItemClass()));
-			addRow("weapon type", EnumMapper::mapWeaponTypeName(weapon->getType()));
+			addRow("weapon type", EnumMapper::mapWeaponTypeName(weapon->getType()) + " handed");
 			addRow("attack", OutputFormatter::shortFloat(weapon->getAttack()));
 			addRow("speed", OutputFormatter::shortFloat(weapon->getSpeed()));
 			addRow("accuracy", OutputFormatter::shortFloat(weapon->getAccuracy()));
@@ -379,6 +379,10 @@ void GameStateGame::handleInput()
 					game.window.close();
 				}
 			}
+			else if (event.key.code == sf::Keyboard::U)
+			{
+				usePotionActive = !usePotionActive;
+			}
 			else if (event.key.code == sf::Keyboard::Escape)
 			{
 				pauseGame();
@@ -647,7 +651,10 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			
 			if (retObj != nullptr)
 			{
-				updateDetails(DetailsBag(retObj));
+				if (retObj->getObjectType() == ObjectType::ITEM || retObj->getObjectType() == ObjectType::CREATURE || retObj->getObjectType() == ObjectType::KEY)
+				{
+					updateDetails(DetailsBag(retObj));
+				}
 			}
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
@@ -674,14 +681,17 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	{
 		if (eventType == MouseEvent::DRAGSTART)
 		{
-			draggedItem = player->getArmorItemAtPixels(pos, true);
-
-			std::cout << "draggedItem: " << draggedItem << std::endl;
-
-			if (draggedItem != nullptr)
+			if (!inFight || usePotionActive)
 			{
-				draggedItem->setSize(settings->tileSize, settings->tileSize);
-				draggedFromEquipment = true;
+				draggedItem = player->getArmorItemAtPixels(pos, true, usePotionActive);
+
+				std::cout << "draggedItem: " << draggedItem << std::endl;
+
+				if (draggedItem != nullptr)
+				{
+					draggedItem->setSize(settings->tileSize, settings->tileSize);
+					draggedFromEquipment = true;
+				}
 			}
 		}
 		else if (eventType == MouseEvent::CLICK)
@@ -722,7 +732,14 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 			if (!contains)
 			{
-				OutputFormatter::chat(chatbox, "Equipped " + oldDraggedItem->getName(), sf::Color::White);
+				if (!usePotionActive)
+				{
+					OutputFormatter::chat(chatbox, "Equipped " + oldDraggedItem->getName(), sf::Color::White);
+				}
+				else
+				{
+					OutputFormatter::chat(chatbox, "Used " + oldDraggedItem->getName(), sf::Color::White);
+				}
 			}
 
 			dragging = false;
@@ -731,7 +748,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	}
 	else if (pos.x > horSplitAbs && pos.y >= rightVerSplitAbs) // inside inventory
 	{
-		if (eventType == MouseEvent::DRAGSTART)
+		if (eventType == MouseEvent::DRAGSTART && !inFight)
 		{
 			draggedItem = player->getInventoryItemAtPixels(pos, true);
 
