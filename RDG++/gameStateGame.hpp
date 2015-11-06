@@ -81,6 +81,7 @@ private:
 	tgui::Gui chatGui;
 	tgui::Gui detailsGui;
 	tgui::Gui fightGui;
+	tgui::Gui fightAttackGui;
 	tgui::Gui inventoryGui;
 	tgui::Gui armorGui;
 
@@ -110,6 +111,14 @@ private:
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType);
 	void updateDetails(DetailsBag& detailsBag);
 	void startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_);
+	void showAttackGui();
+	void parry();
+	void usePotion();
+	void toggleEquipment();
+	void attackHead();
+	void attackTorso();
+	void attackArms();
+	void attackLegs();
 
 public:
 
