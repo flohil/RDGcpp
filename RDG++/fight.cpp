@@ -1,10 +1,10 @@
 #include "fight.hpp"
 #include "chances.hpp"
 
-Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Creature> enemy_)
-	: player(player_)
+Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> enemy_)
+	: player(player_), enemy(enemy_)
 {
-	attackSet = false;
+	/*attackSet = false;
 	activeAttack = nullptr;
 	activeAttackType = Attacks::UNKNOWN;
 	selectedPotion = nullptr;
@@ -14,7 +14,7 @@ Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Creature> enemy_)
 	attackSet = false;
 
 	changeTabActive = false;
-	potionTakingActive = false;
+	potionTakingActive = false;*/
 }
 
 
@@ -26,7 +26,7 @@ Fight::~Fight()
 std::shared_ptr<Creature> Fight::fight()
 {
 	/* MAIN FIGHT LOOP */
-	while (player->hp > 0 && enemy->accuracy > 0)
+	while (player->hp > 0 && enemy->hp > 0)
 	{
 		std::shared_ptr<Creature> creature1 = nullptr;
 		std::shared_ptr<Creature> creature2 = nullptr;

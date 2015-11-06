@@ -57,10 +57,9 @@ private:
 	sf::Vector2i lastClickPos;
 	sf::Vector2i dragStartPos;
 
-	bool inFight = false;
 	bool usePotionActive = false;
 	bool inAttackOptions = false;
-
+	bool inFight = false;
 	std::shared_ptr<Fight> fight = nullptr;
 
 	// gui
@@ -110,6 +109,7 @@ private:
 	void changeSet(unsigned int numerator);
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType);
 	void updateDetails(DetailsBag& detailsBag);
+	void startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_);
 
 public:
 

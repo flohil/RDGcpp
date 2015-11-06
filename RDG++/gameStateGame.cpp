@@ -258,7 +258,18 @@ void GameStateGame::draw(const float deltaTime)
 
 void GameStateGame::update(const float deltaTime)
 {
-	player->update(deltaTime);
+	if (!inFight)
+	{
+		player->update(deltaTime); // move player
+
+		std::shared_ptr<Monster> pendingFightEnemy = player->getPendingFightEnemy();
+
+		if (pendingFightEnemy != nullptr)
+		{
+			startFight(player, pendingFightEnemy);
+		}
+	}
+	
 	map->update(deltaTime);
 	adaptMapViewport();
 
@@ -599,7 +610,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 	}
 
-	if (pos.x < horSplitAbs && pos.y < verSplitAbs) // inside map
+	if (pos.x < horSplitAbs && pos.y < verSplitAbs && !inFight) // inside map
 	{
 		if (eventType == MouseEvent::DRAGSTART)
 		{
@@ -795,6 +806,14 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag)
 	}
 
 	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeader->getPosition().y);
+}
+
+void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_)
+{
+	std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
+	inFight = true;
+
+	fight.reset(new Fight(player_, monster_));
 }
 
 GameStateGame::~GameStateGame()

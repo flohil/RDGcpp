@@ -26,7 +26,7 @@ struct AttDefMinAvgMax
 class Fight
 {
 public:
-	Fight(std::shared_ptr<Player> player_, std::shared_ptr<Creature> creature_);
+	Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_);
 	~Fight();
 
 	std::shared_ptr<Creature> fight();
@@ -38,7 +38,7 @@ private:
 	std::map<Attacks::Enum, Attack> attacks; // ?
 	Attack* activeAttack;
 	float parryMultiplier;
-	std::shared_ptr<Creature> enemy;
+	std::shared_ptr<Monster> enemy;
 	std::shared_ptr<Player> player;
 	bool changeTabActive;
 	bool potionTakingActive;

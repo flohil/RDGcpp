@@ -489,6 +489,7 @@ void Player::init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr ch
 // player may only move on tiles, but for smooth movements, player is moved in between tiles
 void Player::update(const float deltaTime)
 {
+
 	accumulatedTime += deltaTime;
 
 	// preMove stage: turn player, but do not yet move
@@ -751,9 +752,19 @@ void Player::handleInput(sf::Event event, std::shared_ptr<RenderableObject> drag
 					map->setOverlayObject(facingPoint, putInInventory(object));
 					break;
 				case ObjectType::CREATURE:
+				{
 					OutputFormatter::chat(chatBox, "Started fight against " + object->getName(), sf::Color::White);
-					//startFight(this, std::dynamic_pointer_cast<Creature>(object));
+
+					std::shared_ptr<Creature> creature = std::dynamic_pointer_cast<Creature>(object);
+
+					if (creature->getCreatureType() == CreatureType::MONSTER)
+					{
+						std::shared_ptr<Monster> monster = std::dynamic_pointer_cast<Monster>(creature);
+						pendingFightEnemy = monster;
+					}
+
 					break;
+				}
 				default:
 					break;
 				}

@@ -14,6 +14,7 @@ class Weapon;
 class Armament;
 class Potion;
 class Item;
+class Monster;
 class RenderableObject;
 class GameStateGame;
 class Fight;
@@ -236,6 +237,8 @@ public:
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos, bool remove);
 	void setChatbox(tgui::ChatBox::Ptr chatbox_) { activeSet->setChatbox(chatbox_); };
+	std::shared_ptr<Monster> getPendingFightEnemy() const { return pendingFightEnemy; };
+	void setPendingFightEnemy(std::shared_ptr<Monster> pendingFightEnemy_) { pendingFightEnemy = pendingFightEnemy_; };
 
 private:
 
@@ -277,6 +280,8 @@ private:
 	int verRightSplitAbs;
 
 	tgui::ChatBox::Ptr chatBox;
+
+	std::shared_ptr<Monster> pendingFightEnemy = nullptr;
 
 	void setPosition(Point position_);
 	void preMove();
