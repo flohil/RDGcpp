@@ -706,12 +706,17 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 			for (std::shared_ptr<RenderableObject> obj : retObjs)
 			{
+				std::cout << "       " << obj->getName() << std::endl;
 				if (obj == oldDraggedItem)
 				{
 					contains = true;
 				}
 				std::cout << obj << std::endl;
 				draggedItem = obj;
+				if (!draggedFromEquipment)
+				{
+					OutputFormatter::chat(chatbox, "Unequipped " + obj->getName(), sf::Color::White);
+				}
 				handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE);
 			}
 
@@ -766,6 +771,8 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			dragging = false;
 		}
 	}
+
+	std::cout << "End of Mouse Handling: draggedItem = " << draggedItem << ", primaryWeapon = " << player->getEquipmentSet()->getPrimaryWeapon() << ", secondaryWEapon = " << player->getEquipmentSet()->getSecondaryWeapon() << std::endl;
 }
 
 void GameStateGame::updateDetails(DetailsBag& detailsBag)

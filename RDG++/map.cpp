@@ -88,6 +88,8 @@ void Map::init(std::shared_ptr<Player> player_)
 	loadRooms();
 	fillWithRooms();
 
+	placeInOverlay(Point{ 1, 1 }, game.getPrototypeStorage()->weaponFactory->create("Bow"));
+
 	LOG(INFO) << "successfully initialized map";
 }
 

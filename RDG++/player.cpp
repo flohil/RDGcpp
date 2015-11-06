@@ -15,8 +15,12 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 	std::shared_ptr<Weapon> oldWeapon = primaryWeapon;
 
 	primaryWeapon = weapon_;
-	primaryWeapon->setSize(itemSize, itemSize);
-	primaryWeapon->setPosition(primaryWeaponPos);
+
+	if (primaryWeapon != nullptr)
+	{
+		primaryWeapon->setSize(itemSize, itemSize);
+		primaryWeapon->setPosition(primaryWeaponPos);
+	}
 
 	return oldWeapon;
 };
@@ -26,8 +30,12 @@ std::shared_ptr<Weapon> EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon>
 	std::shared_ptr<Weapon> oldWeapon = secondaryWeapon;
 
 	secondaryWeapon = weapon_;
-	secondaryWeapon->setSize(itemSize, itemSize);
-	secondaryWeapon->setPosition(secondaryWeaponPos);
+
+	if (secondaryWeapon != nullptr)
+	{
+		secondaryWeapon->setSize(itemSize, itemSize);
+		secondaryWeapon->setPosition(secondaryWeaponPos);
+	}
 
 	return oldWeapon;
 };
@@ -37,8 +45,12 @@ std::shared_ptr<Armament> EquipmentSet::setHelmet(std::shared_ptr<Armament> helm
 	std::shared_ptr<Armament> oldArmament = helmet;
 
 	helmet = helmet_;
-	helmet->setSize(itemSize, itemSize);
-	helmet->setPosition(helmetPos);
+
+	if (helmet != nullptr)
+	{
+		helmet->setSize(itemSize, itemSize);
+		helmet->setPosition(helmetPos);
+	}
 
 	return oldArmament;
 };
@@ -48,8 +60,12 @@ std::shared_ptr<Armament> EquipmentSet::setHarness(std::shared_ptr<Armament> har
 	std::shared_ptr<Armament> oldArmament = harness;
 
 	harness = harness_;
-	harness->setSize(itemSize, itemSize);
-	harness->setPosition(harnessPos);
+
+	if (harness != nullptr)
+	{
+		harness->setSize(itemSize, itemSize);
+		harness->setPosition(harnessPos);
+	}
 
 	return oldArmament;
 };
@@ -59,9 +75,12 @@ std::shared_ptr<Armament> EquipmentSet::setCuisse(std::shared_ptr<Armament> cuis
 	std::shared_ptr<Armament> oldArmament = cuisse;
 
 	cuisse = cuisse_;
-	cuisse->setSize(itemSize, itemSize);
-	cuisse->setPosition(cuissePos);
 
+	if (cuisse != nullptr)
+	{
+		cuisse->setSize(itemSize, itemSize);
+		cuisse->setPosition(cuissePos);
+	}
 
 	return oldArmament;
 };
@@ -71,8 +90,12 @@ std::shared_ptr<Armament> EquipmentSet::setGauntlets(std::shared_ptr<Armament> g
 	std::shared_ptr<Armament> oldArmament = gauntlets;
 
 	gauntlets = gauntlets_;
-	gauntlets->setSize(itemSize, itemSize);
-	gauntlets->setPosition(gauntletsPos);
+
+	if (gauntlets != nullptr)
+	{
+		gauntlets->setSize(itemSize, itemSize);
+		gauntlets->setPosition(gauntletsPos);
+	}
 
 	return oldArmament;
 };
@@ -82,8 +105,12 @@ std::shared_ptr<Armament> EquipmentSet::setBoots(std::shared_ptr<Armament> boots
 	std::shared_ptr<Armament> oldArmament = boots;
 
 	boots = boots_;
-	boots->setSize(itemSize, itemSize);
-	boots->setPosition(bootsPos);
+
+	if (boots != nullptr)
+	{
+		boots->setSize(itemSize, itemSize);
+		boots->setPosition(bootsPos);
+	}
 
 	return oldArmament;
 };
@@ -93,8 +120,12 @@ std::shared_ptr<Potion> EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_
 	std::shared_ptr<Potion> oldPotion = potion1;
 
 	potion1 = potion_;
-	potion1->setSize(itemSize, itemSize);
-	potion1->setPosition(potion1Pos);
+
+	if (potion1 != nullptr)
+	{
+		potion1->setSize(itemSize, itemSize);
+		potion1->setPosition(potion1Pos);
+	}
 
 	return oldPotion;
 };
@@ -104,8 +135,12 @@ std::shared_ptr<Potion> EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_
 	std::shared_ptr<Potion> oldPotion = potion2;
 
 	potion2 = potion_;
-	potion2->setSize(itemSize, itemSize);
-	potion2->setPosition(potion2Pos);
+
+	if (potion2 != nullptr)
+	{
+		potion2->setSize(itemSize, itemSize);
+		potion2->setPosition(potion2Pos);
+	}
 
 	return oldPotion;
 };
@@ -115,8 +150,12 @@ std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_
 	std::shared_ptr<Potion> oldPotion = potion3;
 
 	potion3 = potion_;
-	potion3->setSize(itemSize, itemSize);
-	potion3->setPosition(potion3Pos);
+
+	if (potion3 != nullptr)
+	{
+		potion3->setSize(itemSize, itemSize);
+		potion3->setPosition(potion3Pos);
+	}
 
 	return oldPotion;
 };
@@ -192,13 +231,13 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 
 				if (secondaryWeapon != nullptr && secondaryWeapon->getSlots() == 2)
 				{
-					retArm2 = secondaryWeapon;
+					retArm2 = setSecondaryWeapon(nullptr);
 				}
 			}
 			else if (weapon->getSlots() == 2)
 			{
 				retArm1 = setPrimaryWeapon(weapon);
-				retArm2 = secondaryWeapon;
+				retArm2 = setSecondaryWeapon(nullptr);
 			}
 		}
 		else if (hotspot == EquipHotspots::RIGHT)
@@ -209,12 +248,12 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 
 				if (primaryWeapon != nullptr && primaryWeapon->getSlots() == 2)
 				{
-					retArm2 = primaryWeapon;
+					retArm2 = setPrimaryWeapon(nullptr);
 				}
 			}
 			else if (weapon->getSlots() == 2)
 			{
-				retArm1 = primaryWeapon;
+				retArm1 = setPrimaryWeapon(nullptr);
 				retArm2 = setSecondaryWeapon(weapon);
 			}
 		}
