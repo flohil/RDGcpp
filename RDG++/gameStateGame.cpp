@@ -364,7 +364,16 @@ void GameStateGame::handleInput()
 		{
 			if (event.key.code == sf::Keyboard::Delete)
 			{
-				game.window.close();
+				if (inFight)
+				{
+					fight.reset();
+					player->setPendingFightEnemy(nullptr);
+					inFight = false;
+				}
+				else
+				{
+					game.window.close();
+				}
 			}
 			else if (event.key.code == sf::Keyboard::Escape)
 			{
