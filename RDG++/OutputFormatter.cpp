@@ -9,3 +9,12 @@ void OutputFormatter::chat(tgui::ChatBox::Ptr chatBox, std::string str, sf::Colo
 
 	chatBox->addLine(" " + time + " - " + str, color);
 }
+
+// returns float with max 2 decimals
+std::string OutputFormatter::shortFloat(float nbr)
+{
+	std::string rawStr = std::to_string(nbr);
+	unsigned int dotPos = rawStr.find(".");
+
+	return rawStr.substr(0, dotPos + 3);
+}

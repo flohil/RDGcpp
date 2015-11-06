@@ -7,16 +7,22 @@
 #include "easylogging++.hpp"
 #include "OutputFormatter.hpp"
 
+void DetailsBag::addRow(std::string key, std::string value)
+{
+	std::vector<std::string> row;
+	row.push_back(key);
+	row.push_back(value);
+	details.push_back(row);
+}
+
 DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj)
 {
 	std::cout << "constructing detailsBag for GameObject " << obj->getName() << std::endl;
 
 	if (obj->getObjectType() == ObjectType::KEY)
 	{
-		name = obj->getName();
-		std::vector<std::string> row;
-		row.push_back("description");
-		row.push_back("unlocks treasure chamber door");
+		name = "Key";
+		addRow("description", "unlocks treasure chamber door");
 	}
 	else if (obj->getObjectType() == ObjectType::ITEM)
 	{
@@ -27,10 +33,24 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj)
 		if (item->getItemType() == ItemType::ARMAMENT)
 		{
 			std::shared_ptr<Armament> armament = std::dynamic_pointer_cast<Armament>(item);
+
+			addRow("item class", EnumMapper::mapClassesName(armament->getItemClass()));
+			addRow("armament type", EnumMapper::mapArmamentTypeNames(armament->getArmamentType()));
+			addRow("material", armament->getMaterial());
+			addRow("armor", OutputFormatter::shortFloat(armament->getArmor()));
+			addRow("speed", OutputFormatter::shortFloat(armament->getSpeed()));
+			addRow("full set multiplier", OutputFormatter::shortFloat(armament->getBonus() + 1.f));
 		}
 		else if (item->getItemType() == ItemType::WEAPON)
 		{
-			std::shared_ptr<Weapon> wepaon = std::dynamic_pointer_cast<Weapon>(item);
+			std::shared_ptr<Weapon> weapon = std::dynamic_pointer_cast<Weapon>(item);
+
+			addRow("item class", EnumMapper::mapClassesName(weapon->getItemClass()));
+			addRow("weapon type", EnumMapper::mapWeaponTypeName(weapon->getType()));
+			addRow("attack", OutputFormatter::shortFloat(weapon->getAttack()));
+			addRow("speed", OutputFormatter::shortFloat(weapon->getSpeed()));
+			addRow("accuracy", OutputFormatter::shortFloat(weapon->getAccuracy()));
+			addRow("defence", OutputFormatter::shortFloat(weapon->getDefence()));
 		}
 		else if (item->getItemType() == ItemType::POTION)
 		{
@@ -47,19 +67,13 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj)
 			}
 			if (findX != std::string::npos)
 			{
-				description.replace(findX + 1, 1, std::to_string(potion->getStrength()));
+				description.replace(findX + 1, 1, OutputFormatter::shortFloat(potion->getStrength()));
 			}
 
 			std::cout << "description: " << description << std::endl;
 
-			//std::vector<std::string> row;
-			//row.push_back("description");
-			//row.push_back(description);
-			//details.push_back(row);
-
-			//std::vector<std::string> row2;
-			//row.push_back("item class");
-			//row.push_back(EnumMapper::mapClassesName(potion->getItemClass()));
+			addRow("description", description);
+			addRow("item class", EnumMapper::mapClassesName(potion->getItemClass()));
 		}
 	}
 	else if (obj->getObjectType() == ObjectType::CREATURE)
@@ -71,6 +85,13 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj)
 			std::shared_ptr<Monster> monster = std::dynamic_pointer_cast<Monster>(creature);
 
 			name = monster->getName();
+
+			addRow("level", EnumMapper::mapLevelName(monster->getLevel()));
+			addRow("hp", OutputFormatter::shortFloat(monster->hp) + " (" + OutputFormatter::shortFloat(monster->getOrHP()) + ")");
+			addRow("strength", OutputFormatter::shortFloat(monster->strength) + " (" + OutputFormatter::shortFloat(monster->getOrStrength()) + ")");
+			addRow("speed", OutputFormatter::shortFloat(monster->speed) + " (" + OutputFormatter::shortFloat(monster->getOrSpeed()) + ")");
+			addRow("accuracy", OutputFormatter::shortFloat(monster->accuracy) + " (" + OutputFormatter::shortFloat(monster->getOrAccuracy()) + ")");
+			addRow("kill bonus", OutputFormatter::shortFloat(monster->getKillBonus()) + "  " + EnumMapper::mapAttributeName(monster->getKillBonusType()));
 		}
 	}
 	else
@@ -195,6 +216,17 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.clear(sf::Color::Black);
 
 	game.window.setView(mapView);
+	if (inFight)
+	{
+		if (inAttackOptions)
+		{
+			// fightGuiAttacks.draw();
+		}
+		else
+		{
+			fightGui.draw();
+		}
+	}
 	fightGui.draw();
 	map->draw(game.window, deltaTime);
 	player->draw(game.window, deltaTime);
@@ -482,12 +514,15 @@ void GameStateGame::loadGui()
 	float detailsTopMargin = detailsHeaderTopMargin + detailsHeaderHeight;
 	unsigned int detailsHeaderTextSize = 18u;
 	unsigned int detailsLabelTextSize = 14u;
+	float detailsMiddleSpacing = 20.f;
 	float detailsLineSpacing = 5.f;
-	unsigned int detailRows = 7u;
+	detailRows = 7u;
 
 	detailsMiddle = detailsView.getSize().x * 0.5f;
 	detailsKeyMiddle = detailsView.getSize().x * 0.25f;
 	detailsValueMiddle = detailsView.getSize().x * 0.75f;
+	detailsLeftAnchor = detailsMiddle - detailsMiddleSpacing * 0.5f;
+	detailsRightAnchor = detailsMiddle + detailsMiddleSpacing * 0.5f;
 
 	detailsHeader = std::make_shared<tgui::Label>();
 	detailsHeader->setAutoSize(true);
@@ -499,7 +534,9 @@ void GameStateGame::loadGui()
 
 	for (unsigned int i = 0; i < detailRows; ++i)
 	{
-		for (unsigned int j = 0; j < 2; ++j)
+		std::vector<tgui::Label::Ptr> row;
+
+		for (unsigned int j = 0; j < 3; ++j)
 		{
 			tgui::Label::Ptr detailsLabel = std::make_shared<tgui::Label>();
 			detailsLabel->setAutoSize(true);
@@ -508,7 +545,11 @@ void GameStateGame::loadGui()
 			detailsLabel->setText("");
 			detailsGui.add(detailsLabel);
 			detailsLabel->setPosition((detailsKeyMiddle + j * detailsMiddle) - detailsLabel->getSize().x * 0.5f, detailsTopMargin + i * (detailsLabel->getSize().y + detailsLineSpacing));
+
+			row.push_back(detailsLabel);
 		}
+
+		details.push_back(row);
 	}
 }
 
@@ -517,16 +558,19 @@ void GameStateGame::changeSet(unsigned int numerator)
 	float activeOpacity = 1.f;
 	float inactiveOpacity = 0.7f;
 
-	player->setActiveEquipmentSet(numerator);
-	if (numerator == 1u)
+	if (!inFight)
 	{
-		set1Button->setOpacity(activeOpacity);
-		set2Button->setOpacity(inactiveOpacity);
-	}
-	else
-	{
-		set1Button->setOpacity(inactiveOpacity);
-		set2Button->setOpacity(activeOpacity);
+		player->setActiveEquipmentSet(numerator);
+		if (numerator == 1u)
+		{
+			set1Button->setOpacity(activeOpacity);
+			set2Button->setOpacity(inactiveOpacity);
+		}
+		else
+		{
+			set1Button->setOpacity(inactiveOpacity);
+			set2Button->setOpacity(activeOpacity);
+		}
 	}
 }
 
@@ -544,6 +588,15 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	{
 		dragStartPos = pos; // in case anything goes wrong when dropping an item, return it to former position
 		draggedFromEquipment = false;
+	}
+
+	if (eventType == MouseEvent::DRAGRELEASE)
+	{
+		if (draggedItem == nullptr)
+		{
+			dragging = false;
+			return;
+		}
 	}
 
 	if (pos.x < horSplitAbs && pos.y < verSplitAbs) // inside map
@@ -611,7 +664,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 			std::shared_ptr<RenderableObject> oldDraggedItem = draggedItem;
 
-			std::list<std::shared_ptr<RenderableObject>> retObjs = player->getEquipmentSet()->setItemAtPixels(pos, draggedItem);
+			std::list<std::shared_ptr<RenderableObject>> retObjs = player->getEquipmentSet()->setItemAtPixels(pos, draggedItem, usePotionActive, fight);
 			bool contains = false;
 
 			std::cout << "  RETURNED: - " << retObjs.size() << std::endl;
@@ -682,11 +735,33 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 void GameStateGame::updateDetails(DetailsBag& detailsBag)
 {
+	// empty all entries
+	detailsHeader->setText("");
+	for (unsigned int row = 0; row < detailRows; ++row)
+	{
+		for (unsigned int col = 0; col < 3; ++col)
+		{
+			details[row][col]->setText("");
+		}
+	}
+
 	detailsHeader->setText(detailsBag.getName());
 
+	std::cout << "detailsGrid: rows = " << details.size() << ", cols = " << details[0].size() << std::endl;
+	std::cout << "detailsBag: rows = " << detailsBag.getDetails().size();
+
+	if (detailsBag.getDetails().size() == 0)
+	{
+		std::cout << std::endl << "detialsBag was empty" << std::endl;
+	}
+	else
+	{
+		std::cout << ", cols = " << detailsBag.getDetails()[0].size() << std::endl;
+	}
+	
 	for (unsigned int row = 0; row < detailsBag.getDetails().size(); ++row)
 	{
-		for (unsigned int col = 0; col < 2; ++col)
+		for (unsigned int col = 0; col < detailsBag.getDetails()[row].size(); ++col)
 		{
 			if (detailsBag.getDetails()[row][0] == "description") // print description over two cols and without key
 			{
@@ -700,10 +775,21 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag)
 					details[row][col]->setPosition(detailsMiddle - details[row][col]->getSize().x * 0.5f, details[row][col]->getPosition().y);
 				}
 			}
-			else
+			else // print normal key value pair
 			{
-				details[row][col]->setText(detailsBag.getDetails()[row][col]);
-				details[row][col]->setPosition((detailsKeyMiddle + col * detailsMiddle) - details[row][col]->getSize().x * 0.5f, details[row][col]->getPosition().y);
+				if (col == 0)
+				{
+					details[row][col]->setText(detailsBag.getDetails()[row][col]);
+					details[row][col]->setPosition(detailsLeftAnchor - details[row][col]->getSize().x, details[row][col]->getPosition().y);
+
+					details[row][col+1]->setText(":");
+					details[row][col+1]->setPosition(detailsMiddle - details[row][col+1]->getSize().x * 0.5f, details[row][col+1]->getPosition().y);
+				}
+				else if (col == 1)
+				{
+					details[row][col+1]->setText(detailsBag.getDetails()[row][col]);
+					details[row][col+1]->setPosition(detailsRightAnchor, details[row][col+1]->getPosition().y);
+				}
 			}
 		}
 	}

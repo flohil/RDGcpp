@@ -1,6 +1,7 @@
 #include "gameObjects.hpp"
 #include "map.hpp"
 #include "OutputFormatter.hpp"
+#include "fight.hpp"
 
 float EquipmentSet::getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum)
 {
@@ -379,7 +380,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 	return retObj;
 }
 
-std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj)
+std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj, bool usePotion, std::shared_ptr<Fight> fight)
 {
 	std::list<std::shared_ptr<RenderableObject>> retObjs;
 	EquipHotspots::Enum hotspot = EquipHotspots::UNKNOWN;
@@ -441,7 +442,16 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 	if (item->getItemType() == ItemType::POTION && hotspot != EquipHotspots::POTION1 && hotspot != EquipHotspots::POTION2 && hotspot != EquipHotspots::POTION3) // potion dragged on armament
 	{
 		std::cout << "dragged into armor" << std::endl;
-		retObjs.push_back(obj);
+		if (usePotion)
+		{
+			std::shared_ptr<Potion> potion = std::dynamic_pointer_cast<Potion>(item);
+			// add to active Potions list
+			//fight->(potion)...
+		}
+		else
+		{
+			retObjs.push_back(obj);
+		}
 		return retObjs;
 	}
 

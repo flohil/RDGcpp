@@ -160,7 +160,7 @@ public:
 	static std::string mapClassesName(Classes::Enum input);
 	static std::string mapRoomNames(RoomTypes::Enum input);
 	static std::string mapArmamentTypeNames(ArmamentType::Enum input);
-	static std::string mapLevelName(Classes::Enum input);
+	static std::string mapLevelName(DifficultyLevel::Enum input);
 	static std::string mapTargetName(Target::Enum input);
 	static std::string mapAttributeName(Attribute::Enum input);
 	static std::string mapModeName(Mode::Enum input);

@@ -16,6 +16,7 @@ class Potion;
 class Item;
 class RenderableObject;
 class GameStateGame;
+class Fight;
 
 class EquipmentSet
 {
@@ -89,7 +90,7 @@ public:
 	void setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs_, int verRightSplitAbs_);
 	void setItemSize(unsigned int itemSize_) { itemSize = itemSize_; };
 	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos, bool remove);
-	std::list<std::shared_ptr<RenderableObject>> setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj);
+	std::list<std::shared_ptr<RenderableObject>> setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj, bool usePotion, std::shared_ptr<Fight> fight);
 
 	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
 };

@@ -11,6 +11,7 @@ class OutputFormatter
 public:
 
 	static void chat(tgui::ChatBox::Ptr chatBox, std::string str, sf::Color color);
+	static std::string shortFloat(float nbr);
 };
 
 #endif /* OUTPUT_FORMATTER */

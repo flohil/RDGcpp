@@ -5,6 +5,7 @@
 
 #include "gameState.hpp"
 #include "map.hpp"
+#include "fight.hpp"
 
 class DetailsBag
 {
@@ -20,6 +21,8 @@ private:
 
 	std::string name;
 	std::vector<std::vector<std::string>> details;
+
+	void addRow(std::string key, std::string value);
 };
 
 class GameStateGame : public GameState
@@ -53,6 +56,12 @@ private:
 	bool mouseDeterminationTriggered = false;
 	sf::Vector2i lastClickPos;
 	sf::Vector2i dragStartPos;
+
+	bool inFight = false;
+	bool usePotionActive = false;
+	bool inAttackOptions = false;
+
+	std::shared_ptr<Fight> fight = nullptr;
 
 	// gui
 	float horSplit;
@@ -92,8 +101,11 @@ private:
 	float detailsMiddle;
 	float detailsKeyMiddle;
 	float detailsValueMiddle;
+	float detailsLeftAnchor;
+	float detailsRightAnchor;
 
 	std::vector<std::vector<tgui::Label::Ptr>> details;
+	unsigned int detailRows;
 
 	void changeSet(unsigned int numerator);
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType);

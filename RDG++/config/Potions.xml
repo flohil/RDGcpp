@@ -15,7 +15,7 @@
 		<Image>potions/instant_cure.png</Image>
 	</Potion>
 	<Potion>
-		<Name>Regeneration</Name>
+		<Name>Potion of Regeneration</Name>
 		<Item_Class>weak</Item_Class>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
@@ -43,7 +43,7 @@
 		<Image>potions/antidote.png</Image>
 	</Potion>
 	<Potion>
-		<Name>Strength</Name>
+		<Name>Potion of Strength</Name>
 		<Item_Class>medium</Item_Class>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
@@ -57,7 +57,7 @@
 		<Image>potions/strength.png</Image>
 	</Potion>
 	<Potion>
-		<Name>Speed</Name>
+		<Name>Potion of Speed</Name>
 		<Item_Class>medium</Item_Class>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
@@ -71,7 +71,7 @@
 		<Image>potions/speed.png</Image>
 	</Potion>
 	<Potion>
-		<Name>Accuracy</Name>
+		<Name>Potion of Accuracy</Name>
 		<Item_Class>medium</Item_Class>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
@@ -85,7 +85,7 @@
 		<Image>potions/accuracy.png</Image>
 	</Potion>
 	<Potion>
-		<Name>Blindness </Name>
+		<Name>Potion of Blindness</Name>
 		<Item_Class>medium</Item_Class>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
@@ -99,7 +99,7 @@
 		<Image>potions/blindness.png</Image>
 	</Potion>
 	<Potion>
-		<Name>Slowness</Name>
+		<Name>Potion of Slowness</Name>
 		<Item_Class>medium</Item_Class>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
@@ -127,7 +127,7 @@
 		<Image>potions/poison.png</Image>
 	</Potion>
 	<Potion>
-		<Name>Weakness</Name>
+		<Name>Potion of Weakness</Name>
 		<Item_Class>medium</Item_Class>
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>

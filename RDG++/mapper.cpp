@@ -300,20 +300,18 @@ std::string EnumMapper::mapArmamentTypeNames(ArmamentType::Enum input)
 	}
 };
 
-std::string EnumMapper::mapLevelName(Classes::Enum input)
+std::string EnumMapper::mapLevelName(DifficultyLevel::Enum input)
 {
 	switch (input)
 	{
-		case Classes::NONE:
-			return "none";
-		case Classes::WEAK:
-			return "weak";
-		case Classes::MEDIUM:
-			return "medium";
-		case Classes::STRONG:
-			return "strong";
-		case Classes::UNKNOWN:
-			LOG(ERROR) << "Unknown input for Classes::Enum: " << input;
+		case DifficultyLevel::EASY:
+				return "easy";
+		case DifficultyLevel::NORMAL:
+				return "normal";
+		case DifficultyLevel::HARD:
+				return "hard";
+		case DifficultyLevel::UNKNOWN:
+			LOG(ERROR) << "Unknown input for DifficultyLevel::Enum: " << input;
 			return "Unknown";
 		default:
 			return "Unmatched";
