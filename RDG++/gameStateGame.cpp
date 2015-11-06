@@ -15,7 +15,7 @@ void DetailsBag::addRow(std::string key, std::string value)
 	details.push_back(row);
 }
 
-DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj)
+DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj) : detailsPic(ResourceManager::getInstance().getTexture(obj->getName()))
 {
 	std::cout << "constructing detailsBag for GameObject " << obj->getName() << std::endl;
 
@@ -248,6 +248,10 @@ void GameStateGame::draw(const float deltaTime)
 
 	game.window.setView(detailsView);
 	detailsGui.draw();
+	if (detailsHeader->getText() != "")
+	{
+		game.window.draw(detailsSprite);
+	}
 
 	game.window.setView(completeView);
 	if (draggedItem != nullptr && dragging)
@@ -569,7 +573,7 @@ void GameStateGame::loadGui()
 	set1Button->setText("Set 1");
 	set1Button->setPosition(armorButtonsLeftMargin, armorButtonsTopMargin);
 	set1Button->setSize(setButtonSize.x, setButtonSize.y);
-	set1Button->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * setButtonTextSize));
+	set1Button->setTextSize(static_cast<unsigned int>(setButtonTextSize));
 	set1Button->connect("pressed", [&](){ changeSet(1); });
 	armorGui.add(set1Button);
 
@@ -577,7 +581,7 @@ void GameStateGame::loadGui()
 	set2Button->setText("Set 2");
 	set2Button->setPosition(armorButtonsLeftMargin + setButtonSize.x + 2 * spacing, armorButtonsTopMargin);
 	set2Button->setSize(setButtonSize.x, setButtonSize.y);
-	set2Button->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * setButtonTextSize));
+	set2Button->setTextSize(static_cast<unsigned int>(setButtonTextSize));
 	set2Button->connect("pressed", [&](){ changeSet(2); });
 	armorGui.add(set2Button);
 
@@ -614,11 +618,17 @@ void GameStateGame::loadGui()
 	unsigned int detailsLabelTextSize = 14u;
 	float detailsMiddleSpacing = 20.f;
 	float detailsLineSpacing = 5.f;
+	float detailsPicSideMargin = 40.f;
 	detailRows = 7u;
+	detailsPicSize = 96.f;
+	detailsPicTop = detailsView.getSize().y * 0.5f - detailsPicSize * 0.5f;
+	detailsPicLeft = detailsView.getSize().x - detailsPicSideMargin - detailsPicSize;
+	detailsHeaderMiddle = detailsView.getSize().x * 0.5f;
+	float detailsWidth = detailsPicLeft - detailsPicSideMargin * 0.5f;
 
-	detailsMiddle = detailsView.getSize().x * 0.5f;
-	detailsKeyMiddle = detailsView.getSize().x * 0.25f;
-	detailsValueMiddle = detailsView.getSize().x * 0.75f;
+	detailsMiddle = detailsWidth * 0.5f;
+	detailsKeyMiddle = detailsWidth * 0.25f;
+	detailsValueMiddle = detailsWidth * 0.75f;
 	detailsLeftAnchor = detailsMiddle - detailsMiddleSpacing * 0.5f;
 	detailsRightAnchor = detailsMiddle + detailsMiddleSpacing * 0.5f;
 
@@ -649,6 +659,11 @@ void GameStateGame::loadGui()
 
 		details.push_back(row);
 	}
+
+	sf::Texture& detailsTex = ResourceManager::getInstance().getTexture("key");
+	detailsSprite.setTexture(detailsTex);
+	detailsSprite.setPosition(detailsPicLeft, detailsPicTop);
+	detailsSprite.setScale(sf::Vector2f(detailsPicSize / detailsTex.getSize().x, detailsPicSize / detailsTex.getSize().y));
 }
 
 void GameStateGame::changeSet(unsigned int numerator)
@@ -893,6 +908,7 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag)
 	}
 
 	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeader->getPosition().y);
+	detailsSprite.setTexture(detailsBag.getDetailsPic());
 }
 
 void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_)

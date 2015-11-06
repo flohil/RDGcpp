@@ -13,6 +13,7 @@ public:
 
 	std::string getName() const { return name; };
 	std::vector<std::vector<std::string>> getDetails() const { return details; };
+	sf::Texture& getDetailsPic() const { return detailsPic; };
 
 	//consturctor for different item types and key and monsters
 	DetailsBag(std::shared_ptr<RenderableObject> obj);
@@ -21,6 +22,7 @@ private:
 
 	std::string name;
 	std::vector<std::vector<std::string>> details;
+	sf::Texture& detailsPic;
 
 	void addRow(std::string key, std::string value);
 };
@@ -97,12 +99,17 @@ private:
 
 	tgui::Label::Ptr detailsHeader;
 	tgui::Grid::Ptr detailsGrid;
+	sf::Sprite detailsSprite;
 
+	float detailsHeaderMiddle;
 	float detailsMiddle;
 	float detailsKeyMiddle;
 	float detailsValueMiddle;
 	float detailsLeftAnchor;
 	float detailsRightAnchor;
+	float detailsPicSize;
+	float detailsPicLeft;
+	float detailsPicTop;
 
 	std::vector<std::vector<tgui::Label::Ptr>> details;
 	unsigned int detailRows;
