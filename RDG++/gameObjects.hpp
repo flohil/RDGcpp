@@ -41,6 +41,9 @@ private:
 	sf::Vector2f potionDims;
 	tgui::ChatBox::Ptr chatbox;
 
+	std::shared_ptr<Weapon> fists1;
+	std::shared_ptr<Weapon> fists2;
+
 	//positions - left, top
 	sf::Vector2f primaryWeaponPos;
 	sf::Vector2f secondaryWeaponPos;
@@ -57,10 +60,11 @@ private:
 
 public:
 
-	EquipmentSet(unsigned int numerator_) :
+	EquipmentSet(unsigned int numerator_, std::shared_ptr<Weapon> fists1_, std::shared_ptr<Weapon> fists2_) :
 		primaryWeapon(nullptr), secondaryWeapon(nullptr), helmet(nullptr), harness(nullptr), cuisse(nullptr), gauntlets(nullptr), 
 		boots(nullptr), potion1(nullptr), potion2(nullptr), potion3(nullptr), numerator(numerator_), itemSize(0u), 
-		armorOffsets(sf::Vector2f(0,0)), potionOffsets(sf::Vector2f(0,0)) {};
+		armorOffsets(sf::Vector2f(0,0)), potionOffsets(sf::Vector2f(0,0)),
+		fists1(fists1_), fists2(fists2_){};
 
 	std::shared_ptr<Weapon> getPrimaryWeapon() const { return primaryWeapon; };
 	std::shared_ptr<Weapon> getSecondaryWeapon() const { return secondaryWeapon; };
@@ -84,6 +88,7 @@ public:
 	std::shared_ptr<Potion> setPotion1(std::shared_ptr<Potion> potion_);
 	std::shared_ptr<Potion> setPotion2(std::shared_ptr<Potion> potion_);
 	std::shared_ptr<Potion> setPotion3(std::shared_ptr<Potion> potion_);
+	void EquipmentSet::setFists(std::shared_ptr<Weapon> fists1_, std::shared_ptr<Weapon> fists2_);
 
 	void setChatbox(tgui::ChatBox::Ptr chatbox_) { chatbox = chatbox_; };
 	void setGeometry(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int itemSize_);
@@ -229,6 +234,7 @@ public:
 		}
 	};
 	void setEquipmentGeometry(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int itemSize_);
+	void setEquipmentFists(std::shared_ptr<Weapon> fists1, std::shared_ptr<Weapon> fists2);
 	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos) { return activeSet->getItemAtPixels(pos, false, false); };
 	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos, bool remove, bool usePotion) { return activeSet->getItemAtPixels(pos, remove, usePotion); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
@@ -264,8 +270,8 @@ private:
 	ViewingDirections::Enum facingDir = ViewingDirections::N;
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 	std::vector<std::shared_ptr<RenderableObject>> inventory;
-	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u));
-	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u));
+	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u, nullptr, nullptr));
+	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u, nullptr, nullptr));
 	std::shared_ptr<EquipmentSet> activeSet = setOne;
 
 	float inventoryLeftPadding = 17.f;

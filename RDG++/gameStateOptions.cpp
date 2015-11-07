@@ -110,9 +110,13 @@ void GameStateOptions::saveSettings()
 
 			settings->widthScaleFactor = static_cast<float>(settings->width) / static_cast<float>(settings->scaleWidth);
 			settings->heightScaleFactor = static_cast<float>(settings->height) / static_cast<float>(settings->scaleHeight);
+			settings->widthDownScaleFactor = 1.f / settings->widthScaleFactor;
+			settings->heightDownScaleFactor = 1.f / settings->heightScaleFactor;
 
 			std::cout << "widthScaleFactor: " << settings->widthScaleFactor << std::endl;
 			std::cout << "heightScaleFactor: " << settings->heightScaleFactor << std::endl;
+			std::cout << "widthDownScaleFactor: " << settings->widthDownScaleFactor << std::endl;
+			std::cout << "heightDownScaleFactor: " << settings->heightDownScaleFactor << std::endl;
 
 			game.reloadGuis();
 		}

@@ -205,6 +205,7 @@ GameState(game_)
 	loadGui();
 
 	player->init(map, settings->tileSize, chatbox);
+	player->setEquipmentFists(game.getPrototypeStorage()->weaponFactory->create("Fists"), game.getPrototypeStorage()->weaponFactory->create("Fists"));
 
 	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 

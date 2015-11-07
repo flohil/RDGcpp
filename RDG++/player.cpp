@@ -16,10 +16,20 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 
 	primaryWeapon = weapon_;
 
-	if (primaryWeapon != nullptr)
+	if (primaryWeapon != nullptr) // position new weapon
 	{
 		primaryWeapon->setSize(itemSize, itemSize);
 		primaryWeapon->setPosition(primaryWeaponPos);
+
+	}
+	else // passing nullptr only when other weapon is twohander
+	{
+
+	}
+
+	if (oldWeapon == fists1) // never return fists
+	{
+		oldWeapon = nullptr;
 	}
 
 	return oldWeapon;
@@ -31,10 +41,19 @@ std::shared_ptr<Weapon> EquipmentSet::setSecondaryWeapon(std::shared_ptr<Weapon>
 
 	secondaryWeapon = weapon_;
 
-	if (secondaryWeapon != nullptr)
+	if (secondaryWeapon != nullptr) // position new weapon
 	{
 		secondaryWeapon->setSize(itemSize, itemSize);
 		secondaryWeapon->setPosition(secondaryWeaponPos);
+	}
+	else // passing nullptr only when other weapon is twohander
+	{
+
+	}
+
+	if (oldWeapon == fists2) // never return fists
+	{
+		oldWeapon = nullptr;
 	}
 
 	return oldWeapon;
@@ -160,6 +179,20 @@ std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_
 	return oldPotion;
 };
 
+void EquipmentSet::setFists(std::shared_ptr<Weapon> fists1_, std::shared_ptr<Weapon> fists2_)
+{
+	fists1 = fists1_;
+	fists2 = fists2_;
+
+	fists1->setCenteredPosition(sf::Vector2i(static_cast<int>(primaryWeaponPos.x + itemSize * 0.5f), static_cast<int>(primaryWeaponPos.y + itemSize * 0.5f)));
+	fists2->setCenteredPosition(sf::Vector2i(static_cast<int>(secondaryWeaponPos.x + itemSize * 0.5f), static_cast<int>(secondaryWeaponPos.y + itemSize * 0.5f)));
+	fists1->setSize(itemSize, itemSize);
+	fists2->setSize(itemSize, itemSize);
+
+	primaryWeapon = fists1;
+	secondaryWeapon = fists2;
+}
+
 std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot)
 {
 	std::list<std::shared_ptr<RenderableObject>> retList;
@@ -229,9 +262,13 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 			{
 				retArm1 = setPrimaryWeapon(weapon);
 
-				if (secondaryWeapon != nullptr && secondaryWeapon->getSlots() == 2)
+				if (secondaryWeapon == nullptr)
 				{
-					retArm2 = setSecondaryWeapon(nullptr);
+					retArm2 = setSecondaryWeapon(fists2);
+				}
+				else if (secondaryWeapon->getSlots() == 2)
+				{
+					retArm2 = setSecondaryWeapon(fists2);
 				}
 			}
 			else if (weapon->getSlots() == 2)
@@ -246,9 +283,13 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 			{
 				retArm1 = setSecondaryWeapon(weapon);
 
-				if (primaryWeapon != nullptr && primaryWeapon->getSlots() == 2)
+				if (primaryWeapon == nullptr)
 				{
-					retArm2 = setPrimaryWeapon(nullptr);
+					retArm2 = setPrimaryWeapon(fists1);
+				}
+				else if (primaryWeapon->getSlots() == 2)
+				{
+					retArm2 = setPrimaryWeapon(fists1);
 				}
 			}
 			else if (weapon->getSlots() == 2)
@@ -330,22 +371,38 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 {
 	std::shared_ptr<RenderableObject> retObj = nullptr;
 
+	std::cout << "called getItemAtPixels with remove " << remove << std::endl;
+
 	if (!usePotion)
 	{
 		if (pos.x >= primaryWeaponPos.x && pos.y >= primaryWeaponPos.y && pos.x <= (primaryWeaponPos.x + itemSize) && pos.y <= (primaryWeaponPos.y + itemSize))
 		{
 			retObj = primaryWeapon;
+
+			if (retObj == fists1)
+			{
+				retObj = nullptr;
+			}
+
 			if (remove)
 			{
-				primaryWeapon = nullptr;
+				// primaryWeapon = nullptr;
+				primaryWeapon = fists1;
 			}
 		}
 		else if (pos.x >= secondaryWeaponPos.x && pos.y >= secondaryWeaponPos.y && pos.x <= (secondaryWeaponPos.x + itemSize) && pos.y <= (secondaryWeaponPos.y + itemSize))
 		{
 			retObj = secondaryWeapon;
+
+			if (retObj == fists2)
+			{
+				retObj = nullptr;
+			}
+
 			if (remove)
 			{
-				secondaryWeapon = nullptr;
+				// secondaryWeapon = nullptr;
+				secondaryWeapon = fists2;
 			}
 		}
 		else if (pos.x >= bootsPos.x && pos.y >= bootsPos.y && pos.x <= (bootsPos.x + itemSize) && pos.y <= (bootsPos.y + itemSize))
@@ -883,6 +940,12 @@ void Player::drawEquipment(sf::RenderWindow& window, const float deltaTime) cons
 	{
 		set->getPotion3()->draw(window, deltaTime);
 	}
+}
+
+void Player::setEquipmentFists(std::shared_ptr<Weapon> fists1, std::shared_ptr<Weapon> fists2)
+{
+	setOne->setFists(fists1, fists2);
+	setTwo->setFists(fists1, fists2);
 }
 
 void Player::setPosition(Point position_)
