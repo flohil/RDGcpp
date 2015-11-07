@@ -303,14 +303,13 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 	return retList;
 }
 
-void EquipmentSet::setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs_, int verRightSplitAbs_) {
+void EquipmentSet::setGeometry(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int itemSize_) {
 
 	armorOffsets = armorOffsets_;
 	potionOffsets = potionOffsets_;
 	armorDims = armorDims_;
 	potionDims = potionDims_;
-	horSplitAbs = horSplitAbs_;
-	verRightSplitAbs = verRightSplitAbs_;
+	itemSize = itemSize_;
 
 	std::cout << "armorDims: " << armorDims.x << " x " << armorDims.y << std::endl;
 	std::cout << "potionDims: " << potionDims.x << " x " << potionDims.y << std::endl;
@@ -329,15 +328,11 @@ void EquipmentSet::setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOff
 
 std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos, bool remove, bool usePotion)
 {
-	sf::Vector2i relPos;
 	std::shared_ptr<RenderableObject> retObj = nullptr;
-
-	relPos.x = pos.x - horSplitAbs;
-	relPos.y = pos.y;
 
 	if (!usePotion)
 	{
-		if (relPos.x >= primaryWeaponPos.x && relPos.y >= primaryWeaponPos.y && relPos.x <= (primaryWeaponPos.x + itemSize) && relPos.y <= (primaryWeaponPos.y + itemSize))
+		if (pos.x >= primaryWeaponPos.x && pos.y >= primaryWeaponPos.y && pos.x <= (primaryWeaponPos.x + itemSize) && pos.y <= (primaryWeaponPos.y + itemSize))
 		{
 			retObj = primaryWeapon;
 			if (remove)
@@ -345,7 +340,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 				primaryWeapon = nullptr;
 			}
 		}
-		else if (relPos.x >= secondaryWeaponPos.x && relPos.y >= secondaryWeaponPos.y && relPos.x <= (secondaryWeaponPos.x + itemSize) && relPos.y <= (secondaryWeaponPos.y + itemSize))
+		else if (pos.x >= secondaryWeaponPos.x && pos.y >= secondaryWeaponPos.y && pos.x <= (secondaryWeaponPos.x + itemSize) && pos.y <= (secondaryWeaponPos.y + itemSize))
 		{
 			retObj = secondaryWeapon;
 			if (remove)
@@ -353,7 +348,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 				secondaryWeapon = nullptr;
 			}
 		}
-		else if (relPos.x >= bootsPos.x && relPos.y >= bootsPos.y && relPos.x <= (bootsPos.x + itemSize) && relPos.y <= (bootsPos.y + itemSize))
+		else if (pos.x >= bootsPos.x && pos.y >= bootsPos.y && pos.x <= (bootsPos.x + itemSize) && pos.y <= (bootsPos.y + itemSize))
 		{
 			retObj = boots;
 			if (remove)
@@ -361,7 +356,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 				boots = nullptr;
 			}
 		}
-		else if (relPos.x >= cuissePos.x && relPos.y >= cuissePos.y && relPos.x <= (cuissePos.x + itemSize) && relPos.y <= (cuissePos.y + itemSize))
+		else if (pos.x >= cuissePos.x && pos.y >= cuissePos.y && pos.x <= (cuissePos.x + itemSize) && pos.y <= (cuissePos.y + itemSize))
 		{
 			retObj = cuisse;
 			if (remove)
@@ -369,7 +364,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 				cuisse = nullptr;
 			}
 		}
-		else if (relPos.x >= gauntletsPos.x && relPos.y >= gauntletsPos.y && relPos.x <= (gauntletsPos.x + itemSize) && relPos.y <= (gauntletsPos.y + itemSize))
+		else if (pos.x >= gauntletsPos.x && pos.y >= gauntletsPos.y && pos.x <= (gauntletsPos.x + itemSize) && pos.y <= (gauntletsPos.y + itemSize))
 		{
 			retObj = gauntlets;
 			if (remove)
@@ -377,7 +372,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 				gauntlets = nullptr;
 			}
 		}
-		else if (relPos.x >= harnessPos.x && relPos.y >= harnessPos.y && relPos.x <= (harnessPos.x + itemSize) && relPos.y <= (harnessPos.y + itemSize))
+		else if (pos.x >= harnessPos.x && pos.y >= harnessPos.y && pos.x <= (harnessPos.x + itemSize) && pos.y <= (harnessPos.y + itemSize))
 		{
 			retObj = harness;
 			if (remove)
@@ -385,7 +380,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 				harness = nullptr;
 			}
 		}
-		else if (relPos.x >= helmetPos.x && relPos.y >= helmetPos.y && relPos.x <= (helmetPos.x + itemSize) && relPos.y <= (helmetPos.y + itemSize))
+		else if (pos.x >= helmetPos.x && pos.y >= helmetPos.y && pos.x <= (helmetPos.x + itemSize) && pos.y <= (helmetPos.y + itemSize))
 		{
 			retObj = helmet;
 			if (remove)
@@ -394,7 +389,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 			}
 		}
 	}
-	if (relPos.x >= potion1Pos.x && relPos.y >= potion1Pos.y && relPos.x <= (potion1Pos.x + itemSize) && relPos.y <= (potion1Pos.y + itemSize))
+	if (pos.x >= potion1Pos.x && pos.y >= potion1Pos.y && pos.x <= (potion1Pos.x + itemSize) && pos.y <= (potion1Pos.y + itemSize))
 	{
 		retObj = potion1;
 		if (remove)
@@ -402,7 +397,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 			potion1 = nullptr;
 		}
 	}
-	else if (relPos.x >= potion2Pos.x && relPos.y >= potion2Pos.y && relPos.x <= (potion2Pos.x + itemSize) && relPos.y <= (potion2Pos.y + itemSize))
+	else if (pos.x >= potion2Pos.x && pos.y >= potion2Pos.y && pos.x <= (potion2Pos.x + itemSize) && pos.y <= (potion2Pos.y + itemSize))
 	{
 		retObj = potion2;
 		if (remove)
@@ -410,7 +405,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 			potion2 = nullptr;
 		}
 	}
-	else if (relPos.x >= potion3Pos.x && relPos.y >= potion3Pos.y && relPos.x <= (potion3Pos.x + itemSize) && relPos.y <= (potion3Pos.y + itemSize))
+	else if (pos.x >= potion3Pos.x && pos.y >= potion3Pos.y && pos.x <= (potion3Pos.x + itemSize) && pos.y <= (potion3Pos.y + itemSize))
 	{
 		retObj = potion3;
 		if (remove)
@@ -427,22 +422,13 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 	std::list<std::shared_ptr<RenderableObject>> retObjs;
 	EquipHotspots::Enum hotspot = EquipHotspots::UNKNOWN;
 
-	sf::Vector2f armorOffsetsAbs;
-	sf::Vector2f potionOffsetsAbs;
-
-	armorOffsetsAbs.x = armorOffsets.x + horSplitAbs;
-	armorOffsetsAbs.y = armorOffsets.y;
-
-	potionOffsetsAbs.x = potionOffsets.x + horSplitAbs;
-	potionOffsetsAbs.y = potionOffsets.y;
-
 	std::cout << "pos: x =  " << pos.x << ", y = " << pos.y << std::endl;
-	std::cout << "armorBounds: left =  " << armorOffsetsAbs.x << ", right = " << (armorOffsetsAbs.x + armorDims.x) << ", top = " << armorOffsetsAbs.y << ", bottom = " << (armorOffsetsAbs.y + armorDims.y) << std::endl;
-	std::cout << "potionBounds: left =  " << potionOffsetsAbs.x << ", right = " << (potionOffsetsAbs.x + potionDims.x) << ", top = " << potionOffsetsAbs.y << ", bottom = " << (potionOffsetsAbs.y + potionDims.y) << std::endl;
+	std::cout << "armorBounds: left =  " << armorOffsets.x << ", right = " << (armorOffsets.x + armorDims.x) << ", top = " << armorOffsets.y << ", bottom = " << (armorOffsets.y + armorDims.y) << std::endl;
+	std::cout << "potionBounds: left =  " << potionOffsets.x << ", right = " << (potionOffsets.x + potionDims.x) << ", top = " << potionOffsets.y << ", bottom = " << (potionOffsets.y + potionDims.y) << std::endl;
 
-	if (pos.x >= armorOffsetsAbs.x && pos.x <= (armorOffsetsAbs.x + armorDims.x) && pos.y >= armorOffsetsAbs.y && pos.y <= (armorOffsetsAbs.y + armorDims.y)) //inside armor
+	if (pos.x >= armorOffsets.x && pos.x <= (armorOffsets.x + armorDims.x) && pos.y >= armorOffsets.y && pos.y <= (armorOffsets.y + armorDims.y)) //inside armor
 	{
-		if (pos.x >= armorOffsetsAbs.x + (armorDims.x * 0.5f)){
+		if (pos.x >= armorOffsets.x + (armorDims.x * 0.5f)){
 			hotspot = EquipHotspots::RIGHT;
 			std::cout << "right" << std::endl;
 		}
@@ -452,18 +438,18 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 			std::cout << "left" << std::endl;
 		}
 	}
-	if (pos.x >= potionOffsetsAbs.x && pos.x <= (potionOffsetsAbs.x + potionDims.x) && pos.y >= potionOffsetsAbs.y && pos.y <= (potionOffsetsAbs.y + potionDims.y)) //inside potions
+	if (pos.x >= potionOffsets.x && pos.x <= (potionOffsets.x + potionDims.x) && pos.y >= potionOffsets.y && pos.y <= (potionOffsets.y + potionDims.y)) //inside potions
 	{
-		if (pos.x >= potionOffsetsAbs.x && pos.x < potionOffsetsAbs.x + (potionDims.x * 0.33f)){
+		if (pos.x >= potionOffsets.x && pos.x < potionOffsets.x + (potionDims.x * 0.33f)){
 			hotspot = EquipHotspots::POTION3;
 			std::cout << "potion1" << std::endl;
 		}
-		else if (pos.x >= potionOffsetsAbs.x + (potionDims.x * 0.33f) && pos.x < potionOffsetsAbs.x + (potionDims.x * 0.66f))
+		else if (pos.x >= potionOffsets.x + (potionDims.x * 0.33f) && pos.x < potionOffsets.x + (potionDims.x * 0.66f))
 		{
 			hotspot = EquipHotspots::POTION2;
 			std::cout << "potion2" << std::endl;
 		}
-		else if (pos.x >= potionOffsetsAbs.x + (potionDims.x * 0.66f) && pos.x < potionOffsetsAbs.x + potionDims.x)
+		else if (pos.x >= potionOffsets.x + (potionDims.x * 0.66f) && pos.x < potionOffsets.x + potionDims.x)
 		{
 			hotspot = EquipHotspots::POTION1;
 			std::cout << "potion3" << std::endl;
@@ -511,21 +497,16 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 
 // Player ----------------------------------------------------------------------------------------------------------------------
 
-void Player::init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_, int horSplitAbs_, int rightVerSplitAbs_)
+void Player::init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_)
 {
 	map = map_;
 	tileSize = tileSize_;
 	chatBox = chatBox_;
-	horSplitAbs = horSplitAbs_;
-	verRightSplitAbs = rightVerSplitAbs_;
 
 	Point point = map->initPlayerPosition();
 	prevPlayerPosition = point;
 	playerPosition = prevPlayerPosition;
 	RenderableObject::setPosition(sf::Vector2f(static_cast<float>(playerPosition.x * tileSize), static_cast<float>(playerPosition.y * tileSize)));
-
-	setOne->setItemSize(tileSize);
-	setTwo->setItemSize(tileSize);
 }
 
 // player may only move on tiles, but for smooth movements, player is moved in between tiles
@@ -910,18 +891,18 @@ void Player::setPosition(Point position_)
 	playerPosition = position_;
 }
 
-void Player::setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs, int verRightSplitAbs)
+void Player::setEquipmentGeometry(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int itemSize_)
 {
-	setOne->setOffsets(armorOffsets, potionOffsets, armorDims_, potionDims_, horSplitAbs, verRightSplitAbs);
-	setTwo->setOffsets(armorOffsets, potionOffsets, armorDims_, potionDims_, horSplitAbs, verRightSplitAbs);
+	setOne->setGeometry(armorOffsets, potionOffsets, armorDims_, potionDims_, itemSize_);
+	setTwo->setGeometry(armorOffsets, potionOffsets, armorDims_, potionDims_, itemSize_);
 }
 
 std::shared_ptr<RenderableObject> Player::getInventoryItemAtPixels(sf::Vector2i pos, bool remove)
 {
 	sf::Vector2i relativePos;
 
-	relativePos.x = static_cast<int>(pos.x - horSplitAbs - inventoryLeftPadding);
-	relativePos.y = static_cast<int>(pos.y - verRightSplitAbs - inventoryTopPadding);
+	relativePos.x = static_cast<int>(pos.x - inventoryLeftPadding);
+	relativePos.y = static_cast<int>(pos.y - inventoryTopPadding);
 
 	if (relativePos.x < 0 || relativePos.y < 0)
 	{

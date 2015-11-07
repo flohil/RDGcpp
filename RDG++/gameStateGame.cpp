@@ -117,25 +117,28 @@ GameState(game_)
 	*/
 	
 	//horSplit = 0.8265625f;
-	horSplit = 0.815f;
+	topVerSplit = 0.07f;
+	rightHorSplit = 0.815f;
 	rightVerSplit = 0.5f;
-	verSplit = 0.75f;
+	bottomVerSplit = 0.786f;
 	bottomHorSplit = 0.5f; // relative to horSplit
 
-	horSplitAbs = static_cast<int>(horSplit * size.x);
+	rightHorSplitAbs = static_cast<int>(rightHorSplit * size.x);
+	topVerSplitAbs = static_cast<int>(topVerSplit * size.y);
 	rightVerSplitAbs = static_cast<int>(rightVerSplit * size.y);
-	verSplitAbs = static_cast<int>(verSplit * size.y);
-	bottomHorSplitAbs = static_cast<int>(bottomHorSplit * size.y);
+	bottomVerSplitAbs = static_cast<int>(bottomVerSplit * size.y);
+	bottomHorSplitAbs = static_cast<int>(bottomHorSplit * rightHorSplit * size.x);
 
-	float armorImageHeight = size.x * (1.f - horSplit);
+	float armorImageHeight = size.x - rightHorSplitAbs;
 	
 	// for aspect Ratio 16:9
-	sf::Vector2f possibleMapViewSize = sf::Vector2f(size.x * horSplit, size.y * 0.75f);
+	sf::Vector2f statsViewSize = sf::Vector2f(static_cast<float>(rightHorSplitAbs), static_cast<float>(topVerSplitAbs));
+	sf::Vector2f possibleMapViewSize = sf::Vector2f(static_cast<float>(rightHorSplitAbs), static_cast<float>(bottomVerSplitAbs - topVerSplitAbs));
 	viewportSize = possibleMapViewSize;
-	sf::Vector2f chatViewSize = sf::Vector2f(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
-	sf::Vector2f detailsViewSize = sf::Vector2f(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
-	sf::Vector2f armorViewSize = sf::Vector2f(size.x * (1.f - horSplit), size.y * rightVerSplit);
-	sf::Vector2f inventoryViewSize = sf::Vector2f(size.x * (1.f - horSplit), size.y * (1.f - rightVerSplit));
+	sf::Vector2f chatViewSize = sf::Vector2f(static_cast<float>(bottomHorSplitAbs), static_cast<float>(size.y - bottomVerSplitAbs));
+	sf::Vector2f detailsViewSize = sf::Vector2f(static_cast<float>(bottomHorSplitAbs), static_cast<float>(size.y - bottomVerSplitAbs));
+	sf::Vector2f armorViewSize = sf::Vector2f(static_cast<float>(size.x - rightHorSplitAbs), static_cast<float>(rightVerSplitAbs));
+	sf::Vector2f inventoryViewSize = sf::Vector2f(static_cast<float>(size.x - rightHorSplitAbs), static_cast<float>(size.y - rightVerSplitAbs));
 
 	unsigned int tilesX = (game_.getSettings()->ROOM_WIDTH + 1) * game_.getSettings()->mazeSize + 1;
 	unsigned int tilesY = (game_.getSettings()->ROOM_HEIGHT + 1) * game_.getSettings()->mazeSize + 1;
@@ -153,19 +156,22 @@ GameState(game_)
 	float left = (possibleMapViewSize.x - viewportSize.x) / size.x;
 	float top = (possibleMapViewSize.y - viewportSize.y) / size.y;
 
-	mapView.setViewport(sf::FloatRect(left / 2, top / 2, viewportSize.x / size.x, viewportSize.y / size.y));
-	armorView.setViewport(sf::FloatRect(horSplit, 0.f, (1.f - horSplit), rightVerSplit));
-	chatView.setViewport(sf::FloatRect(0.f, verSplit, horSplit * bottomHorSplit, (1.f - verSplit)));
-	detailsView.setViewport(sf::FloatRect(horSplit * bottomHorSplit, verSplit, (horSplit - horSplit * bottomHorSplit), (1.f - verSplit)));
-	inventoryView.setViewport(sf::FloatRect(horSplit, rightVerSplit, (1.f - horSplit), (1.f - rightVerSplit)));
+	statsView.setViewport(sf::FloatRect(0.f, 0.f, rightHorSplit, topVerSplit));
+	mapView.setViewport(sf::FloatRect(left / 2, topVerSplit +  top / 2, viewportSize.x / size.x, viewportSize.y / size.y));
+	armorView.setViewport(sf::FloatRect(rightHorSplit, 0.f, (1.f - rightHorSplit), rightVerSplit));
+	chatView.setViewport(sf::FloatRect(0.f, bottomVerSplit, rightHorSplit * bottomHorSplit, (1.f - bottomVerSplit)));
+	detailsView.setViewport(sf::FloatRect(rightHorSplit * bottomHorSplit, bottomVerSplit, (rightHorSplit - rightHorSplit * bottomHorSplit), (1.f - bottomVerSplit)));
+	inventoryView.setViewport(sf::FloatRect(rightHorSplit, rightVerSplit, (1.f - rightHorSplit), (1.f - rightVerSplit)));
 	completeView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
 
+	statsView.setSize(statsViewSize);
 	mapView.setSize(viewportSize);
 	armorView.setSize(armorViewSize);
 	chatView.setSize(chatViewSize);
 	detailsView.setSize(detailsViewSize);
 	inventoryView.setSize(inventoryViewSize);
 	completeView.setSize(size);
+	statsView.setCenter(statsViewSize * 0.5f);
 	mapView.setCenter(viewportSize * 0.5f);
 	armorView.setCenter(armorViewSize * 0.5f);
 	chatView.setCenter(chatViewSize * 0.5f);
@@ -194,7 +200,7 @@ GameState(game_)
 
 	loadGui();
 
-	player->init(map, settings->tileSize, chatbox, horSplitAbs, rightVerSplitAbs);
+	player->init(map, settings->tileSize, chatbox);
 
 	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 
@@ -214,6 +220,9 @@ GameState(game_)
 void GameStateGame::draw(const float deltaTime)
 {
 	game.window.clear(sf::Color::Black);
+
+	game.window.setView(statsView);
+	statsGui.draw();
 
 	game.window.setView(mapView);
 	if (inFight)
@@ -293,7 +302,10 @@ void GameStateGame::update(const float deltaTime)
 	{
 		if (draggedItem != nullptr)
 		{
-			draggedItem->setCenteredPosition(sf::Mouse::getPosition(game.window));
+			sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
+			mousePos.x *= static_cast<int>(settings->widthDownScaleFactor);
+			mousePos.y *= static_cast<int>(settings->heightDownScaleFactor);
+			draggedItem->setCenteredPosition(mousePos);
 		}
 	}
 
@@ -436,6 +448,9 @@ void GameStateGame::pauseGame()
 
 void GameStateGame::loadGui()
 {
+	statsGui.removeAllWidgets();
+	statsGui.setWindow(game.window);
+
 	chatGui.removeAllWidgets();
 	chatGui.setWindow(game.window);
 
@@ -452,6 +467,7 @@ void GameStateGame::loadGui()
 	inventoryGui.setWindow(game.window);
 
 	// set global font that all widgets can use by default
+	statsGui.setFont("res/fonts/DejaVuSans.ttf");
 	chatGui.setFont("res/fonts/DejaVuSans.ttf");
 	detailsGui.setFont("res/fonts/DejaVuSans.ttf");
 	armorGui.setFont("res/fonts/DejaVuSans.ttf");
@@ -459,11 +475,18 @@ void GameStateGame::loadGui()
 	fightGui.setFont("res/fonts/DejaVuSans.ttf");
 
 	// gui loading
+	statsbox = theme->load("ChatBox");
+	statsbox->setSize(static_cast<float>(rightHorSplitAbs), static_cast<float>(topVerSplitAbs));
+	statsbox->setPosition(0, 0);
+	statsGui.add(statsbox, "stats");
+
+	statsGui.setView(statsView);
+
 	chatbox = theme->load("ChatBox");
-	chatbox->setSize(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
-	chatbox->setTextSize(18);
+	chatbox->setSize(static_cast<float>(bottomHorSplitAbs), static_cast<float>(size.y - bottomVerSplitAbs));
+	chatbox->setTextSize(17u);
 	chatbox->setPosition(0, 0);
-	chatbox->setLineLimit(8);
+	chatbox->setLineLimit(7);
 	chatbox->setLinesStartFromTop();
 	chatGui.add(chatbox, "log");
 
@@ -472,27 +495,28 @@ void GameStateGame::loadGui()
 	chatGui.setView(chatView);
 
 	detailsbox = theme->load("ChatBox");
-	detailsbox->setSize(size.x * horSplit * bottomHorSplit, size.y * (1 - verSplit));
+	detailsbox->setSize(static_cast<float>(bottomHorSplitAbs), static_cast<float>(size.y - bottomVerSplitAbs));
+	detailsbox->setPosition(0, 0);
 	detailsGui.add(detailsbox, "details");
 
 	detailsGui.setView(detailsView);
 
 	inventorybox = theme->load("ChatBox");
-	inventorybox->setSize(size.x * (1 - horSplit), size.y * (1.f - rightVerSplit));
+	inventorybox->setSize(static_cast<float>(size.x - rightHorSplitAbs), static_cast<float>(size.y - rightVerSplitAbs));
 	inventorybox->setPosition(0, 0);
 	inventoryGui.add(inventorybox, "inventory");
 
 	inventoryGui.setView(inventoryView);
 
 	armorbox = theme->load("ChatBox");
-	armorbox->setSize(size.x * (1 - horSplit), size.y * rightVerSplit);
+	armorbox->setSize(static_cast<float>(size.x - rightHorSplitAbs), static_cast<float>(rightVerSplitAbs));
 	armorbox->setPosition(0, 0);
 	armorGui.add(armorbox, "armor");
 
 	float armorButtonsTopMargin = 10.f;
 	float armorButtonsLeftMargin = 8.f;
 	float spacing = 2.f;
-	sf::Vector2f setButtonSize(size.x * (1 - horSplit) * 0.5f - armorButtonsLeftMargin - spacing, 35);
+	sf::Vector2f setButtonSize((size.x - rightHorSplitAbs) * 0.5f - armorButtonsLeftMargin - spacing, 35);
 	unsigned int setButtonTextSize = 18u;
 
 	set1Button = theme->load("Button");
@@ -531,19 +555,19 @@ void GameStateGame::loadGui()
 	potionDims.x = potionSprite.getGlobalBounds().width;
 	potionDims.y = potionSprite.getGlobalBounds().height;
 
-	player->setEquipmentOffsets(sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset), armorDims, potionDims, horSplitAbs, rightVerSplitAbs);
+	player->setEquipmentGeometry(sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset), armorDims, potionDims, settings->tileSize);
 
 	armorGui.setView(armorView);
 
 	// details stuff
 
-	float detailsHeaderTopMargin = 4.f;
+	float detailsHeaderTopMargin = 2.f;
 	float detailsHeaderHeight = 27.f;
 	float detailsTopMargin = detailsHeaderTopMargin + detailsHeaderHeight;
 	unsigned int detailsHeaderTextSize = 18u;
 	unsigned int detailsLabelTextSize = 14u;
 	float detailsMiddleSpacing = 20.f;
-	float detailsLineSpacing = 5.f;
+	float detailsLineSpacing = 4.f;
 	float detailsPicSideMargin = 40.f;
 	detailRows = 7u;
 	detailsPicSize = 96.f;
@@ -613,13 +637,20 @@ void GameStateGame::changeSet(unsigned int numerator)
 	}
 }
 
-void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType)
+void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType, bool noScale)
 {
 	// scale mouse position
 	sf::Vector2i pos;
 
-	pos.x = static_cast<int>(pos_.x * static_cast<float>(size.x / settings->width));
-	pos.y = static_cast<int>(pos_.y * static_cast<float>(size.y / settings->height));
+	if (noScale)
+	{
+		pos = pos_;
+	}
+	else
+	{
+		pos.x = static_cast<int>(pos_.x * settings->widthDownScaleFactor);
+		pos.y = static_cast<int>(pos_.y * settings->heightDownScaleFactor);
+	}
 
 	std::cout << "mouseEvent: pos = " << pos.x << ", " << pos.y << ", type: " << eventType << std::endl;
 
@@ -638,8 +669,13 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 	}
 
-	if (pos.x < horSplitAbs && pos.y < verSplitAbs && !inFight) // inside map
+	if (pos.x < rightHorSplitAbs && pos.y < bottomVerSplitAbs && pos.y >= topVerSplitAbs && !inFight) // inside map
 	{
+		sf::Vector2i relPos;
+
+		relPos.x = pos.x;
+		relPos.y = pos.y - topVerSplitAbs;
+
 		if (eventType == MouseEvent::DRAGSTART)
 		{
 			draggedItem = nullptr;
@@ -647,7 +683,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if (eventType == MouseEvent::CLICK)
 		{
-			std::shared_ptr<RenderableObject> retObj = map->getItemAtPixels(pos);
+			std::shared_ptr<RenderableObject> retObj = map->getItemAtPixels(relPos);
 			
 			if (retObj != nullptr)
 			{
@@ -671,19 +707,24 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 				else
 				{
 					OutputFormatter::chat(chatbox, "Could not drop " + draggedItem->getName(), sf::Color::White);
-					handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE); // return dragged item to where it came from if there is no free tile in front of the player
+					handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE, true); // return dragged item to where it came from if there is no free tile in front of the player
 				}
 			}
 			dragging = false;
 		}
 	}
-	else if (pos.x > horSplitAbs && pos.y < rightVerSplitAbs) // inside armor
+	else if (pos.x > rightHorSplitAbs && pos.y < rightVerSplitAbs) // inside armor
 	{
+		sf::Vector2i relPos;
+
+		relPos.x = pos.x - rightHorSplitAbs;
+		relPos.y = pos.y;
+
 		if (eventType == MouseEvent::DRAGSTART)
 		{
 			if (!inFight || usePotionActive)
 			{
-				draggedItem = player->getArmorItemAtPixels(pos, true, usePotionActive);
+				draggedItem = player->getArmorItemAtPixels(relPos, true, usePotionActive);
 
 				std::cout << "draggedItem: " << draggedItem << std::endl;
 
@@ -696,7 +737,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if (eventType == MouseEvent::CLICK)
 		{
-			std::shared_ptr<RenderableObject> retObj = player->getArmorItemAtPixels(pos);
+			std::shared_ptr<RenderableObject> retObj = player->getArmorItemAtPixels(relPos);
 
 			if (retObj != nullptr)
 			{
@@ -709,7 +750,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 			std::shared_ptr<RenderableObject> oldDraggedItem = draggedItem;
 
-			std::list<std::shared_ptr<RenderableObject>> retObjs = player->getEquipmentSet()->setItemAtPixels(pos, draggedItem, usePotionActive, fight);
+			std::list<std::shared_ptr<RenderableObject>> retObjs = player->getEquipmentSet()->setItemAtPixels(relPos, draggedItem, usePotionActive, fight);
 			bool contains = false;
 
 			std::cout << "  RETURNED: - " << retObjs.size() << std::endl;
@@ -727,7 +768,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 				{
 					OutputFormatter::chat(chatbox, "Unequipped " + obj->getName(), sf::Color::White);
 				}
-				handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE);
+				handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE, true);
 			}
 
 			if (!contains)
@@ -746,11 +787,16 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			draggedItem = nullptr;
 		}
 	}
-	else if (pos.x > horSplitAbs && pos.y >= rightVerSplitAbs) // inside inventory
+	else if (pos.x > rightHorSplitAbs && pos.y >= rightVerSplitAbs) // inside inventory
 	{
+		sf::Vector2i relPos;
+
+		relPos.x = pos.x - rightHorSplitAbs;
+		relPos.y = pos.y - rightVerSplitAbs;
+
 		if (eventType == MouseEvent::DRAGSTART && !inFight)
 		{
-			draggedItem = player->getInventoryItemAtPixels(pos, true);
+			draggedItem = player->getInventoryItemAtPixels(relPos, true);
 
 			if (draggedItem != nullptr)
 			{
@@ -759,7 +805,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if(eventType == MouseEvent::CLICK)
 		{
-			std::shared_ptr<RenderableObject> retObj = player->getInventoryItemAtPixels(pos);
+			std::shared_ptr<RenderableObject> retObj = player->getInventoryItemAtPixels(relPos);
 
 			if (retObj != nullptr)
 			{
@@ -771,7 +817,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			std::string oldDraggedItemName = draggedItem->getName();
 			if ((draggedItem = player->putInInventory(draggedItem, false)) != nullptr)
 			{
-				handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE);
+				handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE, true);
 			}
 			else if (draggedFromEquipment)
 			{
@@ -784,7 +830,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	{
 		if (eventType == MouseEvent::DRAGRELEASE)
 		{
-			handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE);
+			handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE, true);
 			dragging = false;
 		}
 	}

@@ -39,8 +39,6 @@ private:
 	sf::Vector2f potionOffsets;
 	sf::Vector2f armorDims;
 	sf::Vector2f potionDims;
-	int horSplitAbs;
-	int verRightSplitAbs;
 	tgui::ChatBox::Ptr chatbox;
 
 	//positions - left, top
@@ -88,8 +86,7 @@ public:
 	std::shared_ptr<Potion> setPotion3(std::shared_ptr<Potion> potion_);
 
 	void setChatbox(tgui::ChatBox::Ptr chatbox_) { chatbox = chatbox_; };
-	void setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs_, int verRightSplitAbs_);
-	void setItemSize(unsigned int itemSize_) { itemSize = itemSize_; };
+	void setGeometry(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int itemSize_);
 	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos, bool remove, bool usePotion);
 	std::list<std::shared_ptr<RenderableObject>> setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj, bool usePotion, std::shared_ptr<Fight> fight);
 
@@ -205,7 +202,7 @@ public:
 	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_, float moveDistance_, unsigned int maxInventorySize_, sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_) : 
 		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_), moveDistance(moveDistance_), maxInventorySize(maxInventorySize_) {};
 
-	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_, int horSplitAbs_, int rightVerSplitAbs_);
+	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_);
 	void update(const float deltaTime);
 	void handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem);
 	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object) { return putInInventory(object, true); };
@@ -231,7 +228,7 @@ public:
 			activeSet = setTwo;
 		}
 	};
-	void setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs, int verRightSplitAbs);
+	void setEquipmentGeometry(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int itemSize_);
 	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos) { return activeSet->getItemAtPixels(pos, false, false); };
 	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos, bool remove, bool usePotion) { return activeSet->getItemAtPixels(pos, remove, usePotion); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
@@ -275,9 +272,6 @@ private:
 	float inventoryTopPadding = 12.f;
 	float inventorySpacing = 5.f;
 	unsigned int inventoryHorItemCount = 3u;
-
-	int horSplitAbs;
-	int verRightSplitAbs;
 
 	tgui::ChatBox::Ptr chatBox;
 

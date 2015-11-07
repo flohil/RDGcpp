@@ -22,6 +22,8 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	height = desktopHeight;
 	widthScaleFactor = static_cast<float>(width) / static_cast<float>(scaleWidth);
 	heightScaleFactor = static_cast<float>(height) / static_cast<float>(scaleHeight);
+	widthDownScaleFactor = 1 / widthScaleFactor;
+	heightDownScaleFactor = 1 / heightScaleFactor;
 	mazeSize = 5;
 	tileSize = 32;
 	creatureSize = 128;
@@ -132,6 +134,8 @@ bool Settings::loadSettings()
 
 		widthScaleFactor = static_cast<float>(width) / static_cast<float>(scaleWidth);
 		heightScaleFactor = static_cast<float>(height) / static_cast<float>(scaleHeight);
+		widthDownScaleFactor = 1 / widthScaleFactor;
+		heightDownScaleFactor = 1 / heightScaleFactor;
 
 		std::cout << "widthScaleFactor: " << widthScaleFactor << std::endl;
 		std::cout << "heightScaleFactor: " << heightScaleFactor << std::endl;
