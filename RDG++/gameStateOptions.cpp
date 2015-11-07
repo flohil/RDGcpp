@@ -90,6 +90,17 @@ void GameStateOptions::saveSettings()
 	settings->width = resolution.x;
 	settings->height = resolution.y;
 
+	if (settings->enableSound)
+	{
+		settings->actualEffectsVolume = settings->effectsVolume;
+		settings->actualMusicVolume = settings->musicVolume;
+	}
+	else
+	{
+		settings->actualEffectsVolume = 0.f;
+		settings->actualMusicVolume = 0.f;
+	}
+
 	settings->saveSettings();
 
 	status = "Settings have been saved!";

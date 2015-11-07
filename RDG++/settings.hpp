@@ -42,6 +42,11 @@ public:
 	float labelPaddingX;
 	float labelBigHeight;
 	float labelSmallHeight;
+	float effectsVolume;
+	float musicVolume;
+	float actualEffectsVolume;
+	float actualMusicVolume;
+	bool enableSound;
 
 	// functions
 	Settings(unsigned int desktopWidth, unsigned int desktopHeight);
