@@ -303,8 +303,10 @@ void GameStateGame::update(const float deltaTime)
 		if (draggedItem != nullptr)
 		{
 			sf::Vector2i mousePos = sf::Mouse::getPosition(game.window);
-			mousePos.x *= static_cast<int>(settings->widthDownScaleFactor);
-			mousePos.y *= static_cast<int>(settings->heightDownScaleFactor);
+
+			mousePos.x = static_cast<int>(settings->widthDownScaleFactor * mousePos.x);
+			mousePos.y = static_cast<int>(settings->heightDownScaleFactor * mousePos.y);
+
 			draggedItem->setCenteredPosition(mousePos);
 		}
 	}
