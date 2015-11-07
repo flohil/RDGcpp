@@ -98,6 +98,21 @@ private:
 	tgui::ChatBox::Ptr inventorybox;
 	tgui::ChatBox::Ptr armorbox;
 
+	tgui::Label::Ptr playerNameLabel;
+	tgui::Label::Ptr hpLabel;
+	tgui::Label::Ptr accuracyLabel;
+	tgui::Label::Ptr strengthLabel;
+	tgui::Label::Ptr speedLabel;
+
+	sf::Sprite hpSprite;
+	sf::Sprite accuracySprite;
+	sf::Sprite strengthSprite;
+	sf::Sprite speedSprite;
+
+	float statsMarginRight;
+	float statsSpacing;
+	float statsPicSize;
+
 	tgui::Button::Ptr set1Button;
 	tgui::Button::Ptr set2Button;
 
@@ -122,6 +137,7 @@ private:
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType) { handleMouseEvent(pos_, eventType, false); };
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType, bool noScale);
 	void updateDetails(DetailsBag& detailsBag);
+	void updateStats();
 	void startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_);
 
 public:

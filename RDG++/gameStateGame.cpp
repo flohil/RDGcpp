@@ -189,6 +189,10 @@ GameState(game_)
 
 	armorSprite.setTexture(ResourceManager::getInstance().getTexture("armorBackground"));
 	potionSprite.setTexture(ResourceManager::getInstance().getTexture("potionBar"));
+	hpSprite.setTexture(ResourceManager::getInstance().getTexture("hp"));
+	accuracySprite.setTexture(ResourceManager::getInstance().getTexture("accuracy"));
+	strengthSprite.setTexture(ResourceManager::getInstance().getTexture("strength"));
+	speedSprite.setTexture(ResourceManager::getInstance().getTexture("speed"));
 
 	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
@@ -223,6 +227,10 @@ void GameStateGame::draw(const float deltaTime)
 
 	game.window.setView(statsView);
 	statsGui.draw();
+	game.window.draw(strengthSprite);
+	game.window.draw(speedSprite);
+	game.window.draw(accuracySprite);
+	game.window.draw(hpSprite);
 
 	game.window.setView(mapView);
 	if (inFight)
@@ -311,6 +319,8 @@ void GameStateGame::update(const float deltaTime)
 		}
 	}
 
+	updateStats();
+
 	return;
 }
 
@@ -393,7 +403,7 @@ void GameStateGame::handleInput()
 					game.window.close();
 				}
 			}
-			else if (event.key.code == sf::Keyboard::U)
+			else if (event.key.code == sf::Keyboard::U) // debug
 			{
 				usePotionActive = !usePotionActive;
 			}
@@ -477,13 +487,88 @@ void GameStateGame::loadGui()
 	fightGui.setFont("res/fonts/DejaVuSans.ttf");
 
 	// gui loading
+
+	// stats
 	statsbox = theme->load("ChatBox");
 	statsbox->setSize(static_cast<float>(rightHorSplitAbs), static_cast<float>(topVerSplitAbs));
 	statsbox->setPosition(0, 0);
 	statsGui.add(statsbox, "stats");
 
+	unsigned int playerNameTextSize = 18u;
+	float playerNameLeft = 20.f;
+	statsMarginRight = 10.f;
+	statsSpacing = 5.f;
+	float rightOffsetSum = rightHorSplitAbs - statsMarginRight;
+	statsPicSize = 36.f;
+
+	sf::Texture& strengthTex = ResourceManager::getInstance().getTexture("strength");
+	sf::Texture& speedTex = ResourceManager::getInstance().getTexture("speed");
+	sf::Texture& accuracyTex = ResourceManager::getInstance().getTexture("accuracy");
+	sf::Texture& hpTex = ResourceManager::getInstance().getTexture("hp");
+
+	playerNameLabel = std::make_shared<tgui::Label>();
+	playerNameLabel->setAutoSize(true);
+	playerNameLabel->setTextSize(playerNameTextSize);
+	playerNameLabel->setTextColor(sf::Color::White);
+	playerNameLabel->setText(player->getPlayerName());
+	statsGui.add(playerNameLabel);
+	playerNameLabel->setPosition(playerNameLeft, (topVerSplitAbs - playerNameLabel->getSize().y) * 0.5f);
+
+	strengthLabel = std::make_shared<tgui::Label>();
+	strengthLabel->setAutoSize(true);
+	strengthLabel->setTextSize(playerNameTextSize);
+	strengthLabel->setTextColor(sf::Color::White);
+	strengthLabel->setText(OutputFormatter::shortFloat(player->strength));
+	statsGui.add(strengthLabel);
+	rightOffsetSum -= (strengthLabel->getSize().x + 2 * statsSpacing);
+	strengthLabel->setPosition(rightOffsetSum, (topVerSplitAbs - strengthLabel->getSize().y) * 0.5f);
+
+	rightOffsetSum -= (statsPicSize + statsSpacing);
+	strengthSprite.setScale(sf::Vector2f(statsPicSize / strengthTex.getSize().x, statsPicSize / strengthTex.getSize().y));
+	strengthSprite.setPosition(sf::Vector2f(rightOffsetSum, (topVerSplitAbs - statsPicSize) * 0.5f));
+
+	speedLabel = std::make_shared<tgui::Label>();
+	speedLabel->setAutoSize(true);
+	speedLabel->setTextSize(playerNameTextSize);
+	speedLabel->setTextColor(sf::Color::White);
+	speedLabel->setText(OutputFormatter::shortFloat(player->speed));
+	statsGui.add(speedLabel);
+	rightOffsetSum -= (speedLabel->getSize().x + 2 * statsSpacing);
+	speedLabel->setPosition(rightOffsetSum, (topVerSplitAbs - speedLabel->getSize().y) * 0.5f);
+
+	rightOffsetSum -= (statsPicSize + statsSpacing);
+	speedSprite.setScale(sf::Vector2f(statsPicSize / speedTex.getSize().x, statsPicSize / speedTex.getSize().y));
+	speedSprite.setPosition(sf::Vector2f(rightOffsetSum, (topVerSplitAbs - statsPicSize) * 0.5f));
+
+	accuracyLabel = std::make_shared<tgui::Label>();
+	accuracyLabel->setAutoSize(true);
+	accuracyLabel->setTextSize(playerNameTextSize);
+	accuracyLabel->setTextColor(sf::Color::White);
+	accuracyLabel->setText(OutputFormatter::shortFloat(player->accuracy));
+	statsGui.add(accuracyLabel);
+	rightOffsetSum -= (accuracyLabel->getSize().x + 2 * statsSpacing);
+	accuracyLabel->setPosition(rightOffsetSum, (topVerSplitAbs - accuracyLabel->getSize().y) * 0.5f);
+
+	rightOffsetSum -= (statsPicSize + statsSpacing);
+	accuracySprite.setScale(sf::Vector2f(statsPicSize / accuracyTex.getSize().x, statsPicSize / accuracyTex.getSize().y));
+	accuracySprite.setPosition(sf::Vector2f(rightOffsetSum, (topVerSplitAbs - statsPicSize) * 0.5f));
+
+	hpLabel = std::make_shared<tgui::Label>();
+	hpLabel->setAutoSize(true);
+	hpLabel->setTextSize(playerNameTextSize);
+	hpLabel->setTextColor(sf::Color::White);
+	hpLabel->setText(OutputFormatter::shortFloat(player->hp));
+	statsGui.add(hpLabel);
+	rightOffsetSum -= (hpLabel->getSize().x + 2 * statsSpacing);
+	hpLabel->setPosition(rightOffsetSum, (topVerSplitAbs - hpLabel->getSize().y) * 0.5f);
+
+	rightOffsetSum -= (statsPicSize + statsSpacing);
+	hpSprite.setScale(sf::Vector2f(statsPicSize / hpTex.getSize().x, statsPicSize / hpTex.getSize().y));
+	hpSprite.setPosition(sf::Vector2f(rightOffsetSum, (topVerSplitAbs - statsPicSize) * 0.5f));
+
 	statsGui.setView(statsView);
 
+	// chatbox
 	chatbox = theme->load("ChatBox");
 	chatbox->setSize(static_cast<float>(bottomHorSplitAbs), static_cast<float>(size.y - bottomVerSplitAbs));
 	chatbox->setTextSize(17u);
@@ -903,6 +988,44 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag)
 
 	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeader->getPosition().y);
 	detailsSprite.setTexture(detailsBag.getDetailsPic());
+}
+
+void GameStateGame::updateStats()
+{
+	float rightOffsetSum = rightHorSplitAbs - statsMarginRight;
+
+	sf::Texture& strengthTex = ResourceManager::getInstance().getTexture("strength");
+	sf::Texture& speedTex = ResourceManager::getInstance().getTexture("speed");
+	sf::Texture& accuracyTex = ResourceManager::getInstance().getTexture("accuracy");
+	sf::Texture& hpTex = ResourceManager::getInstance().getTexture("hp");
+
+	strengthLabel->setText(OutputFormatter::shortFloat(player->strength));
+	rightOffsetSum -= (strengthLabel->getSize().x + 2 * statsSpacing);
+	strengthLabel->setPosition(rightOffsetSum, (topVerSplitAbs - strengthLabel->getSize().y) * 0.5f);
+
+	rightOffsetSum -= (statsPicSize + statsSpacing);
+	strengthSprite.setPosition(sf::Vector2f(rightOffsetSum, (topVerSplitAbs - statsPicSize) * 0.5f));
+
+	speedLabel->setText(OutputFormatter::shortFloat(player->speed));
+	rightOffsetSum -= (speedLabel->getSize().x + 2 * statsSpacing);
+	speedLabel->setPosition(rightOffsetSum, (topVerSplitAbs - speedLabel->getSize().y) * 0.5f);
+
+	rightOffsetSum -= (statsPicSize + statsSpacing);
+	speedSprite.setPosition(sf::Vector2f(rightOffsetSum, (topVerSplitAbs - statsPicSize) * 0.5f));
+
+	accuracyLabel->setText(OutputFormatter::shortFloat(player->accuracy));
+	rightOffsetSum -= (accuracyLabel->getSize().x + 2 * statsSpacing);
+	accuracyLabel->setPosition(rightOffsetSum, (topVerSplitAbs - accuracyLabel->getSize().y) * 0.5f);
+
+	rightOffsetSum -= (statsPicSize + statsSpacing);
+	accuracySprite.setPosition(sf::Vector2f(rightOffsetSum, (topVerSplitAbs - statsPicSize) * 0.5f));
+
+	hpLabel->setText(OutputFormatter::shortFloat(player->hp));
+	rightOffsetSum -= (hpLabel->getSize().x + 2 * statsSpacing);
+	hpLabel->setPosition(rightOffsetSum, (topVerSplitAbs - hpLabel->getSize().y) * 0.5f);
+
+	rightOffsetSum -= (statsPicSize + statsSpacing);
+	hpSprite.setPosition(sf::Vector2f(rightOffsetSum, (topVerSplitAbs - statsPicSize) * 0.5f));
 }
 
 void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_)
