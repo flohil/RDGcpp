@@ -83,7 +83,6 @@ private:
 	tgui::Gui chatGui;
 	tgui::Gui detailsGui;
 	tgui::Gui fightGui;
-	tgui::Gui fightAttackGui;
 	tgui::Gui inventoryGui;
 	tgui::Gui armorGui;
 
@@ -114,11 +113,21 @@ private:
 	std::vector<std::vector<tgui::Label::Ptr>> details;
 	unsigned int detailRows;
 
+	tgui::Button::Ptr attackButton;
+	tgui::Button::Ptr parryButton;
+	tgui::Button::Ptr potionButton;
+	tgui::Button::Ptr equipmentSetButton;
+	tgui::Button::Ptr headButton;
+	tgui::Button::Ptr torsoButton;
+	tgui::Button::Ptr armsButton;
+	tgui::Button::Ptr legsButton;
+
 	void changeSet(unsigned int numerator);
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType);
 	void updateDetails(DetailsBag& detailsBag);
 	void startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_);
-	void showAttackGui();
+	void toggleAttackGui();
+	void hideAttackGui();
 	void parry();
 	void usePotion();
 	void toggleEquipment();

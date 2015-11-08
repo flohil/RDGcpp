@@ -218,14 +218,7 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.setView(mapView);
 	if (inFight)
 	{
-		if (inAttackOptions)
-		{
-			fightAttackGui.draw();
-		}
-		else
-		{
-			fightGui.draw();
-		}
+		fightGui.draw();
 	}
 	else
 	{
@@ -419,7 +412,6 @@ void GameStateGame::handleInput()
 		chatGui.handleEvent(event);
 		// detailsGui.handleEvent(event);
 		fightGui.handleEvent(event);
-		fightAttackGui.handleEvent(event);
 		armorGui.handleEvent(event);
 	}
 }
@@ -443,9 +435,6 @@ void GameStateGame::loadGui()
 
 	fightGui.removeAllWidgets();
 	fightGui.setWindow(game.window);
-
-	fightAttackGui.removeAllWidgets();
-	fightAttackGui.setWindow(game.window);
 
 	armorGui.removeAllWidgets();
 	armorGui.setWindow(game.window);
@@ -492,74 +481,84 @@ void GameStateGame::loadGui()
 	armorGui.add(armorbox, "armor");
 
 	/* FIGHT STUFF */
+	float spacer = 30.f;
+	float buttonWidth = (horSplitAbs - spacer) / 4.f;
+	float buttonHeight = verSplitAbs / 8.f;
+	float buttonCount = 4.f;
+	float spacePerButton = spacer / buttonCount;
+	float buttonWithSpacer = buttonWidth + spacePerButton;
+	float heightSpacer = 6.f;
+
 	fightGui.setView(mapView);
 
-	tgui::Button::Ptr attackButton = std::make_shared<tgui::Button>();
+	attackButton = theme->load("Button");
 	attackButton->setText("Attack");
 	attackButton->setOpacity(1.f);
-	attackButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
-	attackButton->connect("pressed", [&](){ showAttackGui(); });
-	attackButton->setSize((horSplitAbs / 4), verSplitAbs / 8);
+	attackButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
+	attackButton->connect("pressed", [&](){ toggleAttackGui(); });
+	attackButton->setSize(buttonWidth, buttonHeight);
+	attackButton->setPosition(0.f * buttonWithSpacer + spacePerButton /2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
 	fightGui.add(attackButton);
 
-	tgui::Button::Ptr parryButton = std::make_shared<tgui::Button>();
+	parryButton = theme->load("Button");
 	parryButton->setText("Parry");
 	parryButton->setOpacity(1.f);
-	parryButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
+	parryButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	parryButton->connect("pressed", [&](){ parry(); });
-	parryButton->setSize((horSplitAbs / 4), verSplitAbs / 8);
+	parryButton->setSize(buttonWidth, buttonHeight);
+	parryButton->setPosition(1.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
 	fightGui.add(parryButton);
 
-	tgui::Button::Ptr potionButton = std::make_shared<tgui::Button>();
+	potionButton = theme->load("Button");
 	potionButton->setText("Use Potion");
 	potionButton->setOpacity(1.f);
-	potionButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
+	potionButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	potionButton->connect("pressed", [&](){ usePotion(); });
-	potionButton->setSize((horSplitAbs / 4), verSplitAbs / 8);
+	potionButton->setSize(buttonWidth, buttonHeight);
+	potionButton->setPosition(2.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
 	fightGui.add(potionButton);
 
-	tgui::Button::Ptr equipmentSetButton = std::make_shared<tgui::Button>();
+	equipmentSetButton = theme->load("Button");
 	equipmentSetButton->setText("Change Equipment");
 	equipmentSetButton->setOpacity(1.f);
-	equipmentSetButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
+	equipmentSetButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	equipmentSetButton->connect("pressed", [&](){ toggleEquipment(); });
-	equipmentSetButton->setSize((horSplitAbs / 4), verSplitAbs / 8);
+	equipmentSetButton->setSize(buttonWidth, buttonHeight);
+	equipmentSetButton->setPosition(3.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
 	fightGui.add(equipmentSetButton);
 
-
-	fightAttackGui.setView(mapView);
-
-	tgui::Button::Ptr headButton = std::make_shared<tgui::Button>();
+	/* Attack Submenu */
+	headButton = theme->load("Button");
 	headButton->setText("Head");
 	headButton->setOpacity(1.f);
-	headButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
+	headButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	headButton->connect("pressed", [&](){ attackHead(); });
-	headButton->setSize((horSplitAbs / 4), verSplitAbs / 8);
-	fightAttackGui.add(headButton);
+	headButton->setSize(buttonWidth, buttonHeight);
+	headButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer - 1.f * buttonHeight);
 
-	tgui::Button::Ptr torsoButton = std::make_shared<tgui::Button>();
+	torsoButton = theme->load("Button");
 	torsoButton->setText("Torso");
 	torsoButton->setOpacity(1.f);
-	torsoButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
+	torsoButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	torsoButton->connect("pressed", [&](){ attackTorso(); });
-	torsoButton->setSize((horSplitAbs / 4), verSplitAbs / 8);
-	fightAttackGui.add(torsoButton);
+	torsoButton->setSize(buttonWidth, buttonHeight);
+	torsoButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer - 2.f * buttonHeight);
 
-	tgui::Button::Ptr armsButton = std::make_shared<tgui::Button>();
+	armsButton = theme->load("Button");
 	armsButton->setText("Arms");
 	armsButton->setOpacity(1.f);
-	armsButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
+	armsButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	armsButton->connect("pressed", [&](){ attackArms(); });
-	armsButton->setSize((horSplitAbs / 4), verSplitAbs / 8);
-	fightAttackGui.add(armsButton);
+	armsButton->setSize(buttonWidth, buttonHeight);
+	armsButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer - 3.f * buttonHeight);
 
-	tgui::Button::Ptr legsButton = std::make_shared<tgui::Button>();
+	legsButton = theme->load("Button");
 	legsButton->setText("Legs");
 	legsButton->setOpacity(1.f);
-	legsButton->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->buttonTextSize));
+	legsButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	legsButton->connect("pressed", [&](){ attackLegs(); });
-	legsButton->setSize((horSplitAbs / 4), verSplitAbs / 8);
-	fightAttackGui.add(legsButton);
+	legsButton->setSize(buttonWidth, buttonHeight);
+	legsButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer - 4.f * buttonHeight);
 
 	/* FIGHT STUFF END */
 
@@ -919,44 +918,76 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	fight.reset(new Fight(player_, monster_));
 }
 
-void GameStateGame::showAttackGui()
+void GameStateGame::toggleAttackGui()
 {
-	
+	if (!inAttackOptions)
+	{
+		fightGui.add(headButton);
+		fightGui.add(torsoButton);
+		fightGui.add(armsButton);
+		fightGui.add(legsButton);
+		inAttackOptions = true;
+		return;
+	}
+	fightGui.remove(headButton);
+	fightGui.remove(torsoButton);
+	fightGui.remove(armsButton);
+	fightGui.remove(legsButton);
+	inAttackOptions = false;
+}
+
+void GameStateGame::hideAttackGui()
+{
+	if (inAttackOptions)
+	{
+		fightGui.remove(headButton);
+		fightGui.remove(torsoButton);
+		fightGui.remove(armsButton);
+		fightGui.remove(legsButton);
+		inAttackOptions = false;
+	}
 }
 
 void GameStateGame::parry()
 {
-	
+	hideAttackGui();
+	OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
 }
 
 void GameStateGame::usePotion()
 {
-
+	hideAttackGui();
+	OutputFormatter::chat(chatbox, "Trying to use Potion", sf::Color::White);
 }
 
 void GameStateGame::toggleEquipment()
 {
-
+	hideAttackGui();
+	OutputFormatter::chat(chatbox, "Changing Equipment", sf::Color::White);
 }
 
 void GameStateGame::attackHead()
 {
-
+	hideAttackGui();
+	OutputFormatter::chat(chatbox, "Trying to attack the enemy's head", sf::Color::White);
 }
 
 void GameStateGame::attackTorso()
 {
-
+	hideAttackGui();
+	OutputFormatter::chat(chatbox, "Trying to attack the enemy's torso", sf::Color::White);
 }
 
 void GameStateGame::attackArms()
 {
-
+	hideAttackGui();
+	OutputFormatter::chat(chatbox, "Tring to attack the enemy's arms", sf::Color::White);
 }
 
 void GameStateGame::attackLegs()
 {
-
+	hideAttackGui();
+	OutputFormatter::chat(chatbox, "Trying to attack the enemy's legs", sf::Color::White);
 }
 
 GameStateGame::~GameStateGame()
