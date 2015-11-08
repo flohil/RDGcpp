@@ -26,7 +26,6 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 		primaryWeapon = weapon_;
 		primaryWeapon->setSize(itemSize, itemSize);
 		primaryWeapon->setPosition(primaryWeaponPos);
-
 	}
 	else // passing nullptr only when other weapon is twohander
 	{
@@ -392,6 +391,11 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 					retObj = nullptr;
 				}
 
+				if (primaryWeapon->getSlots() == 2)
+				{
+					secondaryWeapon = fists2;
+				}
+
 				// primaryWeapon = nullptr;
 				primaryWeapon = fists1;
 			}
@@ -405,6 +409,11 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 				if (retObj == fists2)
 				{
 					retObj = nullptr;
+				}
+
+				if (secondaryWeapon->getSlots() == 2)
+				{
+					primaryWeapon = fists1;
 				}
 
 				// secondaryWeapon = nullptr;
@@ -536,8 +545,6 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 		if (usePotion) // drink a potion
 		{
 			std::shared_ptr<Potion> potion = std::dynamic_pointer_cast<Potion>(item);
-
-			ResourceManager::getInstance().getSound("drink").play();
 			// add to active Potions list
 			//fight->(potion)...
 		}
@@ -636,7 +643,7 @@ void Player::update(const float deltaTime)
 					velocity = vFactor;
 					moveState = MoveState::MOVING;
 					movDir = lastDir;
-
+					ResourceManager::getInstance().getSound("footsteps").play();
 				}
 				else
 				{
@@ -878,10 +885,9 @@ std::shared_ptr<RenderableObject> Player::putInInventory(std::shared_ptr<Rendera
 		{
 			map->openTreasureChamber();
 		}
-		else
-		{
-			ResourceManager::getInstance().getSound("putInInventory").play();
-		}
+
+		ResourceManager::getInstance().getSound("putInInventory").play();
+
 		object->setSize(tileSize * 2, tileSize * 2);
 		setPositionInInventory(inventory.size(), object);
 		inventory.push_back(object);

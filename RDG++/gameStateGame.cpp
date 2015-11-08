@@ -23,6 +23,7 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj) : detailsPic(Resou
 	{
 		name = "Key";
 		addRow("description", "unlocks treasure chamber door");
+		ResourceManager::getInstance().getSound("key").play();
 	}
 	else if (obj->getObjectType() == ObjectType::ITEM)
 	{
@@ -75,6 +76,8 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj) : detailsPic(Resou
 			addRow("description", description);
 			addRow("item class", EnumMapper::mapClassesName(potion->getItemClass()));
 		}
+
+		ResourceManager::getInstance().getSound(item->getName()).play();
 	}
 	else if (obj->getObjectType() == ObjectType::CREATURE)
 	{
@@ -92,6 +95,8 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj) : detailsPic(Resou
 			addRow("speed", OutputFormatter::shortFloat(monster->speed) + " (" + OutputFormatter::shortFloat(monster->getOrSpeed()) + ")");
 			addRow("accuracy", OutputFormatter::shortFloat(monster->accuracy) + " (" + OutputFormatter::shortFloat(monster->getOrAccuracy()) + ")");
 			addRow("kill bonus", OutputFormatter::shortFloat(monster->getKillBonus()) + "  " + EnumMapper::mapAttributeName(monster->getKillBonusType()));
+
+			ResourceManager::getInstance().getSound(monster->getName()).play();
 		}
 	}
 	else
@@ -726,7 +731,7 @@ void GameStateGame::changeSet(bool playSound, unsigned int numerator)
 	{
 		if (playSound)
 		{
-			ResourceManager::getInstance().getSound("buttonClick").play();
+			ResourceManager::getInstance().getSound("changeSet").play();
 		}
 		
 		player->setActiveEquipmentSet(numerator);
@@ -831,9 +836,11 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	else if (pos.x > rightHorSplitAbs && pos.y < rightVerSplitAbs) // inside armor
 	{
 		sf::Vector2i relPos;
+		sf::Vector2f mapViewCenter = mapView.getCenter();
+		sf::Vector2f mapCenter = sf::Vector2f(rightHorSplitAbs * 0.5f, topVerSplitAbs + (bottomVerSplitAbs - topVerSplitAbs) * 0.5f);
 
-		relPos.x = pos.x - rightHorSplitAbs;
-		relPos.y = pos.y;
+		relPos.x = pos.x - rightHorSplitAbs + static_cast<int>(mapCenter.x - mapViewCenter.x);
+		relPos.y = pos.y + static_cast<int>(mapCenter.y - mapViewCenter.y);
 
 		if (eventType == MouseEvent::DRAGSTART)
 		{
@@ -891,10 +898,12 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 				if (!usePotionActive)
 				{
 					OutputFormatter::chat(chatbox, "Equipped " + oldDraggedItem->getName(), sf::Color::White);
+					ResourceManager::getInstance().getSound(oldDraggedItem->getName()).play();
 				}
 				else
 				{
 					OutputFormatter::chat(chatbox, "Used " + oldDraggedItem->getName(), sf::Color::White);
+					ResourceManager::getInstance().getSound("drink").play();
 				}
 			}
 
