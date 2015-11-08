@@ -183,6 +183,7 @@ GameState(game_)
 
 	armorSprite.setTexture(ResourceManager::getInstance().getTexture("armorBackground"));
 	potionSprite.setTexture(ResourceManager::getInstance().getTexture("potionBar"));
+	//playerSprite.setTexture(ResourceManager::getInstance().getTexture("player_big"));
 
 	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
@@ -218,7 +219,13 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.setView(mapView);
 	if (inFight)
 	{
+		//game.window.draw(playerSprite);
+
+		//enemySprite.setPosition(verSplitAbs, 0.f);
+		//enemySprite.setScale(sf::Vector2f(1.f, 1.f));
+		//game.window.draw(enemySprite);
 		fightGui.draw();
+		
 	}
 	else
 	{
@@ -262,6 +269,7 @@ void GameStateGame::update(const float deltaTime)
 		player->update(deltaTime); // move player
 
 		std::shared_ptr<Monster> pendingFightEnemy = player->getPendingFightEnemy();
+		//enemySprite.setTexture(ResourceManager::getInstance().getTexture(pendingFightEnemy->getName() + "_big"));
 
 		if (pendingFightEnemy != nullptr)
 		{
@@ -481,6 +489,7 @@ void GameStateGame::loadGui()
 	armorGui.add(armorbox, "armor");
 
 	/* FIGHT STUFF */
+
 	float spacer = 30.f;
 	float buttonWidth = (horSplitAbs - spacer) / 4.f;
 	float buttonHeight = verSplitAbs / 8.f;
@@ -490,6 +499,27 @@ void GameStateGame::loadGui()
 	float heightSpacer = 6.f;
 
 	fightGui.setView(mapView);
+
+	//playerSprite.setPosition(0.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
+	//playerSprite.setScale(sf::Vector2f(1.f, 1.f));
+	//sf::Texture& enemyTex = enemySprite.getTexture();
+	//enemyTex.getSize().x;
+
+	// ausführliche Version
+	enemyHealthBar = theme->load("ProgressBar");
+	enemyHealthBar->setPosition(100, 50);
+	enemyHealthBar->setSize(200, 20);
+	enemyHealthBar->setMinimum(0u);
+	enemyHealthBar->setMaximum(100u);
+	enemyHealthBar->setValue(50u);
+	fightGui.add(enemyHealthBar);
+
+	// minimalistische version aus dem full example
+	playerHealthBar = theme->load("ProgressBar");
+	playerHealthBar->setPosition(100, 100);
+	playerHealthBar->setSize(200, 20);
+	playerHealthBar->setValue(50);
+	fightGui.add(playerHealthBar);
 
 	attackButton = theme->load("Button");
 	attackButton->setText("Attack");

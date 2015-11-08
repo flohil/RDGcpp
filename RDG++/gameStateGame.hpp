@@ -50,6 +50,8 @@ private:
 
 	sf::Sprite armorSprite;
 	sf::Sprite potionSprite;
+	//sf::Sprite playerSprite;
+	//sf::Sprite enemySprite;
 
 	std::shared_ptr<RenderableObject> draggedItem = nullptr;
 	bool dragging = false;
@@ -121,6 +123,9 @@ private:
 	tgui::Button::Ptr torsoButton;
 	tgui::Button::Ptr armsButton;
 	tgui::Button::Ptr legsButton;
+
+	tgui::ProgressBar::Ptr enemyHealthBar;
+	tgui::ProgressBar::Ptr playerHealthBar;
 
 	void changeSet(unsigned int numerator);
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType);
