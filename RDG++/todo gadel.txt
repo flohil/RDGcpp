@@ -1,0 +1,52 @@
+.) User Interaction für Kampf:
+	show opponent in fight when clicking on his picture -> updateDetails(monster);
+
+.) Gesundheitsanzeige in Kampfscreen:
+	tgui loading bar aus gui full example (theme verwenden)
+
+.) Sounds für Kampf:
+	alles in "" sind <<soundName>>s -> ResourceManager::getInstance().getSound("<<soundName>>").play();
+
+	zu Beginn:
+	Sound des Monsters abspielen (wie Pokemon): monster->getSound().play()
+
+	"Kampfhauptmenü":
+	Attack -> "buttonClick"
+	Force Parry -> "forceParry"
+	Use Potion -> "buttonClick"
+	Change Set -> "changeSet"
+
+	"AttackMenü"
+	bei Buttons selbst keinen Sound abspielen
+
+	wenn Monster durch Attacke von Spieler getroffen: player->getEquipmentSet()->getPrimaryWeapon()>getAttackSound().play()
+	wenn Monster von Spieler verfehlt: "miss"
+
+	wenn Spieler von Monster verfehlt: "miss"
+	wenn Spieler von Monster getroffen: "humanHit"
+
+	wenn Spieler stirbt: "humanDies"
+	wenn Monster stirbt: monster->getSound().play()
+
+.) großes Bild von Gegner:
+	einen fixen Sprite erstellen für Player und für Gegner als "Teil der Gui" (kein gui.add()) notwending -> siehe armorSprite
+	playerSprite->setTexture(ResourceManager::getInstance().getTexture("player_big");
+	enemySprite->setTexture(ResourceManager::getInstance().getTexture(monster->getName() + "_big");
+
+.) Kampflog
+
+- ins Chatfenster schreiben: (aus gameStateGame.hpp muss tgui::ChatBox::Ptr chatbox an Fight übergeben werden -> am Besten in Constructor)
+	OutputFormatter::chat(chatbox, "my message", sf::Color::White);
+
+- alle Attributsänderungen (zb hp damage, strength increase...) mit folgender Funktion auf zweistellige Float zahl bringen:
+	OutputFormatter::shortFloat(myFloat)
+
+- was loggen?
+	- zu Beginn: wer kämpft gegen wen (player->getName(), monster->getName())
+	- jeder ausgewählte Angriff (Head, Arms, Torso, Legs, Force Parry, Use Potion, Change Set)
+	- wenn Player Trank eingenommen hat (Trank an fight übergeben in EquipmentSet::setItemAtPixels() -> zweite if Bedingung von unten, is schon kommentiert
+	- jeder Attributswechsel -> zb durch Angriff, oder durch Tränke, auch Instant Cure
+	- wenn Attacke daneben geht
+	- Ende von Kampf: player hat gewonnen/verloren gegen monster->getName()
+	- (Player hat gewonnen): player hat x attribute bonus erhalten (monster->getKillBonusType(), monster->getKillBonus())
+		-> killBonusType Enum in String umwandeln: EnumMapper::mapAttributeName(monster->getKillBonusType())

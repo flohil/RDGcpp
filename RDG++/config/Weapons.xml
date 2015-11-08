@@ -14,6 +14,8 @@
 		<Max>2</Max>
 		<Type>single-hand</Type>
 		<Image>weapons/fists.png</Image>
+		<Sound>fists.ogg</Sound>
+		<AttackSound>fists.ogg</AttackSound>
 	</Weapon>
 	<Weapon>
 		<Name>Dagger</Name>
@@ -29,6 +31,8 @@
 		<Max>2</Max>
 		<Type>single-hand</Type>
 		<Image>weapons/dagger.png</Image>
+		<Sound>dagger.ogg</Sound>
+		<AttackSound>dagger.ogg</AttackSound>
 	</Weapon>
 	<Weapon>
 		<Name>Axt</Name>
@@ -44,6 +48,8 @@
 		<Max>2</Max>
 		<Type>single-hand</Type>
 		<Image>weapons/axt.png</Image>
+		<Sound>axe.ogg</Sound>
+		<AttackSound>axe.ogg</AttackSound>
 	</Weapon>
 	<Weapon>
 		<Name>Sword</Name>
@@ -59,6 +65,8 @@
 		<Max>2</Max>
 		<Type>single-hand</Type>
 		<Image>weapons/sword.png</Image>
+		<Sound>sword.ogg</Sound>
+		<AttackSound>sword.ogg</AttackSound>
 	</Weapon>
 	<Weapon>
 		<Name>Shield</Name>
@@ -74,6 +82,8 @@
 		<Max>1</Max>
 		<Type>single-hand</Type>
 		<Image>weapons/shield.png</Image>
+		<Sound>shield.ogg</Sound>
+		<AttackSound>shield.ogg</AttackSound>
 	</Weapon>
 	<Weapon>
 		<Name>Sabre</Name>
@@ -89,6 +99,8 @@
 		<Max>2</Max>
 		<Type>single-hand</Type>
 		<Image>weapons/sabre.png</Image>
+		<Sound>sabre.ogg</Sound>
+		<AttackSound>sabre.ogg</AttackSound>
 	</Weapon>
 	<Weapon>
 		<Name>Longsword</Name>
@@ -104,6 +116,8 @@
 		<Max>1</Max>
 		<Type>two-hand</Type>
 		<Image>weapons/longsword.png</Image>
+		<Sound>longsword.ogg</Sound>
+		<AttackSound>longsword.ogg</AttackSound>
 	</Weapon>
 	<Weapon>
 		<Name>Bow</Name>
@@ -119,5 +133,7 @@
 		<Max>1</Max>
 		<Type>two-hand</Type>
 		<Image>weapons/bow.png</Image>
+		<Sound>bow_equip.ogg</Sound>
+		<AttackSound>arrowHit.ogg</AttackSound>
 	</Weapon>
 </Weapons>

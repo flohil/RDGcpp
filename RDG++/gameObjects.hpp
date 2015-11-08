@@ -3,6 +3,8 @@
 
 #include "debugPrint.hpp"
 #include <TGUI/TGUI.hpp>
+#include <SFML/audio.hpp>
+#include "resourceManager.hpp"
 #include "enums.hpp"
 #include <map>
 #include <set>
@@ -160,7 +162,7 @@ class Item : public RenderableObject
 {
 public:
 
-	class Item(const std::string& name_, const ObjectType::Enum objectType_, const Classes::Enum itemClass_, const ItemType::Enum itemType_) : RenderableObject(name_, objectType_), itemClass(itemClass_), itemType(itemType_) {};
+	class Item(const std::string& name_, const ObjectType::Enum objectType_, const Classes::Enum itemClass_, const ItemType::Enum itemType_) : RenderableObject(name_, objectType_), itemClass(itemClass_), itemType(itemType_), sound(ResourceManager::getInstance().getSound(name_)) {};
 
 	Classes::Enum getItemClass() const { return itemClass; };
 	ItemType::Enum getItemType() const { return itemType; };
@@ -171,6 +173,7 @@ protected:
 
 	const Classes::Enum itemClass;
 	const ItemType::Enum itemType;
+	sf::Sound& sound;
 };
 
 class Creature
@@ -315,7 +318,7 @@ class Monster : public RenderableObject, public Creature, public DebugPrintObjec
 public:
 
 	Monster(const std::string& name_, const DifficultyLevel::Enum level_, const Attribute::Enum killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
-		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER), level(level_), killBonusType(killBonusType_), killBonus(killBonus_) {};
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER), level(level_), killBonusType(killBonusType_), killBonus(killBonus_), sound(ResourceManager::getInstance().getSound(name_)) {};
 
 	Attribute::Enum getKillBonusType() const { return killBonusType; };
 	float getKillBonus() const { return killBonus; };
@@ -327,6 +330,7 @@ protected:
 	const DifficultyLevel::Enum level;
 	const Attribute::Enum killBonusType;
 	const float killBonus;
+	sf::Sound& sound;
 };
 
 class Potion : public Item, public DebugPrintObject
@@ -360,7 +364,7 @@ class Weapon : public Item, public DebugPrintObject
 public:
 
 	Weapon::Weapon(const std::string& name_, const Classes::Enum itemClass_, const WeaponType::Enum type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
-		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_) {};
+		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_), attackSound(ResourceManager::getInstance().getSound(name_ + "_attack")) {};
 
 	WeaponType::Enum getType() const { return type; };
 	float getAttack() const { return attack; };
@@ -376,6 +380,7 @@ protected:
 	const WeaponType::Enum type;
 	const float attack, speed, accuracy, defence;
 	const unsigned int slots, maxWeapons;
+	sf::Sound& attackSound;
 };
 
 class Attack : public GameObject, public DebugPrintObject

@@ -14,10 +14,16 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 {
 	std::shared_ptr<Weapon> oldWeapon = primaryWeapon;
 
-	primaryWeapon = weapon_;
-
-	if (primaryWeapon != nullptr) // position new weapon
+	if (weapon_ != nullptr) // position new weapon
 	{
+		if (weapon_->getName() == "Shield")
+		{
+			ResourceManager::getInstance().getSound("error").play();
+			OutputFormatter::chat(chatbox, "Shield can only be secondary weapon", sf::Color::White);
+			return weapon_;
+		}
+
+		primaryWeapon = weapon_;
 		primaryWeapon->setSize(itemSize, itemSize);
 		primaryWeapon->setPosition(primaryWeaponPos);
 
@@ -379,13 +385,13 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 		{
 			retObj = primaryWeapon;
 
-			if (retObj == fists1)
-			{
-				retObj = nullptr;
-			}
-
 			if (remove)
 			{
+				if (retObj == fists1)
+				{
+					retObj = nullptr;
+				}
+
 				// primaryWeapon = nullptr;
 				primaryWeapon = fists1;
 			}
@@ -394,13 +400,13 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 		{
 			retObj = secondaryWeapon;
 
-			if (retObj == fists2)
-			{
-				retObj = nullptr;
-			}
-
 			if (remove)
 			{
+				if (retObj == fists2)
+				{
+					retObj = nullptr;
+				}
+
 				// secondaryWeapon = nullptr;
 				secondaryWeapon = fists2;
 			}
@@ -527,9 +533,11 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 	if (item->getItemType() == ItemType::POTION && hotspot != EquipHotspots::POTION1 && hotspot != EquipHotspots::POTION2 && hotspot != EquipHotspots::POTION3) // potion dragged on armament
 	{
 		std::cout << "dragged into armor" << std::endl;
-		if (usePotion)
+		if (usePotion) // drink a potion
 		{
 			std::shared_ptr<Potion> potion = std::dynamic_pointer_cast<Potion>(item);
+
+			ResourceManager::getInstance().getSound("drink").play();
 			// add to active Potions list
 			//fight->(potion)...
 		}

@@ -43,6 +43,7 @@ bool ArmamentFactory::importConfig(const std::string& path)
 			const float armor = armamentNode.child("Armor").text().as_float();
 			const float speed = armamentNode.child("Speed").text().as_float();
 			const float bonus = armamentNode.child("Bonus").text().as_float();
+			const std::string& sound = armamentNode.child("Sound").text().as_string();
 
 			if (itemClass == Classes::UNKNOWN)
 			{
@@ -65,6 +66,7 @@ bool ArmamentFactory::importConfig(const std::string& path)
 			}
 
 			ResourceManager::getInstance().loadTexture(name, image);
+			ResourceManager::getInstance().loadSound(name, sound);
 
 			std::shared_ptr<ArmamentTemplate> armament(new ArmamentTemplate(name, image, itemClass, armamentType, classMultiplier, statsLowMultiplier, statsHighMultiplier, type, armor, speed, bonus));
 
@@ -123,6 +125,7 @@ bool MonsterFactory::importConfig(const std::string& path)
 			float strength = monsterNode.child("Strength").text().as_float();
 			float speed = monsterNode.child("Speed").text().as_float();
 			float accuracy = monsterNode.child("Accuracy").text().as_float();
+			const std::string& sound = monsterNode.child("Sound").text().as_string();
 
 			if (level == DifficultyLevel::UNKNOWN || killBonusType == Attribute::UNKNOWN) {
 				return false;
@@ -145,6 +148,7 @@ bool MonsterFactory::importConfig(const std::string& path)
 
 			ResourceManager::getInstance().loadTexture(name, image);
 			ResourceManager::getInstance().loadTexture(name + "_big", image.substr(0, image.find(".png")) + "_big.png");
+			ResourceManager::getInstance().loadSound(name, sound);
 
 			std::shared_ptr<MonsterTemplate> monster(new MonsterTemplate(name, image, level, killBonusType, classMultiplier, statsLowMultiplier, statsHighMultiplier, killBonusLow, killBonusHigh, hp, strength, speed, accuracy));
 
@@ -199,6 +203,7 @@ bool PotionFactory::importConfig(const std::string& path)
 			const Mode::Enum mode = EnumMapper::mapMode(potionNode.child("Mode").text().as_string());
 			const float strength = potionNode.child("x").text().as_float();
 			const unsigned int duration = potionNode.child("n").text().as_uint();
+			const std::string& sound = potionNode.child("Sound").text().as_string();
 
 			if (itemClass == Classes::UNKNOWN || target == Target::UNKNOWN || effect == Attribute::UNKNOWN || mode == Mode::UNKNOWN)
 			{
@@ -221,6 +226,7 @@ bool PotionFactory::importConfig(const std::string& path)
 			}
 
 			ResourceManager::getInstance().loadTexture(name, image);
+			ResourceManager::getInstance().loadSound(name, sound);
 
 			std::shared_ptr<PotionTemplate> potion(new PotionTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier, description, target, effect, mode, strength, duration));
 
@@ -280,6 +286,8 @@ bool WeaponFactory::importConfig(const std::string& path)
 			const float defence = weaponNode.child("Defence").text().as_float();
 			const unsigned int slots = weaponNode.child("Slots").text().as_uint();
 			const unsigned int max = weaponNode.child("Max").text().as_uint();
+			const std::string& sound = weaponNode.child("Sound").text().as_string();
+			const std::string& attackSound = weaponNode.child("AttackSound").text().as_string();
 
 			if (itemClass == Classes::UNKNOWN || type == WeaponType::UNKNOWN)
 			{
@@ -302,6 +310,8 @@ bool WeaponFactory::importConfig(const std::string& path)
 			}
 
 			ResourceManager::getInstance().loadTexture(name, image);
+			ResourceManager::getInstance().loadSound(name, sound);
+			ResourceManager::getInstance().loadSound(name + "_attack", attackSound);
 
 			std::shared_ptr<WeaponTemplate> weapon(new WeaponTemplate(name, image, itemClass, classMultiplier, statsLowMultiplier, statsHighMultiplier,
 				type, attack, speed, accuracy, defence, slots, max));

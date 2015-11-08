@@ -12,6 +12,7 @@
 		<Type>leather</Type>
 		<Bonus>0.1</Bonus>
 		<Image>armaments/leather_helmet.png</Image>
+		<Sound>leather.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Leather Harness</Name>
@@ -25,6 +26,7 @@
 		<Type>leather</Type>
 		<Bonus>0.1</Bonus>
 		<Image>armaments/leather_harness.png</Image>
+		<Sound>leather.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Leather Gauntlets</Name>
@@ -38,6 +40,7 @@
 		<Type>leather</Type>
 		<Bonus>0.1</Bonus>
 		<Image>armaments/leather_gauntlets.png</Image>
+		<Sound>leather.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Leather Cuisse</Name>
@@ -51,6 +54,7 @@
 		<Type>leather</Type>
 		<Bonus>0.1</Bonus>
 		<Image>armaments/leather_cuisse.png</Image>
+		<Sound>leather.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Leather Boots</Name>
@@ -64,6 +68,7 @@
 		<Type>leather</Type>
 		<Bonus>0.1</Bonus>
 		<Image>armaments/leather_boots.png</Image>
+		<Sound>leather.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Habergeon Helmet</Name>
@@ -77,6 +82,7 @@
 		<Type>habergeon</Type>
 		<Bonus>0.15</Bonus>
 		<Image>armaments/habergeon_helmet.png</Image>
+		<Sound>habergeon.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Habergeon Harness</Name>
@@ -90,6 +96,7 @@
 		<Type>habergeon</Type>
 		<Bonus>0.15</Bonus>
 		<Image>armaments/habergeon_harness.png</Image>
+		<Sound>habergeon.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Habergeon Gauntlets</Name>
@@ -103,6 +110,7 @@
 		<Type>habergeon</Type>
 		<Bonus>0.15</Bonus>
 		<Image>armaments/habergeon_gauntlets.png</Image>
+		<Sound>habergeon.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Habergeon Cuisse</Name>
@@ -116,6 +124,7 @@
 		<Type>habergeon</Type>
 		<Bonus>0.15</Bonus>
 		<Image>armaments/habergeon_cuisse.png</Image>
+		<Sound>habergeon.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Habergeon Boots</Name>
@@ -129,6 +138,7 @@
 		<Type>habergeon</Type>
 		<Bonus>0.15</Bonus>
 		<Image>armaments/habergeon_boots.png</Image>
+		<Sound>habergeon.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Plate Helmet</Name>
@@ -142,6 +152,7 @@
 		<Type>plate</Type>
 		<Bonus>0.2</Bonus>
 		<Image>armaments/plate_helmet.png</Image>
+		<Sound>plate.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Plate Harness</Name>
@@ -155,6 +166,7 @@
 		<Type>plate</Type>
 		<Bonus>0.2</Bonus>
 		<Image>armaments/plate_harness.png</Image>
+		<Sound>plate.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Plate Gauntlets</Name>
@@ -168,6 +180,7 @@
 		<Type>plate</Type>
 		<Bonus>0.2</Bonus>
 		<Image>armaments/plate_gauntlets.png</Image>
+		<Sound>plate.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Plate Cuisse</Name>
@@ -181,6 +194,7 @@
 		<Type>plate</Type>
 		<Bonus>0.2</Bonus>
 		<Image>armaments/plate_cuisse.png</Image>
+		<Sound>plate.ogg</Sound>
 	</Armament>
 	<Armament>
 		<Name>Plate Boots</Name>
@@ -194,5 +208,6 @@
 		<Type>plate</Type>
 		<Bonus>0.2</Bonus>
 		<Image>armaments/plate_boots.png</Image>
+		<Sound>plate.ogg</Sound>
 	</Armament>
 </Armaments>

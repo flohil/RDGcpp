@@ -55,11 +55,18 @@ bool ResourceManager::loadAdditionalResources()
 
 	soundNames.insert(std::pair<std::string, std::string>("buttonClick", "gui_control_response.ogg"));
 	soundNames.insert(std::pair<std::string, std::string>("guiControlResponse", "gui_control_response.ogg"));
-	soundNames.insert(std::pair<std::string, std::string>("keyStroke", "key_stroke.ogg"));
-	soundNames.insert(std::pair<std::string, std::string>("keyStrokeReturn", "key_stroke_return.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("keyStroke", "keyStroke.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("keyStrokeReturn", "keyStrokeReturn.ogg"));
 	soundNames.insert(std::pair<std::string, std::string>("error", "error.ogg"));
 	soundNames.insert(std::pair<std::string, std::string>("dropItem", "drop_item.ogg"));
 	soundNames.insert(std::pair<std::string, std::string>("putInInventory", "put_in_inventory.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("footsteps", "footsteps.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("key", "keys.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("drink", "drink.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("humanDies", "humanDies.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("humanHit", "humanHit.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("miss", "miss.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("forceParry", "parry.ogg"));
 
 	// load single textures
 	for (std::map<std::string, std::string>::iterator it = textureNames.begin(); it != textureNames.end(); ++it)
@@ -177,6 +184,11 @@ bool ResourceManager::loadSound(const std::string soundName, const std::string f
 {
 	sf::SoundBuffer buffer;
 	sf::Sound sound;
+
+	if (sounds.find(soundName) != sounds.end()) // sound has already been loaded
+	{
+		return true;
+	}
 
 	if (!buffer.loadFromFile(settings->SOUNDS_PATH + filePath))
 	{

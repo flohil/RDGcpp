@@ -26,6 +26,7 @@ public:
 	sf::Sprite& getRandomTile(const std::string& tileName);
 	sf::Sound& getSound(const std::string& soundName) { return sounds.at(soundName); };
 	void setSoundVolumes(const float effectsVolume);
+	bool loadSound(const std::string soundName, const std::string filePath);
 
 private:
 
@@ -37,8 +38,7 @@ private:
 	std::map <const std::string, sf::Sound> sounds;
 
 	void loadTiles();
-	bool loadSound(const std::string soundName, const std::string filePath);
-
+	
 	ResourceManager() {};
 	ResourceManager(ResourceManager const&);
 	~ResourceManager();
