@@ -30,6 +30,8 @@ Game::Game()
 		return;
 	}
 
+	resourceManager.setSoundVolumes(settings->actualEffectsVolume);
+
 	// prototype initalization
 	prototypeStorage.reset(new PrototypeStorage(settings->CONFIG_PATH));
 	if (!prototypeStorage->initializedSuccessfully())

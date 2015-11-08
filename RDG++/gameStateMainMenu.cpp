@@ -6,6 +6,8 @@
 #include "gameStateGame.hpp"
 #include "gameState.hpp"
 #include "easylogging++.hpp"
+#include <thread>
+#include <chrono>
 
 GameStateMainMenu::GameStateMainMenu(Game& game_) : 
 	GameState(game_)
@@ -58,6 +60,7 @@ void GameStateMainMenu::startGame()
 {
 	LOG(INFO) << "Switching to loading screen...";
 
+	ResourceManager::getInstance().getSound("buttonClick").play();
 	game.pushState(std::shared_ptr<GameState>(new GameStateLoading(game)));
 
 	return;
@@ -67,6 +70,8 @@ void GameStateMainMenu::quit()
 {
 	LOG(INFO) << "Quitting game...";
 
+	ResourceManager::getInstance().getSound("buttonClick").play();
+	std::this_thread::sleep_for(std::chrono::milliseconds(300));
 	game.window.close();
 
 	return;
@@ -76,6 +81,7 @@ void GameStateMainMenu::openSettings()
 {
 	LOG(INFO) << "Opening settings...";
 
+	ResourceManager::getInstance().getSound("buttonClick").play();
 	game.pushState(std::shared_ptr<GameState>(new GameStateOptions(game)));
 
 	return;

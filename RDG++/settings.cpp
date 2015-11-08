@@ -8,6 +8,7 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	SETTINGS_FILE_PATH("settings.txt"),
 	CONFIG_PATH("config/"),
 	IMAGE_PATH("res/"),
+	SOUNDS_PATH("res/sounds/"),
 	COLOR_DEPTH(32), 
 	ROOM_WIDTH(8),
 	ROOM_HEIGHT(6),

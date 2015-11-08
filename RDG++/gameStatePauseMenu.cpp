@@ -63,6 +63,7 @@ void GameStatePauseMenu::returnToGame()
 {
 	LOG(INFO) << "Returning to game";
 
+	ResourceManager::getInstance().getSound("buttonClick").play();
 	game.popState();
 
 	return;
@@ -72,6 +73,7 @@ void GameStatePauseMenu::quitToMainMenu()
 {
 	LOG(INFO) << "Quitting to main menu";
 
+	ResourceManager::getInstance().getSound("buttonClick").play();
 	if (!quit)
 	{
 		quit = true;
