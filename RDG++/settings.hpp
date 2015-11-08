@@ -42,6 +42,7 @@ public:
 	float labelPaddingX;
 	float labelBigHeight;
 	float labelSmallHeight;
+	float sliderHeight;
 	float effectsVolume;
 	float musicVolume;
 	float actualEffectsVolume;

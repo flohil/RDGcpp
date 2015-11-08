@@ -37,6 +37,7 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	labelPaddingX = 8.f;
 	labelBigHeight = 36.f;
 	labelSmallHeight = 34.f;
+	sliderHeight = 23.f;
 	enableSound = true;
 	effectsVolume = 100.f;
 	musicVolume = 100.f;
