@@ -859,6 +859,7 @@ std::shared_ptr<RenderableObject> Player::putInInventory(std::shared_ptr<Rendera
 	{
 		if (output)
 		{
+			ResourceManager::getInstance().getSound("error").play();
 			OutputFormatter::chat(chatBox, "Inventory is full!", sf::Color::White);
 		}
 		return object;
@@ -868,6 +869,10 @@ std::shared_ptr<RenderableObject> Player::putInInventory(std::shared_ptr<Rendera
 		if (object->getObjectType() == ObjectType::KEY)
 		{
 			map->openTreasureChamber();
+		}
+		else
+		{
+			ResourceManager::getInstance().getSound("putInInventory").play();
 		}
 		object->setSize(tileSize * 2, tileSize * 2);
 		setPositionInInventory(inventory.size(), object);

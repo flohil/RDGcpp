@@ -385,6 +385,10 @@ void GameStateGame::handleInput()
 
 	while (game.window.pollEvent(event))
 	{
+		chatGui.handleEvent(event);
+		fightGui.handleEvent(event);
+		armorGui.handleEvent(event);
+
 		if (event.type == sf::Event::Closed)
 		{
 			game.window.close();
@@ -442,11 +446,6 @@ void GameStateGame::handleInput()
 				dragging = false;
 			}
 		}
-
-		chatGui.handleEvent(event);
-		// detailsGui.handleEvent(event);
-		fightGui.handleEvent(event);
-		armorGui.handleEvent(event);
 	}
 }
 
@@ -612,7 +611,7 @@ void GameStateGame::loadGui()
 	set1Button->setPosition(armorButtonsLeftMargin, armorButtonsTopMargin);
 	set1Button->setSize(setButtonSize.x, setButtonSize.y);
 	set1Button->setTextSize(static_cast<unsigned int>(setButtonTextSize));
-	set1Button->connect("pressed", [&](){ changeSet(1); });
+	set1Button->connect("pressed", [&](){ changeSet(true, 1); });
 	armorGui.add(set1Button);
 
 	set2Button = theme->load("Button");
@@ -620,10 +619,10 @@ void GameStateGame::loadGui()
 	set2Button->setPosition(armorButtonsLeftMargin + setButtonSize.x + 2 * spacing, armorButtonsTopMargin);
 	set2Button->setSize(setButtonSize.x, setButtonSize.y);
 	set2Button->setTextSize(static_cast<unsigned int>(setButtonTextSize));
-	set2Button->connect("pressed", [&](){ changeSet(2); });
+	set2Button->connect("pressed", [&](){ changeSet(true, 2); });
 	armorGui.add(set2Button);
 
-	changeSet(player->getEquipmentSet()->getNumerator());
+	changeSet(false, player->getEquipmentSet()->getNumerator());
 
 	armorTopOffset = armorButtonsTopMargin + setButtonSize.y + 10.f;
 	armorLeftOffset = -1.f;
@@ -704,13 +703,32 @@ void GameStateGame::loadGui()
 	detailsSprite.setScale(sf::Vector2f(detailsPicSize / detailsTex.getSize().x, detailsPicSize / detailsTex.getSize().y));
 }
 
-void GameStateGame::changeSet(unsigned int numerator)
+void GameStateGame::changeSet(bool playSound)
+{
+	unsigned int activeNumerator = player->getEquipmentSet()->getNumerator();
+
+	if (activeNumerator == 1u)
+	{
+		changeSet(playSound, 2u);
+	}
+	else if (activeNumerator == 2u)
+	{
+		changeSet(playSound, 1u);
+	}
+}
+
+void GameStateGame::changeSet(bool playSound, unsigned int numerator)
 {
 	float activeOpacity = 1.f;
 	float inactiveOpacity = 0.7f;
 
 	if (!inFight)
 	{
+		if (playSound)
+		{
+			ResourceManager::getInstance().getSound("buttonClick").play();
+		}
+		
 		player->setActiveEquipmentSet(numerator);
 		if (numerator == 1u)
 		{
@@ -721,6 +739,13 @@ void GameStateGame::changeSet(unsigned int numerator)
 		{
 			set1Button->setOpacity(inactiveOpacity);
 			set2Button->setOpacity(activeOpacity);
+		}
+	}
+	else
+	{
+		if (playSound)
+		{
+			ResourceManager::getInstance().getSound("error").play();
 		}
 	}
 }
@@ -788,12 +813,14 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 				Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
 				if (map->getOverlayObject(facingPoint) == nullptr)
 				{
+					ResourceManager::getInstance().getSound("dropItem").play();
 					OutputFormatter::chat(chatbox, "Dropped " + draggedItem->getName(), sf::Color::White);
 					map->setOverlayObject(facingPoint, draggedItem); // place dragged item on map if there is a free tile in front of the player
 					draggedItem = nullptr;
 				}
 				else
 				{
+					ResourceManager::getInstance().getSound("error").play();
 					OutputFormatter::chat(chatbox, "Could not drop " + draggedItem->getName(), sf::Color::White);
 					handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE, true); // return dragged item to where it came from if there is no free tile in front of the player
 				}
@@ -918,6 +945,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	{
 		if (eventType == MouseEvent::DRAGRELEASE)
 		{
+			ResourceManager::getInstance().getSound("error").play();
 			handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE, true);
 			dragging = false;
 		}

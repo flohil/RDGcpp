@@ -57,6 +57,9 @@ bool ResourceManager::loadAdditionalResources()
 	soundNames.insert(std::pair<std::string, std::string>("guiControlResponse", "gui_control_response.ogg"));
 	soundNames.insert(std::pair<std::string, std::string>("keyStroke", "key_stroke.ogg"));
 	soundNames.insert(std::pair<std::string, std::string>("keyStrokeReturn", "key_stroke_return.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("error", "error.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("dropItem", "drop_item.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("putInInventory", "put_in_inventory.ogg"));
 
 	// load single textures
 	for (std::map<std::string, std::string>::iterator it = textureNames.begin(); it != textureNames.end(); ++it)

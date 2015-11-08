@@ -133,7 +133,9 @@ private:
 	std::vector<std::vector<tgui::Label::Ptr>> details;
 	unsigned int detailRows;
 
-	void changeSet(unsigned int numerator);
+	void changeSet() { changeSet(false); };
+	void changeSet(bool playSound);
+	void changeSet(bool playSound, unsigned int numerator);
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType) { handleMouseEvent(pos_, eventType, false); };
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType, bool noScale);
 	void updateDetails(DetailsBag& detailsBag);
