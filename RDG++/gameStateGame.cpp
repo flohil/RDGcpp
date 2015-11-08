@@ -790,9 +790,21 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	if (pos.x < rightHorSplitAbs && pos.y < bottomVerSplitAbs && pos.y >= topVerSplitAbs && !inFight) // inside map
 	{
 		sf::Vector2i relPos;
+		sf::Vector2f mapViewCenter = mapView.getCenter();
+		sf::Vector2f mapCenter = sf::Vector2f(rightHorSplitAbs * 0.5f, (bottomVerSplitAbs - topVerSplitAbs) * 0.5f);
 
-		relPos.x = pos.x;
-		relPos.y = pos.y - topVerSplitAbs;
+		relPos.x = pos.x/* + static_cast<int>(mapCenter.x - mapViewCenter.x)*/;
+		relPos.y = pos.y - topVerSplitAbs /*+ static_cast<int>(mapCenter.y - mapViewCenter.y)*/;
+
+		std::cout << "mapViewCenter: x = " << mapViewCenter.x << ", y = " << mapViewCenter.y << std::endl;
+		std::cout << "mapCenter: x = " << mapCenter.x << ", y = " << mapCenter.y << std::endl;
+
+		std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
+
+		relPos.x = relPos.x - static_cast<int>(mapCenter.x - mapViewCenter.x);
+		relPos.y = relPos.y - static_cast<int>(mapCenter.y - mapViewCenter.y);
+
+		std::cout << "after relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
 
 		if (eventType == MouseEvent::DRAGSTART)
 		{
@@ -836,11 +848,9 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	else if (pos.x > rightHorSplitAbs && pos.y < rightVerSplitAbs) // inside armor
 	{
 		sf::Vector2i relPos;
-		sf::Vector2f mapViewCenter = mapView.getCenter();
-		sf::Vector2f mapCenter = sf::Vector2f(rightHorSplitAbs * 0.5f, topVerSplitAbs + (bottomVerSplitAbs - topVerSplitAbs) * 0.5f);
 
-		relPos.x = pos.x - rightHorSplitAbs + static_cast<int>(mapCenter.x - mapViewCenter.x);
-		relPos.y = pos.y + static_cast<int>(mapCenter.y - mapViewCenter.y);
+		relPos.x = pos.x - rightHorSplitAbs;
+		relPos.y = pos.y;
 
 		if (eventType == MouseEvent::DRAGSTART)
 		{
