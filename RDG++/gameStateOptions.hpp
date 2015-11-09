@@ -26,6 +26,9 @@ private:
 	tgui::ComboBox::Ptr mazeSizeCombobox;
 	tgui::CheckBox::Ptr fullscreenCheckbox;
 	tgui::ComboBox::Ptr resolutionsCombobox;
+	tgui::CheckBox::Ptr enableSoundCheckbox;
+	tgui::Slider::Ptr effectsVolumeSlider;
+	tgui::Slider::Ptr musicVolumeSlider;
 	tgui::Label::Ptr statusLabel;
 
 public:

@@ -35,6 +35,7 @@ bool ResourceManager::loadTexture(const std::string& textureName, const std::str
 bool ResourceManager::loadAdditionalResources()
 {
 	std::map<std::string, std::string> textureNames;
+	std::map<std::string, std::string> soundNames;
 
 	textureNames.insert(std::pair<std::string, std::string>("player_big", "player_big.png"));
 	textureNames.insert(std::pair<std::string, std::string>("player", "player.png"));
@@ -47,14 +48,46 @@ bool ResourceManager::loadAdditionalResources()
 	textureNames.insert(std::pair<std::string, std::string>("tileset", "rooms/tileset.png"));
 	textureNames.insert(std::pair<std::string, std::string>("icon", "icon.png"));
 	textureNames.insert(std::pair<std::string, std::string>("background", "background.png"));
+	textureNames.insert(std::pair<std::string, std::string>("hp", "hp.png"));
+	textureNames.insert(std::pair<std::string, std::string>("accuracy", "accuracy.png"));
+	textureNames.insert(std::pair<std::string, std::string>("speed", "speed.png"));
+	textureNames.insert(std::pair<std::string, std::string>("strength", "strength.png"));
+
+	soundNames.insert(std::pair<std::string, std::string>("buttonClick", "gui_control_response.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("guiControlResponse", "gui_control_response.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("keyStroke", "keyStroke.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("keyStrokeReturn", "keyStrokeReturn.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("error", "error.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("dropItem", "drop_item.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("putInInventory", "put_in_inventory.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("footsteps", "footsteps.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("key", "keys.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("drink", "drink.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("humanDies", "humanDies.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("humanHit", "humanHit.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("miss", "miss.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("forceParry", "parry.ogg"));
+	soundNames.insert(std::pair<std::string, std::string>("changeSet", "changeSet.ogg"));
 
 	// load single textures
 	for (std::map<std::string, std::string>::iterator it = textureNames.begin(); it != textureNames.end(); ++it)
 	{
-		loadTexture(it->first, it->second);
+		if (!loadTexture(it->first, it->second))
+		{
+			return false;
+		}
 	}
 
 	loadTiles();
+
+	// load sounds
+	for (std::map<std::string, std::string>::iterator it = soundNames.begin(); it != soundNames.end(); ++it)
+	{
+		if (!loadSound(it->first, it->second))
+		{
+			return false;
+		}
+	}
 
 	LOG(INFO) << "Resources loaded successfully";
 
@@ -148,7 +181,44 @@ void ResourceManager::loadTiles()
 	tiles.insert(spritePair("doorGroundTwo", doorGroundTwo));
 }
 
+bool ResourceManager::loadSound(const std::string soundName, const std::string filePath)
+{
+	sf::SoundBuffer buffer;
+	sf::Sound sound;
+
+	if (sounds.find(soundName) != sounds.end()) // sound has already been loaded
+	{
+		return true;
+	}
+
+	if (!buffer.loadFromFile(settings->SOUNDS_PATH + filePath))
+	{
+		LOG(ERROR) << "Failed to load sound " << settings->SOUNDS_PATH + filePath;
+		return false;
+	}
+
+	soundBuffers.insert(std::pair<const std::string, sf::SoundBuffer>(soundName, buffer));
+
+	sound.setBuffer(soundBuffers.at(soundName));
+
+	sounds.insert(std::pair<const std::string, sf::Sound>(soundName, sound));
+
+	LOG(DEBUG) << "loaded " << settings->SOUNDS_PATH + filePath;
+
+	return true;
+}
+
 sf::Sprite& ResourceManager::getRandomTile(const std::string& tileName)
 {
 	return *selectRandomly(tiles[tileName].begin(), tiles[tileName].end());
+}
+
+void ResourceManager::setSoundVolumes(const float effectsVolume)
+{
+	typedef std::map <const std::string, sf::Sound>::iterator soundIt;
+
+	for (soundIt it = sounds.begin(); it != sounds.end(); ++it)
+	{
+		it->second.setVolume(effectsVolume);
+	}
 }

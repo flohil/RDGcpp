@@ -7,6 +7,7 @@
 #include <memory>
 #include <list>
 #include "settings.hpp"
+#include <SFML/Audio.hpp>
 
 class ResourceManager
 {
@@ -23,6 +24,9 @@ public:
 	bool loadAdditionalResources();
 	sf::Texture& getTexture(const std::string& textureName) { return textures.at(textureName); };
 	sf::Sprite& getRandomTile(const std::string& tileName);
+	sf::Sound& getSound(const std::string& soundName) { return sounds.at(soundName); };
+	void setSoundVolumes(const float effectsVolume);
+	bool loadSound(const std::string soundName, const std::string filePath);
 
 private:
 
@@ -30,9 +34,11 @@ private:
 	std::map <const std::string, sf::Texture> textures;
 	std::map <const std::string, sf::Sprite> sprites;
 	std::map <const std::string, std::list<sf::Sprite>> tiles;
+	std::map <const std::string, sf::SoundBuffer> soundBuffers;
+	std::map <const std::string, sf::Sound> sounds;
 
 	void loadTiles();
-
+	
 	ResourceManager() {};
 	ResourceManager(ResourceManager const&);
 	~ResourceManager();

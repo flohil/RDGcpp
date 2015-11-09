@@ -3,6 +3,7 @@
 
 #include <stack>
 #include <TGUI/TGUI.hpp>
+#include <SFML/Audio.hpp>
 #include "settings.hpp"
 #include "prototypes.hpp"
 #include "resourceManager.hpp"
@@ -19,6 +20,7 @@ public:
 	sf::RenderWindow window;
 	std::shared_ptr<tgui::Theme> theme;
 	std::shared_ptr<RenderableObject> background;
+	sf::Music music;
 
 	bool initializedSuccessfully() const { return successfullyInitialized; };
 	void pushState(std::shared_ptr<GameState> state);
@@ -45,7 +47,6 @@ private:
 	sf::VideoMode desktopVmode;
 	sf::VideoMode vmode;
 	std::unique_ptr<Maze> maze;
-
 };
 
 #endif /* GAME_HPP */

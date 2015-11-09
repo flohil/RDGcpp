@@ -13,6 +13,7 @@
 		<x>50</x>
 		<n>1</n>
 		<Image>potions/instant_cure.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
 		<Name>Potion of Regeneration</Name>
@@ -27,6 +28,7 @@
 		<x>10</x>
 		<n>5</n>
 		<Image>potions/regeneration.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
 		<Name>Antidote</Name>
@@ -41,6 +43,7 @@
 		<x>1</x>
 		<n>1</n>
 		<Image>potions/antidote.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
 		<Name>Potion of Strength</Name>
@@ -55,6 +58,7 @@
 		<x>10</x>
 		<n>5</n>
 		<Image>potions/strength.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
 		<Name>Potion of Speed</Name>
@@ -69,6 +73,7 @@
 		<x>10</x>
 		<n>5</n>
 		<Image>potions/speed.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
 		<Name>Potion of Accuracy</Name>
@@ -83,6 +88,7 @@
 		<x>10</x>
 		<n>5</n>
 		<Image>potions/accuracy.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
 		<Name>Potion of Blindness</Name>
@@ -97,6 +103,7 @@
 		<x>10</x>
 		<n>5</n>
 		<Image>potions/blindness.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
 		<Name>Potion of Slowness</Name>
@@ -111,6 +118,7 @@
 		<x>10</x>
 		<n>5</n>
 		<Image>potions/slowness.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
 		<Name>Poison</Name>
@@ -125,6 +133,7 @@
 		<x>10</x>
 		<n>5</n>
 		<Image>potions/poison.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
 		<Name>Potion of Weakness</Name>
@@ -139,5 +148,6 @@
 		<x>10</x>
 		<n>5</n>
 		<Image>potions/weakness.png</Image>
+		<Sound>potion.ogg</Sound>
 	</Potion>
 </Potions>

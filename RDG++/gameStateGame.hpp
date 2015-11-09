@@ -31,6 +31,7 @@ class GameStateGame : public GameState
 {
 private:
 
+	sf::View statsView;
 	sf::View mapView;
 	sf::View chatView;
 	sf::View inventoryView;
@@ -67,13 +68,15 @@ private:
 	std::shared_ptr<Fight> fight = nullptr;
 
 	// gui
-	float horSplit;
+	float topVerSplit;
+	float rightHorSplit;
 	float rightVerSplit;
-	float verSplit;
+	float bottomVerSplit;
 	float bottomHorSplit;
-	int horSplitAbs;
+	int topVerSplitAbs;
+	int rightHorSplitAbs;
 	int rightVerSplitAbs;
-	int verSplitAbs;
+	int bottomVerSplitAbs;
 	int bottomHorSplitAbs;
 
 	float armorHeight;
@@ -82,6 +85,7 @@ private:
 	float potionTopOffset;
 	float potionLeftOffset;
 
+	tgui::Gui statsGui;
 	tgui::Gui chatGui;
 	tgui::Gui detailsGui;
 	tgui::Gui fightGui;
@@ -90,10 +94,26 @@ private:
 
 	tgui::Theme::Ptr theme;
 
+	tgui::ChatBox::Ptr statsbox;
 	tgui::ChatBox::Ptr chatbox;
 	tgui::ChatBox::Ptr detailsbox;
 	tgui::ChatBox::Ptr inventorybox;
 	tgui::ChatBox::Ptr armorbox;
+
+	tgui::Label::Ptr playerNameLabel;
+	tgui::Label::Ptr hpLabel;
+	tgui::Label::Ptr accuracyLabel;
+	tgui::Label::Ptr strengthLabel;
+	tgui::Label::Ptr speedLabel;
+
+	sf::Sprite hpSprite;
+	sf::Sprite accuracySprite;
+	sf::Sprite strengthSprite;
+	sf::Sprite speedSprite;
+
+	float statsMarginRight;
+	float statsSpacing;
+	float statsPicSize;
 
 	tgui::Button::Ptr set1Button;
 	tgui::Button::Ptr set2Button;
@@ -127,9 +147,14 @@ private:
 	tgui::ProgressBar::Ptr enemyHealthBar;
 	tgui::ProgressBar::Ptr playerHealthBar;
 
-	void changeSet(unsigned int numerator);
+	void changeSet() { changeSet(false); };
+	void changeSet(bool playSound);
+	void changeSet(bool playSound, unsigned int numerator);
+	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType) { handleMouseEvent(pos_, eventType, false); };
+	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType, bool noScale);
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType);
 	void updateDetails(DetailsBag& detailsBag);
+	void updateStats();
 	void startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_);
 	void toggleAttackGui();
 	void hideAttackGui();

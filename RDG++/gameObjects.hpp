@@ -3,6 +3,8 @@
 
 #include "debugPrint.hpp"
 #include <TGUI/TGUI.hpp>
+#include <SFML/audio.hpp>
+#include "resourceManager.hpp"
 #include "enums.hpp"
 #include <map>
 #include <set>
@@ -39,9 +41,10 @@ private:
 	sf::Vector2f potionOffsets;
 	sf::Vector2f armorDims;
 	sf::Vector2f potionDims;
-	int horSplitAbs;
-	int verRightSplitAbs;
 	tgui::ChatBox::Ptr chatbox;
+
+	std::shared_ptr<Weapon> fists1;
+	std::shared_ptr<Weapon> fists2;
 
 	//positions - left, top
 	sf::Vector2f primaryWeaponPos;
@@ -59,10 +62,11 @@ private:
 
 public:
 
-	EquipmentSet(unsigned int numerator_) :
+	EquipmentSet(unsigned int numerator_, std::shared_ptr<Weapon> fists1_, std::shared_ptr<Weapon> fists2_) :
 		primaryWeapon(nullptr), secondaryWeapon(nullptr), helmet(nullptr), harness(nullptr), cuisse(nullptr), gauntlets(nullptr), 
 		boots(nullptr), potion1(nullptr), potion2(nullptr), potion3(nullptr), numerator(numerator_), itemSize(0u), 
-		armorOffsets(sf::Vector2f(0,0)), potionOffsets(sf::Vector2f(0,0)) {};
+		armorOffsets(sf::Vector2f(0,0)), potionOffsets(sf::Vector2f(0,0)),
+		fists1(fists1_), fists2(fists2_){};
 
 	std::shared_ptr<Weapon> getPrimaryWeapon() const { return primaryWeapon; };
 	std::shared_ptr<Weapon> getSecondaryWeapon() const { return secondaryWeapon; };
@@ -86,11 +90,11 @@ public:
 	std::shared_ptr<Potion> setPotion1(std::shared_ptr<Potion> potion_);
 	std::shared_ptr<Potion> setPotion2(std::shared_ptr<Potion> potion_);
 	std::shared_ptr<Potion> setPotion3(std::shared_ptr<Potion> potion_);
+	void EquipmentSet::setFists(std::shared_ptr<Weapon> fists1_, std::shared_ptr<Weapon> fists2_);
 
 	void setChatbox(tgui::ChatBox::Ptr chatbox_) { chatbox = chatbox_; };
-	void setOffsets(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs_, int verRightSplitAbs_);
-	void setItemSize(unsigned int itemSize_) { itemSize = itemSize_; };
-	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos, bool remove);
+	void setGeometry(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int itemSize_);
+	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos, bool remove, bool usePotion);
 	std::list<std::shared_ptr<RenderableObject>> setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj, bool usePotion, std::shared_ptr<Fight> fight);
 
 	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
@@ -158,7 +162,7 @@ class Item : public RenderableObject
 {
 public:
 
-	class Item(const std::string& name_, const ObjectType::Enum objectType_, const Classes::Enum itemClass_, const ItemType::Enum itemType_) : RenderableObject(name_, objectType_), itemClass(itemClass_), itemType(itemType_) {};
+	class Item(const std::string& name_, const ObjectType::Enum objectType_, const Classes::Enum itemClass_, const ItemType::Enum itemType_) : RenderableObject(name_, objectType_), itemClass(itemClass_), itemType(itemType_), sound(ResourceManager::getInstance().getSound(name_)) {};
 
 	Classes::Enum getItemClass() const { return itemClass; };
 	ItemType::Enum getItemType() const { return itemType; };
@@ -169,6 +173,7 @@ protected:
 
 	const Classes::Enum itemClass;
 	const ItemType::Enum itemType;
+	sf::Sound& sound;
 };
 
 class Creature
@@ -205,7 +210,7 @@ public:
 	Player(const std::string &name_, float hp_, float strength_, float speed_, float accuracy_, const std::string &playerName_, float moveDistance_, unsigned int maxInventorySize_, sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_) : 
 		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::PLAYER), playerName(playerName_), moveDistance(moveDistance_), maxInventorySize(maxInventorySize_) {};
 
-	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_, int horSplitAbs_, int rightVerSplitAbs_);
+	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_);
 	void update(const float deltaTime);
 	void handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem);
 	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object) { return putInInventory(object, true); };
@@ -231,9 +236,10 @@ public:
 			activeSet = setTwo;
 		}
 	};
-	void setEquipmentOffsets(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int horSplitAbs, int verRightSplitAbs);
-	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos) { return activeSet->getItemAtPixels(pos, false); };
-	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos, bool remove) { return activeSet->getItemAtPixels(pos, remove); };
+	void setEquipmentGeometry(sf::Vector2f armorOffsets, sf::Vector2f potionOffsets, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int itemSize_);
+	void setEquipmentFists(std::shared_ptr<Weapon> fists1, std::shared_ptr<Weapon> fists2);
+	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos) { return activeSet->getItemAtPixels(pos, false, false); };
+	std::shared_ptr<RenderableObject> getArmorItemAtPixels(sf::Vector2i pos, bool remove, bool usePotion) { return activeSet->getItemAtPixels(pos, remove, usePotion); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos, bool remove);
 	void setChatbox(tgui::ChatBox::Ptr chatbox_) { activeSet->setChatbox(chatbox_); };
@@ -267,17 +273,14 @@ private:
 	ViewingDirections::Enum facingDir = ViewingDirections::N;
 	MoveState::Enum moveState = MoveState::RESTING; // make sure a move finishes
 	std::vector<std::shared_ptr<RenderableObject>> inventory;
-	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u));
-	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u));
+	std::shared_ptr<EquipmentSet> setOne = std::shared_ptr<EquipmentSet>(new EquipmentSet(1u, nullptr, nullptr));
+	std::shared_ptr<EquipmentSet> setTwo = std::shared_ptr<EquipmentSet>(new EquipmentSet(2u, nullptr, nullptr));
 	std::shared_ptr<EquipmentSet> activeSet = setOne;
 
 	float inventoryLeftPadding = 17.f;
 	float inventoryTopPadding = 12.f;
 	float inventorySpacing = 5.f;
 	unsigned int inventoryHorItemCount = 3u;
-
-	int horSplitAbs;
-	int verRightSplitAbs;
 
 	tgui::ChatBox::Ptr chatBox;
 
@@ -315,7 +318,7 @@ class Monster : public RenderableObject, public Creature, public DebugPrintObjec
 public:
 
 	Monster(const std::string& name_, const DifficultyLevel::Enum level_, const Attribute::Enum killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
-		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER), level(level_), killBonusType(killBonusType_), killBonus(killBonus_) {};
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER), level(level_), killBonusType(killBonusType_), killBonus(killBonus_), sound(ResourceManager::getInstance().getSound(name_)) {};
 
 	Attribute::Enum getKillBonusType() const { return killBonusType; };
 	float getKillBonus() const { return killBonus; };
@@ -327,6 +330,7 @@ protected:
 	const DifficultyLevel::Enum level;
 	const Attribute::Enum killBonusType;
 	const float killBonus;
+	sf::Sound& sound;
 };
 
 class Potion : public Item, public DebugPrintObject
@@ -360,7 +364,7 @@ class Weapon : public Item, public DebugPrintObject
 public:
 
 	Weapon::Weapon(const std::string& name_, const Classes::Enum itemClass_, const WeaponType::Enum type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
-		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_) {};
+		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_), attackSound(ResourceManager::getInstance().getSound(name_ + "_attack")) {};
 
 	WeaponType::Enum getType() const { return type; };
 	float getAttack() const { return attack; };
@@ -376,6 +380,7 @@ protected:
 	const WeaponType::Enum type;
 	const float attack, speed, accuracy, defence;
 	const unsigned int slots, maxWeapons;
+	sf::Sound& attackSound;
 };
 
 class Attack : public GameObject, public DebugPrintObject

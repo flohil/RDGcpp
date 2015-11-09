@@ -8,6 +8,7 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	SETTINGS_FILE_PATH("settings.txt"),
 	CONFIG_PATH("config/"),
 	IMAGE_PATH("res/"),
+	SOUNDS_PATH("res/sounds/"),
 	COLOR_DEPTH(32), 
 	ROOM_WIDTH(8),
 	ROOM_HEIGHT(6),
@@ -22,7 +23,9 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	height = desktopHeight;
 	widthScaleFactor = static_cast<float>(width) / static_cast<float>(scaleWidth);
 	heightScaleFactor = static_cast<float>(height) / static_cast<float>(scaleHeight);
-	mazeSize = 5;
+	widthDownScaleFactor = 1.f / widthScaleFactor;
+	heightDownScaleFactor = 1.f / heightScaleFactor;
+	mazeSize = 7;
 	tileSize = 32;
 	creatureSize = 128;
 	playerName = "Player";
@@ -35,6 +38,12 @@ Settings::Settings(unsigned int desktopWidth, unsigned int desktopHeight) :
 	labelPaddingX = 8.f;
 	labelBigHeight = 36.f;
 	labelSmallHeight = 34.f;
+	sliderHeight = 23.f;
+	enableSound = true;
+	effectsVolume = 100.f;
+	musicVolume = 100.f;
+	actualEffectsVolume = effectsVolume;
+	actualMusicVolume = musicVolume;
 
 	successfullyLoaded = loadSettings();
 }
@@ -56,6 +65,9 @@ void Settings::writeDefaultSettings()
 	outfile << std::endl;
 	outfile << "# Game Settings" << std::endl;
 	outfile << "mazeSize = " << mazeSize << std::endl;
+	outfile << "enableSound = " << ((enableSound == true) ? "TRUE" : "FALSE") << std::endl;
+	outfile << "effectsVolume = " << effectsVolume << std::endl;
+	outfile << "musicVolume = " << musicVolume << std::endl;
 	outfile << "playerName = " << playerName << std::endl;
 
 	// close settings file
@@ -72,6 +84,9 @@ void Settings::saveSettings()
 	settingsParser.set("height", height);
 	settingsParser.set("fullscreen", fullscreen);
 	settingsParser.set("mazeSize", mazeSize);
+	settingsParser.set("enableSound", enableSound);
+	settingsParser.set("effectsVolume", effectsVolume);
+	settingsParser.set("musicVolume", musicVolume);
 	settingsParser.set("playerName", playerName);
 
 	settingsParser.saveToFile();
@@ -108,6 +123,9 @@ bool Settings::loadSettings()
 		settingsParser.get("fullscreen", fullscreen);
 		settingsParser.get("mazeSize", mazeSize);
 		settingsParser.get("tileSize", tileSize);
+		settingsParser.get("enableSound", enableSound);
+		settingsParser.get("effectsVolume", effectsVolume);
+		settingsParser.get("musicVolume", musicVolume);
 		settingsParser.get("playerName", playerName);
 
 		if (playerName.length() == 0)
@@ -124,6 +142,27 @@ bool Settings::loadSettings()
 			mazeSize = 3;
 		}
 
+		if (effectsVolume < 0 || effectsVolume > 100.f)
+		{
+			effectsVolume = 100.f;
+		}
+
+		if (musicVolume < 0 || musicVolume > 100.f)
+		{
+			musicVolume = 100.f;
+		}
+
+		if (enableSound)
+		{
+			actualEffectsVolume = effectsVolume;
+			actualMusicVolume = musicVolume;
+		}
+		else
+		{
+			actualEffectsVolume = 0.f;
+			actualMusicVolume = 0.f;
+		}
+
 		std::cout << "scalewidht: " << scaleWidth << std::endl;
 		std::cout << "scaleheight: " << scaleHeight << std::endl;
 
@@ -132,9 +171,13 @@ bool Settings::loadSettings()
 
 		widthScaleFactor = static_cast<float>(width) / static_cast<float>(scaleWidth);
 		heightScaleFactor = static_cast<float>(height) / static_cast<float>(scaleHeight);
+		widthDownScaleFactor = 1.f / widthScaleFactor;
+		heightDownScaleFactor = 1.f / heightScaleFactor;
 
 		std::cout << "widthScaleFactor: " << widthScaleFactor << std::endl;
 		std::cout << "heightScaleFactor: " << heightScaleFactor << std::endl;
+		std::cout << "widthDownScaleFactor: " << widthDownScaleFactor << std::endl;
+		std::cout << "heightDownScaleFactor: " << heightDownScaleFactor << std::endl;
 
 		settingsParser.print();
 	}

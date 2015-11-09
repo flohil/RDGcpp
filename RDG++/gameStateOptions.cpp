@@ -4,6 +4,8 @@
 #include "gameState.hpp"
 #include "easylogging++.hpp"
 #include <cstdlib>
+#include <chrono>
+#include <thread>
 
 GameStateOptions::GameStateOptions(Game& game_) :
 GameState(game_)
@@ -64,6 +66,9 @@ void GameStateOptions::returnToMainMenu()
 {
 	LOG(INFO) << "Returning to main menu...";
 
+	ResourceManager::getInstance().setSoundVolumes(settings->actualEffectsVolume);
+	game.music.setVolume(settings->actualMusicVolume);
+	ResourceManager::getInstance().getSound("buttonClick").play();
 	game.popState();
 
 	return;
@@ -73,9 +78,13 @@ void GameStateOptions::saveSettings()
 {
 	LOG(INFO) << "Saving settings...";
 
+	ResourceManager::getInstance().getSound("buttonClick").play();
+
 	bool oldFullScreen = settings->fullscreen;
 	unsigned int oldWidth = settings->width;
 	unsigned int oldHeight = settings->height;
+	float oldActualEffectsVolume = settings->actualEffectsVolume;
+	float oldActualMusicVolume = settings->actualMusicVolume;
 	
 	std::string playerName = playerNameEditbox->getText().toAnsiString();
 	std::string selectedItemId = mazeSizeCombobox->getSelectedItemId();
@@ -89,12 +98,37 @@ void GameStateOptions::saveSettings()
 	settings->mazeSize = std::stoul(selectedItemId, nullptr, 0);
 	settings->width = resolution.x;
 	settings->height = resolution.y;
+	settings->enableSound = enableSoundCheckbox->isChecked();
+	settings->effectsVolume = static_cast<float>(effectsVolumeSlider->getValue());
+	settings->musicVolume = static_cast<float>(musicVolumeSlider->getValue());
+
+	if (settings->enableSound)
+	{
+		settings->actualEffectsVolume = settings->effectsVolume;
+		settings->actualMusicVolume = settings->musicVolume;
+	}
+	else
+	{
+		settings->actualEffectsVolume = 0.f;
+		settings->actualMusicVolume = 0.f;
+	}
 
 	settings->saveSettings();
 
 	status = "Settings have been saved!";
 
 	statusLabel->setText(status);
+
+	if (oldActualEffectsVolume != settings->actualEffectsVolume)
+	{
+		std::cout << "actualEffectsVolume is now " << settings->actualEffectsVolume << std::endl;
+		ResourceManager::getInstance().setSoundVolumes(settings->actualEffectsVolume);
+	}
+
+	if (oldActualMusicVolume != settings->actualMusicVolume)
+	{
+		// change music volume
+	}
 
 	if (oldFullScreen != settings->fullscreen || oldWidth != settings->width || oldHeight != settings->height)
 	{
@@ -110,9 +144,13 @@ void GameStateOptions::saveSettings()
 
 			settings->widthScaleFactor = static_cast<float>(settings->width) / static_cast<float>(settings->scaleWidth);
 			settings->heightScaleFactor = static_cast<float>(settings->height) / static_cast<float>(settings->scaleHeight);
+			settings->widthDownScaleFactor = 1.f / settings->widthScaleFactor;
+			settings->heightDownScaleFactor = 1.f / settings->heightScaleFactor;
 
 			std::cout << "widthScaleFactor: " << settings->widthScaleFactor << std::endl;
 			std::cout << "heightScaleFactor: " << settings->heightScaleFactor << std::endl;
+			std::cout << "widthDownScaleFactor: " << settings->widthDownScaleFactor << std::endl;
+			std::cout << "heightDownScaleFactor: " << settings->heightDownScaleFactor << std::endl;
 
 			game.reloadGuis();
 		}
@@ -174,6 +212,9 @@ void GameStateOptions::loadGui()
 	playerNameEditbox->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelBigTextSize));
 	playerNameEditbox->setSize(settings->widthScaleFactor * settings->defWidgetWidth, settings->heightScaleFactor * settings->labelBigHeight);
 	playerNameEditbox->setMaximumCharacters(20);
+	playerNameEditbox->connect("clicked", [&](){ ResourceManager::getInstance().getSound("guiControlResponse").play(); });
+	playerNameEditbox->connect("textchanged", [&](){ ResourceManager::getInstance().getSound("keyStroke").play(); });
+	playerNameEditbox->connect("returnkeypressed", [&](){ ResourceManager::getInstance().getSound("keyStrokeReturn").play(); });
 
 	tgui::Label::Ptr mazeSizeLabel = std::make_shared<tgui::Label>();
 	mazeSizeLabel->setText("Maze Size");
@@ -198,6 +239,8 @@ void GameStateOptions::loadGui()
 	}
 	mazeSizeCombobox->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelBigTextSize));
 	mazeSizeCombobox->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelBigHeight);
+	mazeSizeCombobox->connect("focused", [&](){ ResourceManager::getInstance().getSound("guiControlResponse").play(); });
+	mazeSizeCombobox->connect("itemselected", [&](){ ResourceManager::getInstance().getSound("guiControlResponse").play(); });
 
 	tgui::Label::Ptr fullscreenLabel = std::make_shared<tgui::Label>();
 	fullscreenLabel->setText("Fullscreen");
@@ -212,6 +255,8 @@ void GameStateOptions::loadGui()
 	{
 		fullscreenCheckbox->check();
 	}
+	fullscreenCheckbox->connect("checked", [&](){ ResourceManager::getInstance().getSound("guiControlResponse").play(); });
+	fullscreenCheckbox->connect("unchecked", [&](){ ResourceManager::getInstance().getSound("guiControlResponse").play(); });
 
 	tgui::Label::Ptr resolutionLabel = std::make_shared<tgui::Label>();
 	resolutionLabel->setText("Resolution");
@@ -228,6 +273,69 @@ void GameStateOptions::loadGui()
 	resolutionsCombobox->setSelectedItem(GameStateOptions::uiToGuiStrCrossPair(settings->width, settings->height));
 	resolutionsCombobox->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelBigTextSize));
 	resolutionsCombobox->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelBigHeight);
+	resolutionsCombobox->connect("focused", [&](){ ResourceManager::getInstance().getSound("guiControlResponse").play(); });
+	resolutionsCombobox->connect("itemselected", [&](){ ResourceManager::getInstance().getSound("guiControlResponse").play(); });
+
+	tgui::Label::Ptr enableSoundLabel = std::make_shared<tgui::Label>();
+	enableSoundLabel->setText("Enable Sound");
+	enableSoundLabel->setTextColor(sf::Color::Black);
+	enableSoundLabel->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelSmallTextSize));
+	enableSoundLabel->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - settings->labelPaddingX) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelSmallHeight);
+
+	enableSoundCheckbox = std::make_shared<tgui::CheckBox>();
+	enableSoundCheckbox->setOpacity(0.9f);
+	enableSoundCheckbox->setSize(settings->heightScaleFactor * settings->labelBigHeight, settings->heightScaleFactor * settings->labelBigHeight);
+	if (settings->enableSound)
+	{
+		enableSoundCheckbox->check();
+	}
+	enableSoundCheckbox->connect("checked", [&](){ 
+		ResourceManager::getInstance().setSoundVolumes(static_cast<float>(effectsVolumeSlider->getValue()));
+		game.music.setVolume(static_cast<float>(musicVolumeSlider->getValue()));
+		ResourceManager::getInstance().getSound("guiControlResponse").play();
+	});
+	enableSoundCheckbox->connect("unchecked", [&](){ 
+		ResourceManager::getInstance().getSound("guiControlResponse").play();
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		ResourceManager::getInstance().setSoundVolumes(0.f);
+		game.music.setVolume(0.f);
+	});
+
+	tgui::Label::Ptr effectsVolumeLabel = std::make_shared<tgui::Label>();
+	effectsVolumeLabel->setText("Effects Volume");
+	effectsVolumeLabel->setTextColor(sf::Color::Black);
+	effectsVolumeLabel->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelSmallTextSize));
+	effectsVolumeLabel->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - settings->labelPaddingX) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelSmallHeight);
+
+	effectsVolumeSlider = std::make_shared<tgui::Slider>();
+	effectsVolumeSlider->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) - horSpace * 0.5f, settings->heightScaleFactor * settings->sliderHeight);
+	effectsVolumeSlider->setMaximum(100);
+	effectsVolumeSlider->setValue(static_cast<int>(settings->effectsVolume));
+	effectsVolumeSlider->connect("valuechanged", [&](){ 
+		sf::Sound& sound = ResourceManager::getInstance().getSound("guiControlResponse");
+		if (enableSoundCheckbox->isChecked())
+		{
+			ResourceManager::getInstance().setSoundVolumes(static_cast<float>(effectsVolumeSlider->getValue()));
+			sound.play();
+		}
+	});
+
+	tgui::Label::Ptr musicVolumeLabel = std::make_shared<tgui::Label>();
+	musicVolumeLabel->setText("Music Volume");
+	musicVolumeLabel->setTextColor(sf::Color::Black);
+	musicVolumeLabel->setTextSize(static_cast<unsigned int>(settings->heightScaleFactor * settings->labelSmallTextSize));
+	musicVolumeLabel->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - settings->labelPaddingX) - horSpace * 0.5f, settings->heightScaleFactor * settings->labelSmallHeight);
+
+	musicVolumeSlider = std::make_shared<tgui::Slider>();
+	musicVolumeSlider->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) - horSpace * 0.5f, settings->heightScaleFactor * settings->sliderHeight);
+	musicVolumeSlider->setMaximum(100);
+	musicVolumeSlider->setValue(static_cast<int>(settings->musicVolume));
+	musicVolumeSlider->connect("valuechanged", [&](){
+		if (enableSoundCheckbox->isChecked())
+		{
+			game.music.setVolume(static_cast<float>(effectsVolumeSlider->getValue()));
+		}
+	});
 
 	statusLabel = std::make_shared<tgui::Label>();
 	statusLabel->setText(status);
@@ -250,7 +358,7 @@ void GameStateOptions::loadGui()
 	backButton->setSize(settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) - horSpace * 0.5f, static_cast<float>(settings->heightScaleFactor * settings->widgetHeight));
 
 	// obtain size of all elements
-	layoutHeight = playerNameLabel->getSize().y + playerNameEditbox->getSize().y + mazeSizeCombobox->getSize().y + fullscreenCheckbox->getSize().y + resolutionsCombobox->getSize().y + statusLabel->getSize().y + saveButton->getSize().y + 6 * verSpace;
+	layoutHeight = playerNameLabel->getSize().y + playerNameEditbox->getSize().y + mazeSizeCombobox->getSize().y + fullscreenCheckbox->getSize().y + resolutionsCombobox->getSize().y + statusLabel->getSize().y + enableSoundCheckbox->getSize().y + effectsVolumeSlider->getSize().y + musicVolumeSlider->getSize().y + saveButton->getSize().y + 2 * (settings->labelBigHeight - settings->sliderHeight) + 8 * verSpace;
 	float layoutTop = layoutCenterY - layoutHeight * 0.5f;
 	float heightSum = layoutTop;
 
@@ -265,15 +373,27 @@ void GameStateOptions::loadGui()
 	heightSum += mazeSizeCombobox->getSize().y;
 	heightSum += verSpace; //space
 	fullscreenLabel->setPosition(layoutLeft + settings->widthScaleFactor * (settings->labelPaddingX), heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
-	fullscreenCheckbox->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - 1) + horSpace * 0.5f, heightSum);
-	heightSum += mazeSizeCombobox->getSize().y;
+	fullscreenCheckbox->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - 2.f) + horSpace * 0.5f, heightSum);
+	heightSum += fullscreenCheckbox->getSize().y;
 	heightSum += verSpace; //space
 	resolutionLabel->setPosition(layoutLeft + settings->widthScaleFactor * (settings->labelPaddingX), heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
 	resolutionsCombobox->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) + horSpace * 0.5f, heightSum);
-	heightSum += mazeSizeCombobox->getSize().y;
+	heightSum += resolutionsCombobox->getSize().y;
+	heightSum += verSpace; //space
+	enableSoundLabel->setPosition(layoutLeft + settings->widthScaleFactor * (settings->labelPaddingX), heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
+	enableSoundCheckbox->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f - 2.f) + horSpace * 0.5f, heightSum);
+	heightSum += enableSoundCheckbox->getSize().y;
+	heightSum += verSpace; //space
+	effectsVolumeLabel->setPosition(layoutLeft + settings->widthScaleFactor * (settings->labelPaddingX), heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
+	effectsVolumeSlider->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) + horSpace * 0.5f, heightSum + (settings->labelBigHeight - settings->sliderHeight) * 0.5f);
+	heightSum += effectsVolumeSlider->getSize().y + (settings->labelBigHeight - settings->sliderHeight);
+	heightSum += verSpace; //space
+	musicVolumeLabel->setPosition(layoutLeft + settings->widthScaleFactor * (settings->labelPaddingX), heightSum + (settings->labelBigHeight - settings->labelSmallHeight) * 0.5f);
+	musicVolumeSlider->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) + horSpace * 0.5f, heightSum + (settings->labelBigHeight - settings->sliderHeight) * 0.5f);
+	heightSum += musicVolumeSlider->getSize().y + (settings->labelBigHeight - settings->sliderHeight);
 	heightSum += verSpace; //space
 	statusLabel->setPosition(layoutLeft + settings->widthScaleFactor * (75), heightSum);
-	heightSum += verSpace; //space
+	heightSum += statusLabel->getSize().y;
 	heightSum += verSpace; //space
 	saveButton->setPosition(layoutLeft, heightSum);
 	backButton->setPosition(layoutLeft + settings->widthScaleFactor * (settings->defWidgetWidth * 0.5f) + horSpace * 0.5f, heightSum);
@@ -286,6 +406,12 @@ void GameStateOptions::loadGui()
 	gui.add(fullscreenCheckbox);
 	gui.add(resolutionLabel);
 	gui.add(resolutionsCombobox);
+	gui.add(enableSoundLabel);
+	gui.add(enableSoundCheckbox);
+	gui.add(effectsVolumeLabel);
+	gui.add(effectsVolumeSlider);
+	gui.add(musicVolumeLabel);
+	gui.add(musicVolumeSlider);
 	gui.add(statusLabel);
 	gui.add(saveButton);
 	gui.add(backButton);
