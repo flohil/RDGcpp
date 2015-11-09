@@ -9,6 +9,16 @@
 #include "settings.hpp"
 #include <SFML/Audio.hpp>
 
+class MusicInformation
+{
+public:
+
+	MusicInformation(std::string path_) : path(path_), timeOffset(sf::seconds(0)) {};
+
+	std::string path;
+	sf::Time timeOffset;
+};
+
 class ResourceManager
 {
 public:
@@ -27,6 +37,8 @@ public:
 	sf::Sound& getSound(const std::string& soundName) { return sounds.at(soundName); };
 	void setSoundVolumes(const float effectsVolume);
 	bool loadSound(const std::string soundName, const std::string filePath);
+	bool loadMusicPath(const std::string musicName, const std::string filePath);
+	std::shared_ptr<MusicInformation> getMusic(const std::string musicName) const { return musicPieces.at(musicName); };
 
 private:
 
@@ -36,6 +48,7 @@ private:
 	std::map <const std::string, std::list<sf::Sprite>> tiles;
 	std::map <const std::string, sf::SoundBuffer> soundBuffers;
 	std::map <const std::string, sf::Sound> sounds;
+	std::map <const std::string, std::shared_ptr<MusicInformation>> musicPieces;
 
 	void loadTiles();
 	

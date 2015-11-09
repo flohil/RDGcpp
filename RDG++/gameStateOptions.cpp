@@ -292,6 +292,10 @@ void GameStateOptions::loadGui()
 	enableSoundCheckbox->connect("checked", [&](){ 
 		ResourceManager::getInstance().setSoundVolumes(static_cast<float>(effectsVolumeSlider->getValue()));
 		game.music.setVolume(static_cast<float>(musicVolumeSlider->getValue()));
+		sf::Time musicOffset = sf::seconds(0);
+		ResourceManager::getInstance().getMusic(game.currentMusic)->timeOffset = musicOffset;
+		game.music.setPlayingOffset(musicOffset);
+		game.music.play();
 		ResourceManager::getInstance().getSound("guiControlResponse").play();
 	});
 	enableSoundCheckbox->connect("unchecked", [&](){ 
@@ -299,6 +303,7 @@ void GameStateOptions::loadGui()
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		ResourceManager::getInstance().setSoundVolumes(0.f);
 		game.music.setVolume(0.f);
+		game.music.stop();
 	});
 
 	tgui::Label::Ptr effectsVolumeLabel = std::make_shared<tgui::Label>();
@@ -333,7 +338,7 @@ void GameStateOptions::loadGui()
 	musicVolumeSlider->connect("valuechanged", [&](){
 		if (enableSoundCheckbox->isChecked())
 		{
-			game.music.setVolume(static_cast<float>(effectsVolumeSlider->getValue()));
+			game.music.setVolume(static_cast<float>(musicVolumeSlider->getValue()));
 		}
 	});
 

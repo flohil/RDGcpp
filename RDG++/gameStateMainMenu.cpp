@@ -22,6 +22,8 @@ GameStateMainMenu::GameStateMainMenu(Game& game_) :
 
 	background.setTexture(ResourceManager::getInstance().getTexture("background"));
 	
+	game.changeMusic("mainMenu", 0.f, 0.f, 0.f);
+
 	loadGui();
 }
 
@@ -38,6 +40,13 @@ void GameStateMainMenu::draw(const float deltaTime)
 
 void GameStateMainMenu::update(const float deltaTime)
 {
+	if (triggeredGameLoad && !game.isMusicReady())
+	{
+		LOG(INFO) << "Switching to loading screen...";
+		triggeredGameLoad = false;
+		game.pushState(std::shared_ptr<GameState>(new GameStateLoading(game)));
+	}
+
 	return;
 }
 
@@ -58,10 +67,9 @@ void GameStateMainMenu::handleInput()
 
 void GameStateMainMenu::startGame()
 {
-	LOG(INFO) << "Switching to loading screen...";
-
 	ResourceManager::getInstance().getSound("buttonClick").play();
-	game.pushState(std::shared_ptr<GameState>(new GameStateLoading(game)));
+	game.changeMusic("loading", 0.f, 0.f, 0.f);
+	triggeredGameLoad = true;
 
 	return;
 }

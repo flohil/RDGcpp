@@ -20,6 +20,8 @@ private:
 	float layoutCenterX;
 	float layoutCenterY;
 
+	bool triggeredGameLoad = false;
+
 public:
 
 	virtual void draw(const float deltaTime);

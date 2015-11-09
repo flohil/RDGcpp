@@ -36,6 +36,7 @@ bool ResourceManager::loadAdditionalResources()
 {
 	std::map<std::string, std::string> textureNames;
 	std::map<std::string, std::string> soundNames;
+	std::map<std::string, std::string> musicNames;
 
 	textureNames.insert(std::pair<std::string, std::string>("player_big", "player_big.png"));
 	textureNames.insert(std::pair<std::string, std::string>("player", "player.png"));
@@ -69,6 +70,11 @@ bool ResourceManager::loadAdditionalResources()
 	soundNames.insert(std::pair<std::string, std::string>("forceParry", "parry.ogg"));
 	soundNames.insert(std::pair<std::string, std::string>("changeSet", "changeSet.ogg"));
 
+	musicNames.insert(std::pair<std::string, std::string>("mainMenu", "mainMenu.ogg"));
+	musicNames.insert(std::pair<std::string, std::string>("loading", "loading.ogg"));
+	musicNames.insert(std::pair<std::string, std::string>("game", "game.ogg"));
+	musicNames.insert(std::pair<std::string, std::string>("fight", "fight.ogg"));
+
 	// load single textures
 	for (std::map<std::string, std::string>::iterator it = textureNames.begin(); it != textureNames.end(); ++it)
 	{
@@ -84,6 +90,15 @@ bool ResourceManager::loadAdditionalResources()
 	for (std::map<std::string, std::string>::iterator it = soundNames.begin(); it != soundNames.end(); ++it)
 	{
 		if (!loadSound(it->first, it->second))
+		{
+			return false;
+		}
+	}
+
+	// load music file paths
+	for (std::map<std::string, std::string>::iterator it = musicNames.begin(); it != musicNames.end(); ++it)
+	{
+		if (!loadMusicPath(it->first, it->second))
 		{
 			return false;
 		}
@@ -204,6 +219,40 @@ bool ResourceManager::loadSound(const std::string soundName, const std::string f
 	sounds.insert(std::pair<const std::string, sf::Sound>(soundName, sound));
 
 	LOG(DEBUG) << "loaded " << settings->SOUNDS_PATH + filePath;
+
+	return true;
+}
+
+bool ResourceManager::loadMusicPath(const std::string musicName, const std::string filePath)
+{
+	FILE *stream;
+	errno_t err;
+	std::string fullPath = settings->MUSIC_PATH + filePath;
+
+	err = fopen_s(&stream, fullPath.c_str(), "r");
+
+	if (err != 0)
+	{
+		LOG(ERROR) << "Failed to open music file " << fullPath;
+		return false;
+	}
+	
+	if (stream)
+	{
+		err = fclose(stream);
+
+		if (err != 0)
+		{
+			LOG(ERROR) << "Failed to close music file " << fullPath;
+			return false;
+		}
+	}
+
+	std::shared_ptr<MusicInformation> musicInfo(new MusicInformation(fullPath));
+
+	musicPieces.insert(std::pair<const std::string, std::shared_ptr<MusicInformation>>(musicName, musicInfo));
+
+	LOG(DEBUG) << "Succeeded in opening music file " << fullPath;
 
 	return true;
 }

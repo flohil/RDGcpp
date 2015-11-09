@@ -34,11 +34,30 @@ void GameStateLoading::draw(const float deltaTime)
 
 void GameStateLoading::update(const float deltaTime)
 {
-	triggeredLoadingCountdown--;
+	passedLoadTime += deltaTime;
 
-	if (triggeredLoadingCountdown == 0)
+	if (triggeredLoadingCountdown > 0)
+	{
+		triggeredLoadingCountdown--;
+	}
+
+	if (triggeredLoadingCountdown == 0 && !game.isMusicReady() && !loaded)
 	{
 		triggerLoading();
+	}
+
+	if (loaded && passedLoadTime > minLoadTime && !triggeredGameMusicLoad)
+	{
+		game.changeMusic("game", 1.0f, 0.5f, 1.0f);
+		triggeredGameMusicLoad = true;
+	}
+
+	if (triggeredGameMusicLoad && !game.isMusicReady())
+	{
+		game.popState();
+		game.pushState(loadedGame);
+
+		LOG(INFO) << "Finished loading Game";
 	}
 
 	return;
@@ -51,13 +70,8 @@ void GameStateLoading::handleInput()
 
 void GameStateLoading::triggerLoading()
 {
-	std::shared_ptr<GameState> gameGameState(new GameStateGame(game));
-
-	game.popState();
-	game.pushState(gameGameState);
-
-	LOG(INFO) << "Finished loading Game";
-
+	loadedGame = std::shared_ptr<GameStateGame>(new GameStateGame(game));
+	loaded = true;
 	return;
 }
 

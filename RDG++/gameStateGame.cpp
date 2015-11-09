@@ -216,7 +216,7 @@ GameState(game_)
 	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 
 	// test fill set
-	player->getEquipmentSet()->setBoots(game.getPrototypeStorage()->armamentFactory->create("Leather Boots"));
+	/*player->getEquipmentSet()->setBoots(game.getPrototypeStorage()->armamentFactory->create("Leather Boots"));
 	player->getEquipmentSet()->setCuisse(game.getPrototypeStorage()->armamentFactory->create("Leather Cuisse"));
 	player->getEquipmentSet()->setGauntlets(game.getPrototypeStorage()->armamentFactory->create("Leather Gauntlets"));
 	player->getEquipmentSet()->setHarness(game.getPrototypeStorage()->armamentFactory->create("Leather Harness"));
@@ -225,7 +225,7 @@ GameState(game_)
 	player->getEquipmentSet()->setSecondaryWeapon(game.getPrototypeStorage()->weaponFactory->create("Axt"));
 	player->getEquipmentSet()->setPotion1(game.getPrototypeStorage()->potionFactory->create("Antidote"));
 	player->getEquipmentSet()->setPotion2(game.getPrototypeStorage()->potionFactory->create("Antidote"));
-	player->getEquipmentSet()->setPotion3(game.getPrototypeStorage()->potionFactory->create("Antidote"));
+	player->getEquipmentSet()->setPotion3(game.getPrototypeStorage()->potionFactory->create("Antidote"));*/
 }
 
 void GameStateGame::draw(const float deltaTime)
@@ -407,6 +407,8 @@ void GameStateGame::handleInput()
 			{
 				if (inFight)
 				{
+					game.changeMusic("game", 0.7f, 1.5f, 0.5f, true);
+
 					fight.reset();
 					player->setPendingFightEnemy(nullptr);
 					inFight = false;
@@ -432,6 +434,7 @@ void GameStateGame::handleInput()
 				}
 				else
 				{
+					game.changeMusic("mainMenu", 0.7f, 1.0f, 0.f);
 					pauseGame();
 				}
 			}
@@ -1199,6 +1202,8 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 {
 	std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
 	inFight = true;
+
+	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
 
 	fight.reset(new Fight(player_, monster_));
 }

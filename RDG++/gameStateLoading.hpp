@@ -20,6 +20,11 @@ private:
 	float layoutCenterY;
 
 	unsigned int triggeredLoadingCountdown = 10;
+	float minLoadTime = 2.f; // to allow loading music to be played
+	float passedLoadTime = 0.f;
+	bool loaded = false;
+	std::shared_ptr<GameState> loadedGame;
+	bool triggeredGameMusicLoad = false;
 
 public:
 

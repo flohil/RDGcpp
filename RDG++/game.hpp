@@ -20,7 +20,9 @@ public:
 	sf::RenderWindow window;
 	std::shared_ptr<tgui::Theme> theme;
 	std::shared_ptr<RenderableObject> background;
+	std::string currentMusic;
 	sf::Music music;
+	std::string prevMusic;
 
 	bool initializedSuccessfully() const { return successfullyInitialized; };
 	void pushState(std::shared_ptr<GameState> state);
@@ -33,7 +35,13 @@ public:
 	std::shared_ptr<PrototypeStorage> getPrototypeStorage() const { return prototypeStorage; };
 	ResourceManager& getResourceManager() const { return resourceManager; };
 	void reloadGuis();
-
+	void changeMusic(std::string nextMusic_, const float fadeOutSpan_, const float fadeInSpan_, const float pauseSpan_) {
+		changeMusic(nextMusic_, fadeOutSpan_, fadeInSpan_, pauseSpan_, false);
+	}; //in seconds
+	void changeMusic(std::string nextMusic_, const float fadeOutSpan_, const float fadeInSpan_, const float pauseSpan_, bool fromPrevOffset);
+	// when pause has finished
+	bool isMusicReady() const { return musicInChange; };
+		
 	Game();
 	~Game();
 
@@ -47,6 +55,21 @@ private:
 	sf::VideoMode desktopVmode;
 	sf::VideoMode vmode;
 	std::unique_ptr<Maze> maze;
+	std::string nextMusic;
+	float fadeOutSpan;
+	float fadeInSpan;
+	float pauseSpan;
+	float fadeOutAccumulator;
+	float fadeInAccumulator;
+	float pauseAccumulator;
+	bool musicInChange = false;
+	bool finishedFade = false;
+	bool finishedPause = false;
+	bool fromPrevOffset = false;
+	bool musicReady = true;
+	sf::Time prevMusicOffset;
+
+	void changeMusic(const float deltaTime);
 };
 
 #endif /* GAME_HPP */

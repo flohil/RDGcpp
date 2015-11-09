@@ -31,6 +31,9 @@ Game::Game()
 	}
 
 	resourceManager.setSoundVolumes(settings->actualEffectsVolume);
+	music.setVolume(settings->actualMusicVolume);
+	music.setLoop(true);
+	currentMusic = "mainMenu";
 
 	// prototype initalization
 	prototypeStorage.reset(new PrototypeStorage(settings->CONFIG_PATH));
@@ -111,6 +114,11 @@ void Game::gameLoop()
 		{
 			peekState()->handleInput();
 			peekState()->update(deltaTime);
+
+			if (musicInChange) // fade out previous music
+			{
+				changeMusic(deltaTime);
+			}
 		}
 		window.display();
 	}
@@ -132,6 +140,94 @@ void Game::reloadGuis()
 		states.push(oldStates.top());
 		oldStates.pop();
 	}
+}
+
+void Game::changeMusic(const float deltaTime)
+{
+	if (!finishedFade)
+	{
+		fadeOutAccumulator += deltaTime;
+
+		float currentVol = music.getVolume();
+		float maxVol = settings->actualMusicVolume;
+
+		float newVol = (fadeOutSpan - fadeOutAccumulator) / fadeOutSpan * maxVol;
+
+		if (fadeOutAccumulator >= fadeOutSpan)
+		{
+			fadeOutSpan = 0.f;
+			fadeOutAccumulator = 0.f;
+			newVol = 0.f;
+			finishedFade = true;
+			ResourceManager::getInstance().getMusic(currentMusic)->timeOffset = music.getPlayingOffset();
+			music.pause();
+		}
+
+		music.setVolume(newVol);
+	}
+	if (finishedFade && !finishedPause)
+	{
+		pauseAccumulator += deltaTime;
+
+		if (pauseAccumulator >= pauseSpan)
+		{
+			finishedPause = true;
+			prevMusic = currentMusic;
+			currentMusic = nextMusic;
+			music.openFromFile(ResourceManager::getInstance().getMusic(currentMusic)->path);
+			music.play();
+			if (fromPrevOffset)
+			{
+				music.setPlayingOffset(ResourceManager::getInstance().getMusic(currentMusic)->timeOffset);
+			}
+			else
+			{
+				music.setPlayingOffset(sf::seconds(0));
+			}
+			nextMusic.clear();
+			musicReady = true;
+		}
+	}
+	if (finishedFade && finishedPause)
+	{
+		fadeInAccumulator += deltaTime;
+
+		//std::cout << "fadeInAcc: " << fadeInAccumulator << ", fadeInSpan: " << fadeInSpan << std::endl;
+
+		float currentVol = music.getVolume();
+		float maxVol = settings->actualMusicVolume;
+
+		float newVol = fadeInAccumulator / fadeInSpan * maxVol;
+
+		if (fadeInAccumulator >= fadeInSpan)
+		{
+			fadeInSpan = 0.f;
+			fadeInAccumulator = 0.f;
+			newVol = maxVol;
+			musicInChange = false;
+		}
+
+		music.setVolume(newVol);
+	}
+}
+
+void Game::changeMusic(std::string nextMusic_, const float fadeOutSpan_, const float fadeInSpan_, const float pauseSpan_, bool fromPrevOffset_)
+{
+	std::cout << "changeMusic set parameters for " << nextMusic_ << std::endl;
+	std::cout << "fadeOut: " << fadeOutSpan_ << ", fadeIn: " << fadeInSpan_ << ", pause: " << pauseSpan_ << std::endl;
+
+	nextMusic = nextMusic_;
+	fadeOutSpan = fadeOutSpan_;
+	fadeInSpan = fadeInSpan_;
+	pauseSpan = pauseSpan_;
+	fadeOutAccumulator = 0.f;
+	fadeInAccumulator = 0.f;
+	pauseAccumulator = 0.f;
+	finishedFade = false;
+	finishedPause = false;
+	fromPrevOffset = fromPrevOffset_;
+	musicInChange = true;
+	musicReady = false;
 }
 
 Game::~Game()
