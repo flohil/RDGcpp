@@ -50,3 +50,8 @@
 	- Ende von Kampf: player hat gewonnen/verloren gegen monster->getName()
 	- (Player hat gewonnen): player hat x attribute bonus erhalten (monster->getKillBonusType(), monster->getKillBonus())
 		-> killBonusType Enum in String umwandeln: EnumMapper::mapAttributeName(monster->getKillBonusType())
+
+- Architekturidee:
+
+	- Kampf: round() Funktion -> aufgerufen mit AttackType::Enum, handelt Player Angriff, Enemy Angriff, Getränke
+		vor round() Aufruf wird gemacht: setChange(), usePotion() (es wird dann aufgrund der Enum einfach keine Attacke ausgeführt in round())
