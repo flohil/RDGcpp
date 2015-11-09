@@ -637,7 +637,7 @@ void GameStateGame::loadGui()
 	//enemyTex.getSize().x;
 
 	// ausführliche Version
-	enemyHealthBar = theme->load("ProgressBar");
+	enemyHealthBar = std::make_shared<tgui::ProgressBar>();
 	enemyHealthBar->setPosition(100, 50);
 	enemyHealthBar->setSize(200, 20);
 	enemyHealthBar->setMinimum(0u);
@@ -646,10 +646,12 @@ void GameStateGame::loadGui()
 	fightGui.add(enemyHealthBar);
 
 	// minimalistische version aus dem full example
-	playerHealthBar = theme->load("ProgressBar");
+	playerHealthBar = std::make_shared<tgui::ProgressBar>();
 	playerHealthBar->setPosition(100, 100);
 	playerHealthBar->setSize(200, 20);
-	playerHealthBar->setValue(50);
+	playerHealthBar->setMinimum(0u);
+	playerHealthBar->setMaximum(100u);
+	playerHealthBar->setValue(50u);
 	fightGui.add(playerHealthBar);
 
 	attackButton = theme->load("Button");
