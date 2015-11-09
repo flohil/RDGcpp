@@ -65,6 +65,7 @@ private:
 	bool usePotionActive = false;
 	bool inAttackOptions = false;
 	bool inFight = false;
+	bool choseChangeSet = false;
 	std::shared_ptr<Fight> fight = nullptr;
 
 	// gui

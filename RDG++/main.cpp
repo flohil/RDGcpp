@@ -46,7 +46,12 @@ int main()
 	game.pushState(std::shared_ptr<GameState>( new GameStateMainMenu(game)));
 	game.gameLoop();
 
+	game.music.stop();
+
 	LOG(INFO) << "Shutting down...";
+
+	system("pause");
+
 	return 0;
 }
 

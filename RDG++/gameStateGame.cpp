@@ -850,7 +850,7 @@ void GameStateGame::changeSet(bool playSound, unsigned int numerator)
 	float activeOpacity = 1.f;
 	float inactiveOpacity = 0.7f;
 
-	if (!inFight)
+	if (!inFight || choseChangeSet)
 	{
 		if (playSound)
 		{
@@ -868,8 +868,10 @@ void GameStateGame::changeSet(bool playSound, unsigned int numerator)
 			set1Button->setOpacity(inactiveOpacity);
 			set2Button->setOpacity(activeOpacity);
 		}
+
+		choseChangeSet = false;
 	}
-	else
+	else 
 	{
 		if (playSound)
 		{
@@ -1257,6 +1259,8 @@ void GameStateGame::toggleEquipment()
 {
 	usePotionActive = false;
 	hideAttackGui();
+	choseChangeSet = true;
+	changeSet(true);
 	OutputFormatter::chat(chatbox, "Changing Equipment", sf::Color::White);
 }
 
