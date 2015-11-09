@@ -249,11 +249,11 @@ void GameStateGame::draw(const float deltaTime)
 		//game.window.draw(enemySprite);
 		fightGui.draw();
 		
-		}
-		else
-		{
-	map->draw(game.window, deltaTime);
-	player->draw(game.window, deltaTime);
+	}
+	else
+	{
+		map->draw(game.window, deltaTime);
+		player->draw(game.window, deltaTime);
 	}
 	
 	game.window.setView(armorView);
@@ -422,7 +422,18 @@ void GameStateGame::handleInput()
 			}
 			else if (event.key.code == sf::Keyboard::Escape)
 			{
-				pauseGame();
+				if (usePotionActive)
+				{
+					usePotionActive = false;
+				}
+				else if (inAttackOptions)
+				{
+					hideAttackGui();
+				}
+				else
+				{
+					pauseGame();
+				}
 			}
 			else
 			{
@@ -611,8 +622,8 @@ void GameStateGame::loadGui()
 	/* FIGHT STUFF */
 
 	float spacer = 30.f;
-	float buttonWidth = (horSplitAbs - spacer) / 4.f;
-	float buttonHeight = verSplitAbs / 8.f;
+	float buttonWidth = (rightHorSplitAbs - spacer) / 4.f;
+	float buttonHeight = bottomVerSplitAbs / 8.f;
 	float buttonCount = 4.f;
 	float spacePerButton = spacer / buttonCount;
 	float buttonWithSpacer = buttonWidth + spacePerButton;
@@ -647,7 +658,7 @@ void GameStateGame::loadGui()
 	attackButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	attackButton->connect("pressed", [&](){ toggleAttackGui(); });
 	attackButton->setSize(buttonWidth, buttonHeight);
-	attackButton->setPosition(0.f * buttonWithSpacer + spacePerButton /2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
+	attackButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, bottomVerSplitAbs - topVerSplitAbs - buttonHeight - heightSpacer);
 	fightGui.add(attackButton);
 
 	parryButton = theme->load("Button");
@@ -656,7 +667,7 @@ void GameStateGame::loadGui()
 	parryButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	parryButton->connect("pressed", [&](){ parry(); });
 	parryButton->setSize(buttonWidth, buttonHeight);
-	parryButton->setPosition(1.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
+	parryButton->setPosition(1.f * buttonWithSpacer + spacePerButton / 2.f, bottomVerSplitAbs - topVerSplitAbs - buttonHeight - heightSpacer);
 	fightGui.add(parryButton);
 
 	potionButton = theme->load("Button");
@@ -665,7 +676,7 @@ void GameStateGame::loadGui()
 	potionButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	potionButton->connect("pressed", [&](){ usePotion(); });
 	potionButton->setSize(buttonWidth, buttonHeight);
-	potionButton->setPosition(2.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
+	potionButton->setPosition(2.f * buttonWithSpacer + spacePerButton / 2.f, bottomVerSplitAbs - topVerSplitAbs - buttonHeight - heightSpacer);
 	fightGui.add(potionButton);
 
 	equipmentSetButton = theme->load("Button");
@@ -674,7 +685,7 @@ void GameStateGame::loadGui()
 	equipmentSetButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	equipmentSetButton->connect("pressed", [&](){ toggleEquipment(); });
 	equipmentSetButton->setSize(buttonWidth, buttonHeight);
-	equipmentSetButton->setPosition(3.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
+	equipmentSetButton->setPosition(3.f * buttonWithSpacer + spacePerButton / 2.f, bottomVerSplitAbs - topVerSplitAbs - buttonHeight - heightSpacer);
 	fightGui.add(equipmentSetButton);
 
 	/* Attack Submenu */
@@ -684,7 +695,7 @@ void GameStateGame::loadGui()
 	headButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	headButton->connect("pressed", [&](){ attackHead(); });
 	headButton->setSize(buttonWidth, buttonHeight);
-	headButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer - 1.f * buttonHeight);
+	headButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, bottomVerSplitAbs - topVerSplitAbs - buttonHeight - heightSpacer - 1.f * buttonHeight);
 
 	torsoButton = theme->load("Button");
 	torsoButton->setText("Torso");
@@ -692,7 +703,7 @@ void GameStateGame::loadGui()
 	torsoButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	torsoButton->connect("pressed", [&](){ attackTorso(); });
 	torsoButton->setSize(buttonWidth, buttonHeight);
-	torsoButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer - 2.f * buttonHeight);
+	torsoButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, bottomVerSplitAbs - topVerSplitAbs - buttonHeight - heightSpacer - 2.f * buttonHeight);
 
 	armsButton = theme->load("Button");
 	armsButton->setText("Arms");
@@ -700,7 +711,7 @@ void GameStateGame::loadGui()
 	armsButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	armsButton->connect("pressed", [&](){ attackArms(); });
 	armsButton->setSize(buttonWidth, buttonHeight);
-	armsButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer - 3.f * buttonHeight);
+	armsButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, bottomVerSplitAbs - topVerSplitAbs - buttonHeight - heightSpacer - 3.f * buttonHeight);
 
 	legsButton = theme->load("Button");
 	legsButton->setText("Legs");
@@ -708,7 +719,7 @@ void GameStateGame::loadGui()
 	legsButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	legsButton->connect("pressed", [&](){ attackLegs(); });
 	legsButton->setSize(buttonWidth, buttonHeight);
-	legsButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer - 4.f * buttonHeight);
+	legsButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, bottomVerSplitAbs - topVerSplitAbs - buttonHeight - heightSpacer - 4.f * buttonHeight);
 
 	/* FIGHT STUFF END */
 
@@ -1014,13 +1025,12 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			{
 				if (!usePotionActive)
 				{
-				OutputFormatter::chat(chatbox, "Equipped " + oldDraggedItem->getName(), sf::Color::White);
+					OutputFormatter::chat(chatbox, "Equipped " + oldDraggedItem->getName(), sf::Color::White);
 					ResourceManager::getInstance().getSound(oldDraggedItem->getName()).play();
 				}
 				else
 				{
-					OutputFormatter::chat(chatbox, "Used " + oldDraggedItem->getName(), sf::Color::White);
-					ResourceManager::getInstance().getSound("drink").play();
+					usePotionActive = false;
 				}
 			}
 
@@ -1193,6 +1203,7 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 
 void GameStateGame::toggleAttackGui()
 {
+	usePotionActive = false;
 	if (!inAttackOptions)
 	{
 		fightGui.add(headButton);
@@ -1223,6 +1234,7 @@ void GameStateGame::hideAttackGui()
 
 void GameStateGame::parry()
 {
+	usePotionActive = false;
 	hideAttackGui();
 	OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
 }
@@ -1230,11 +1242,13 @@ void GameStateGame::parry()
 void GameStateGame::usePotion()
 {
 	hideAttackGui();
+	usePotionActive = true;
 	OutputFormatter::chat(chatbox, "Trying to use Potion", sf::Color::White);
 }
 
 void GameStateGame::toggleEquipment()
 {
+	usePotionActive = false;
 	hideAttackGui();
 	OutputFormatter::chat(chatbox, "Changing Equipment", sf::Color::White);
 }

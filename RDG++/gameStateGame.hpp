@@ -152,7 +152,6 @@ private:
 	void changeSet(bool playSound, unsigned int numerator);
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType) { handleMouseEvent(pos_, eventType, false); };
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType, bool noScale);
-	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType);
 	void updateDetails(DetailsBag& detailsBag);
 	void updateStats();
 	void startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_);

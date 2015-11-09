@@ -149,6 +149,7 @@ std::shared_ptr<Potion> EquipmentSet::setPotion1(std::shared_ptr<Potion> potion_
 	{
 		potion1->setSize(itemSize, itemSize);
 		potion1->setPosition(potion1Pos);
+		ResourceManager::getInstance().getSound(potion1->getName()).play();
 	}
 
 	return oldPotion;
@@ -164,6 +165,7 @@ std::shared_ptr<Potion> EquipmentSet::setPotion2(std::shared_ptr<Potion> potion_
 	{
 		potion2->setSize(itemSize, itemSize);
 		potion2->setPosition(potion2Pos);
+		ResourceManager::getInstance().getSound(potion2->getName()).play();
 	}
 
 	return oldPotion;
@@ -179,6 +181,7 @@ std::shared_ptr<Potion> EquipmentSet::setPotion3(std::shared_ptr<Potion> potion_
 	{
 		potion3->setSize(itemSize, itemSize);
 		potion3->setPosition(potion3Pos);
+		ResourceManager::getInstance().getSound(potion3->getName()).play();
 	}
 
 	return oldPotion;
@@ -545,6 +548,10 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 		if (usePotion) // drink a potion
 		{
 			std::shared_ptr<Potion> potion = std::dynamic_pointer_cast<Potion>(item);
+
+			OutputFormatter::chat(chatbox, "Used " + potion->getName(), sf::Color::White);
+			ResourceManager::getInstance().getSound("drink").play();
+
 			// add to active Potions list
 			//fight->(potion)...
 		}
