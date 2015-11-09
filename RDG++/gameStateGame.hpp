@@ -33,6 +33,7 @@ private:
 
 	sf::View statsView;
 	sf::View mapView;
+	sf::View fightView;
 	sf::View chatView;
 	sf::View inventoryView;
 	sf::View armorView;

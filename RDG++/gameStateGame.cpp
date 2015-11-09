@@ -140,6 +140,7 @@ GameState(game_)
 	sf::Vector2f statsViewSize = sf::Vector2f(static_cast<float>(rightHorSplitAbs), static_cast<float>(topVerSplitAbs));
 	sf::Vector2f possibleMapViewSize = sf::Vector2f(static_cast<float>(rightHorSplitAbs), static_cast<float>(bottomVerSplitAbs - topVerSplitAbs));
 	viewportSize = possibleMapViewSize;
+	sf::Vector2f fightViewSize = sf::Vector2f(static_cast<float>(rightHorSplitAbs), static_cast<float>(bottomVerSplitAbs - topVerSplitAbs));
 	sf::Vector2f chatViewSize = sf::Vector2f(static_cast<float>(bottomHorSplitAbs), static_cast<float>(size.y - bottomVerSplitAbs));
 	sf::Vector2f detailsViewSize = sf::Vector2f(static_cast<float>(bottomHorSplitAbs), static_cast<float>(size.y - bottomVerSplitAbs));
 	sf::Vector2f armorViewSize = sf::Vector2f(static_cast<float>(size.x - rightHorSplitAbs), static_cast<float>(rightVerSplitAbs));
@@ -162,6 +163,7 @@ GameState(game_)
 	float top = (possibleMapViewSize.y - viewportSize.y) / size.y;
 
 	statsView.setViewport(sf::FloatRect(0.f, 0.f, rightHorSplit, topVerSplit));
+	fightView.setViewport(sf::FloatRect(0.f, topVerSplit, rightHorSplit, bottomVerSplit - topVerSplit));
 	mapView.setViewport(sf::FloatRect(left / 2, topVerSplit +  top / 2, viewportSize.x / size.x, viewportSize.y / size.y));
 	armorView.setViewport(sf::FloatRect(rightHorSplit, 0.f, (1.f - rightHorSplit), rightVerSplit));
 	chatView.setViewport(sf::FloatRect(0.f, bottomVerSplit, rightHorSplit * bottomHorSplit, (1.f - bottomVerSplit)));
@@ -170,6 +172,7 @@ GameState(game_)
 	completeView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
 
 	statsView.setSize(statsViewSize);
+	fightView.setSize(fightViewSize);
 	mapView.setSize(viewportSize);
 	armorView.setSize(armorViewSize);
 	chatView.setSize(chatViewSize);
@@ -178,6 +181,7 @@ GameState(game_)
 	completeView.setSize(size);
 	statsView.setCenter(statsViewSize * 0.5f);
 	mapView.setCenter(viewportSize * 0.5f);
+	fightView.setCenter(fightViewSize * 0.5f);
 	armorView.setCenter(armorViewSize * 0.5f);
 	chatView.setCenter(chatViewSize * 0.5f);
 	detailsView.setCenter(detailsViewSize * 0.5f);
@@ -240,6 +244,13 @@ void GameStateGame::draw(const float deltaTime)
 	game.window.draw(hpSprite);
 
 	game.window.setView(mapView);
+	if (!inFight)
+	{
+		map->draw(game.window, deltaTime);
+		player->draw(game.window, deltaTime);
+	}
+
+	game.window.setView(fightView);
 	if (inFight)
 	{
 		//game.window.draw(playerSprite);
@@ -248,12 +259,6 @@ void GameStateGame::draw(const float deltaTime)
 		//enemySprite.setScale(sf::Vector2f(1.f, 1.f));
 		//game.window.draw(enemySprite);
 		fightGui.draw();
-		
-	}
-	else
-	{
-		map->draw(game.window, deltaTime);
-		player->draw(game.window, deltaTime);
 	}
 	
 	game.window.setView(armorView);
@@ -632,7 +637,7 @@ void GameStateGame::loadGui()
 	float buttonWithSpacer = buttonWidth + spacePerButton;
 	float heightSpacer = 6.f;
 
-	fightGui.setView(mapView);
+	fightGui.setView(fightView);
 
 	//playerSprite.setPosition(0.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
 	//playerSprite.setScale(sf::Vector2f(1.f, 1.f));
