@@ -202,7 +202,7 @@ GameState(game_)
 	accuracySprite.setTexture(ResourceManager::getInstance().getTexture("accuracy"));
 	strengthSprite.setTexture(ResourceManager::getInstance().getTexture("strength"));
 	speedSprite.setTexture(ResourceManager::getInstance().getTexture("speed"));
-	//playerSprite.setTexture(ResourceManager::getInstance().getTexture("player_big"));
+	playerSprite.setTexture(ResourceManager::getInstance().getTexture("player_big"));
 
 	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
@@ -236,12 +236,7 @@ void GameStateGame::draw(const float deltaTime)
 {
 	game.window.clear(sf::Color::Black);
 
-	game.window.setView(statsView);
-	statsGui.draw();
-	game.window.draw(strengthSprite);
-	game.window.draw(speedSprite);
-	game.window.draw(accuracySprite);
-	game.window.draw(hpSprite);
+
 
 	game.window.setView(mapView);
 	if (!inFight)
@@ -250,16 +245,23 @@ void GameStateGame::draw(const float deltaTime)
 		player->draw(game.window, deltaTime);
 	}
 
-	game.window.setView(fightView);
 	if (inFight)
 	{
-		//game.window.draw(playerSprite);
-
+		game.window.setView(fightView);
 		//enemySprite.setPosition(verSplitAbs, 0.f);
 		//enemySprite.setScale(sf::Vector2f(1.f, 1.f));
 		//game.window.draw(enemySprite);
+		game.window.clear(sf::Color::White);
+		game.window.draw(playerSprite);
 		fightGui.draw();
 	}
+
+	game.window.setView(statsView);
+	statsGui.draw();
+	game.window.draw(strengthSprite);
+	game.window.draw(speedSprite);
+	game.window.draw(accuracySprite);
+	game.window.draw(hpSprite);
 	
 	game.window.setView(armorView);
 	armorGui.draw();
@@ -297,10 +299,10 @@ void GameStateGame::update(const float deltaTime)
 		player->update(deltaTime); // move player
 
 		std::shared_ptr<Monster> pendingFightEnemy = player->getPendingFightEnemy();
-		//enemySprite.setTexture(ResourceManager::getInstance().getTexture(pendingFightEnemy->getName() + "_big"));
 
 		if (pendingFightEnemy != nullptr)
 		{
+			//enemySprite.setTexture(ResourceManager::getInstance().getTexture(pendingFightEnemy->getName() + "_big"));
 			startFight(player, pendingFightEnemy);
 		}
 	}
@@ -636,27 +638,26 @@ void GameStateGame::loadGui()
 	float spacePerButton = spacer / buttonCount;
 	float buttonWithSpacer = buttonWidth + spacePerButton;
 	float heightSpacer = 6.f;
+	float healthBarWidth = 300.f;
+	float healthBarHeight = 15.f;
+	float spriteSpacer = 395.f;
 
 	fightGui.setView(fightView);
 
-	//playerSprite.setPosition(0.f, verSplitAbs - verSplitAbs / 8.f - heightSpacer);
-	//playerSprite.setScale(sf::Vector2f(1.f, 1.f));
-	//sf::Texture& enemyTex = enemySprite.getTexture();
-	//enemyTex.getSize().x;
+	playerSprite.setPosition(spacer, bottomVerSplitAbs - topVerSplitAbs - spriteSpacer);
+	playerSprite.setScale(sf::Vector2f(1.5f, 1.5f));
 
-	// ausführliche Version
 	enemyHealthBar = std::make_shared<tgui::ProgressBar>();
-	enemyHealthBar->setPosition(100, 50);
-	enemyHealthBar->setSize(200, 20);
+	enemyHealthBar->setPosition(bottomVerSplitAbs + healthBarWidth/2, spacer*2);
+	enemyHealthBar->setSize(healthBarWidth, healthBarHeight);
 	enemyHealthBar->setMinimum(0u);
 	enemyHealthBar->setMaximum(100u);
 	enemyHealthBar->setValue(50u);
 	fightGui.add(enemyHealthBar);
 
-	// minimalistische version aus dem full example
 	playerHealthBar = std::make_shared<tgui::ProgressBar>();
-	playerHealthBar->setPosition(100, 100);
-	playerHealthBar->setSize(200, 20);
+	playerHealthBar->setPosition(spacer, spacer*2);
+	playerHealthBar->setSize(healthBarWidth, healthBarHeight);
 	playerHealthBar->setMinimum(0u);
 	playerHealthBar->setMaximum(100u);
 	playerHealthBar->setValue(50u);

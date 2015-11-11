@@ -52,8 +52,8 @@ private:
 
 	sf::Sprite armorSprite;
 	sf::Sprite potionSprite;
-	//sf::Sprite playerSprite;
-	//sf::Sprite enemySprite;
+	sf::Sprite playerSprite;
+	sf::Sprite enemySprite;
 
 	std::shared_ptr<RenderableObject> draggedItem = nullptr;
 	bool dragging = false;
