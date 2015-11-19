@@ -557,6 +557,7 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 			if (fight != nullptr)
 			{
 				fight->addPotionToBeUsed(potion);
+				fight->fightRound(Attacks::POTION, 1u);
 			}
 		}
 		else

@@ -60,6 +60,8 @@ public:
 	std::shared_ptr<Monster> getPendingAttacker() const { return pendingAttacker; };
 	std::shared_ptr<Monster> getPendingDefender() const { return pendingDefender; };
 	std::shared_ptr<Monster> getFightEnemy() const { return enemy; };
+	unsigned int getActiveRound() const { return activeRound; };
+	void setActiveRound(unsigned int activeRound_) { activeRound = activeRound_; };
 
 private:
 
@@ -80,6 +82,7 @@ private:
 	float enemyAttackAttributeDamage;
 	float enemyArmorSum;
 	bool enemyFinished;
+	unsigned int activeRound = 0u;
 	std::shared_ptr<PrototypeStorage> prototypeStorage;
 
 	std::shared_ptr<Creature> creature1;

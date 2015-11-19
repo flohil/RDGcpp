@@ -301,7 +301,7 @@ void GameStateGame::update(const float deltaTime)
 	}
 	else {
 #if 1
-		if (finishedFirstRound)
+		if (fight->getActiveRound() == 2u)
 		{
 			fightStageAccumulator += deltaTime;
 
@@ -311,7 +311,6 @@ void GameStateGame::update(const float deltaTime)
 				if (fight != nullptr) { std::cout << "fight != nullptr" << std::endl; }
 				fight->fightRound(fight->getActiveAttackType(), 2u); //set attacktype enum in gameStateGame header
 				fightStageAccumulator = 0;
-				finishedFirstRound = false;
 			}
 		}
 #endif
@@ -1301,7 +1300,6 @@ void GameStateGame::parry()
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
 		fight->fightRound(Attacks::PARRY, 1u);
-		finishedFirstRound = true;
 	}
 }
 
@@ -1328,7 +1326,6 @@ void GameStateGame::toggleEquipment()
 		changeSet(true);
 		OutputFormatter::chat(chatbox, "Changing Equipment", sf::Color::White);
 		fight->fightRound(Attacks::SET, 1u);
-		finishedFirstRound = true;
 	}
 }
 
@@ -1339,7 +1336,6 @@ void GameStateGame::attackHead()
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's head", sf::Color::White);
 		fight->fightRound(Attacks::HEAD, 1u);
-		finishedFirstRound = true;
 	}
 }
 
@@ -1350,7 +1346,6 @@ void GameStateGame::attackTorso()
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's torso", sf::Color::White);
 		fight->fightRound(Attacks::TORSO, 1u);
-		finishedFirstRound = true;
 	}
 }
 
@@ -1361,7 +1356,6 @@ void GameStateGame::attackArms()
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Tring to attack the enemy's arms", sf::Color::White);
 		fight->fightRound(Attacks::ARMS, 1u);
-		finishedFirstRound = true;
 	}
 }
 
@@ -1372,7 +1366,6 @@ void GameStateGame::attackLegs()
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's legs", sf::Color::White);
 		fight->fightRound(Attacks::LEGS, 1u);
-		finishedFirstRound = true;
 	}
 }
 

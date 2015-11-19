@@ -67,6 +67,7 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 		// potion effects for a creature are applied after its attack
 		potionEffects(creature1);
 #endif
+		activeRound = 2u;
 	}
 	else if (stage == 2u)
 	{
@@ -124,6 +125,8 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 		//return loser of the fight
 		return fightLoser;
 #endif
+
+		activeRound = 1u;
 	}
 	return nullptr;
 }
