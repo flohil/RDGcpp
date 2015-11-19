@@ -57,6 +57,9 @@ public:
 	void potionDecrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
 	void potionIncrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
 	void attributeBonusForWinner(std::shared_ptr<Creature>);
+	std::shared_ptr<Monster> getPendingAttacker() const { return pendingAttacker; };
+	std::shared_ptr<Monster> getPendingDefender() const { return pendingDefender; };
+	std::shared_ptr<Monster> getFightEnemy() const { return enemy; };
 
 private:
 
@@ -81,6 +84,9 @@ private:
 
 	std::shared_ptr<Creature> creature1;
 	std::shared_ptr<Creature> creature2;
+
+	std::shared_ptr<Monster> pendingAttacker = nullptr;
+	std::shared_ptr<Monster> pendingDefender = nullptr;
 
 	Attacks::Enum chosenTask1 = Attacks::UNKNOWN;
 	Attacks::Enum chosenTask2 = Attacks::UNKNOWN;

@@ -28,12 +28,14 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 	/* MAIN FIGHT LOOP */
 	//while (player->hp > 0 && enemy->hp > 0)
 	//{
+	std::cout << "Playertask: " << playerTask << std::endl;
 	std::cout << "entered fightRound()" << std::endl;
 	if (stage == 1u)
 	{
 		std::wcout << "stage=1u" << std::endl;
 		creature1 = nullptr;
 		creature2 = nullptr;
+#if 0
 
 		chosenTask1 = Attacks::UNKNOWN;
 		chosenTask2 = Attacks::UNKNOWN;
@@ -64,6 +66,7 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 
 		// potion effects for a creature are applied after its attack
 		potionEffects(creature1);
+#endif
 	}
 	else if (stage == 2u)
 	{
@@ -71,6 +74,7 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 		// set to null between attacks of player and enemy to determine if attack was already chosen
 		activeAttack = nullptr;
 		activeAttackType = Attacks::UNKNOWN;
+#if 0
 
 		// perform Attack of creature first in round
 		//std::cout << "Creature2: " << creature2->getCreatureType() << std::endl;
@@ -82,7 +86,7 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 		// Thread.sleep(1000);
 
 		// Potion effects for a creature are applied after its attack
-		std::cout << "Creature2: " << creature2->getCreatureType() << std::endl;
+		//std::cout << "Creature2: " << creature2->getCreatureType() << std::endl;
 		potionEffects(creature2);
 		std::cout << "potionEffects success" << std::endl;
 
@@ -119,8 +123,8 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 
 		//return loser of the fight
 		return fightLoser;
+#endif
 	}
-
 	return nullptr;
 }
 
@@ -252,6 +256,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 	if (chosenTask == Attacks::HEAD || chosenTask == Attacks::TORSO || chosenTask == Attacks::ARMS || chosenTask == Attacks::LEGS/*activeAttackNumber < 5.f || activeAttackNumber > 6.f*/)
 	{
 		attack(creature1, creature2);
+		std::cout << "attack successful" << std::endl;
 	}
 
 	// parryMultiplier is used on every attack and only temporarily increased when parrying -> needs to be resetted

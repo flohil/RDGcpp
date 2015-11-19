@@ -212,7 +212,7 @@ public:
 
 	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_);
 	void update(const float deltaTime);
-	void handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem);
+	std::shared_ptr<Monster> handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem); // returns true if fight is being started
 	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object) { return putInInventory(object, true); };
 	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object, bool output); // return object if inventory is full
 	Point getPlayerPosition() const { return playerPosition; };
@@ -243,8 +243,6 @@ public:
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos, bool remove);
 	void setChatbox(tgui::ChatBox::Ptr chatbox_) { activeSet->setChatbox(chatbox_); };
-	std::shared_ptr<Monster> getPendingFightEnemy() const { return pendingFightEnemy; };
-	void setPendingFightEnemy(std::shared_ptr<Monster> pendingFightEnemy_) { pendingFightEnemy = pendingFightEnemy_; };
 
 private:
 
@@ -283,8 +281,6 @@ private:
 	unsigned int inventoryHorItemCount = 3u;
 
 	tgui::ChatBox::Ptr chatBox;
-
-	std::shared_ptr<Monster> pendingFightEnemy = nullptr;
 
 	void setPosition(Point position_);
 	void preMove();

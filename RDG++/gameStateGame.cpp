@@ -297,25 +297,12 @@ void GameStateGame::update(const float deltaTime)
 {
 	if (!inFight)
 	{
-		std::cout << "GameStateGame::update() --> if(!inFight) - deltatime = " << deltaTime << std::endl;
 		player->update(deltaTime); // move player
-
-		std::shared_ptr<Monster> pendingFightEnemy = player->getPendingFightEnemy();
-
-		if (pendingFightEnemy != nullptr)
-		{
-			std::cout << "GameStateGame::update() --> if(pendingFightEnemy != nullptr)" << std::endl;
-			enemySprite.setTexture(ResourceManager::getInstance().getTexture(pendingFightEnemy->getName() + "_big"));
-			enemyNameFightLabel->setText(pendingFightEnemy->getName());
-			startFight(player, pendingFightEnemy);
-		}
 	}
 	else {
 #if 1
-		if (!finishedSecondRound)
+		if (finishedFirstRound)
 		{
-			std::cout << "!finishedSecondRound" << std::endl;
-
 			fightStageAccumulator += deltaTime;
 
 			if (fightStageAccumulator >= fightStageSpan)
@@ -324,7 +311,7 @@ void GameStateGame::update(const float deltaTime)
 				if (fight != nullptr) { std::cout << "fight != nullptr" << std::endl; }
 				fight->fightRound(fight->getActiveAttackType(), 2u); //set attacktype enum in gameStateGame header
 				fightStageAccumulator = 0;
-				finishedSecondRound = true;
+				finishedFirstRound = false;
 			}
 		}
 #endif
@@ -440,7 +427,6 @@ void GameStateGame::handleInput()
 					game.changeMusic("game", 0.7f, 1.5f, 0.5f, true);
 
 					fight.reset();
-					player->setPendingFightEnemy(nullptr);
 					inFight = false;
 				}
 				else
@@ -470,7 +456,12 @@ void GameStateGame::handleInput()
 			}
 			else
 			{
-				player->handleInput(event, draggedItem);
+				std::shared_ptr<Monster> enemy = nullptr;
+
+				if ((enemy = player->handleInput(event, draggedItem)) != nullptr)
+				{
+					startFight(player, enemy);
+				}
 			}
 		}
 		else if (event.type == sf::Event::MouseButtonPressed)
@@ -1260,6 +1251,9 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
 	inFight = true;
 
+
+	enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));
+	enemyNameFightLabel->setText(monster_->getName());
 	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
 	fight.reset(new Fight(player_, monster_, game.getPrototypeStorage()));
 }
@@ -1306,6 +1300,8 @@ void GameStateGame::parry()
 		usePotionActive = false;
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
+		fight->fightRound(Attacks::PARRY, 1u);
+		finishedFirstRound = true;
 	}
 }
 
@@ -1317,6 +1313,8 @@ void GameStateGame::usePotion()
 		hideAttackGui();
 		usePotionActive = true;
 		OutputFormatter::chat(chatbox, "Trying to use Potion", sf::Color::White);
+		//fight->fightRound(Attacks::POTION, 1u);
+		//finishedFirstRound = true;
 	}
 }
 
@@ -1329,6 +1327,8 @@ void GameStateGame::toggleEquipment()
 		choseChangeSet = true;
 		changeSet(true);
 		OutputFormatter::chat(chatbox, "Changing Equipment", sf::Color::White);
+		fight->fightRound(Attacks::SET, 1u);
+		finishedFirstRound = true;
 	}
 }
 
@@ -1338,6 +1338,8 @@ void GameStateGame::attackHead()
 	{
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's head", sf::Color::White);
+		fight->fightRound(Attacks::HEAD, 1u);
+		finishedFirstRound = true;
 	}
 }
 
@@ -1347,6 +1349,8 @@ void GameStateGame::attackTorso()
 	{
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's torso", sf::Color::White);
+		fight->fightRound(Attacks::TORSO, 1u);
+		finishedFirstRound = true;
 	}
 }
 
@@ -1356,6 +1360,8 @@ void GameStateGame::attackArms()
 	{
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Tring to attack the enemy's arms", sf::Color::White);
+		fight->fightRound(Attacks::ARMS, 1u);
+		finishedFirstRound = true;
 	}
 }
 
@@ -1365,6 +1371,8 @@ void GameStateGame::attackLegs()
 	{
 		hideAttackGui();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's legs", sf::Color::White);
+		fight->fightRound(Attacks::LEGS, 1u);
+		finishedFirstRound = true;
 	}
 }
 

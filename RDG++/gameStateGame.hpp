@@ -74,7 +74,7 @@ private:
 
 	float fightStageSpan = 1.f; // second
 	float fightStageAccumulator = 0.f;
-	bool finishedSecondRound = false;
+	bool finishedFirstRound = false;
 
 	// gui
 	float topVerSplit;
