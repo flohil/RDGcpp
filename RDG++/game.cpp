@@ -30,8 +30,17 @@ Game::Game()
 		return;
 	}
 
-	resourceManager.setSoundVolumes(settings->actualEffectsVolume);
-	music.setVolume(settings->actualMusicVolume);
+	if (settings->enableSound)
+	{
+		resourceManager.setSoundVolumes(settings->actualEffectsVolume);
+		music.setVolume(settings->actualMusicVolume);
+	}
+	else
+	{
+		resourceManager.setSoundVolumes(0);
+		music.setVolume(0);
+	}
+	
 	music.setLoop(true);
 	currentMusic = "mainMenu";
 

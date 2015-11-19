@@ -1,8 +1,8 @@
 #include "fight.hpp"
 #include "chances.hpp"
 
-Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> enemy_)
-	: player(player_), enemy(enemy_)
+Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> enemy_, std::shared_ptr<PrototypeStorage> prototypeStorage_)
+	: player(player_), enemy(enemy_), prototypeStorage(prototypeStorage_)
 {
 	/*attackSet = false;
 	activeAttack = nullptr;
@@ -23,13 +23,24 @@ Fight::~Fight()
 
 }
 
-std::shared_ptr<Creature> Fight::fight()
+std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 {
 	/* MAIN FIGHT LOOP */
-	while (player->hp > 0 && enemy->hp > 0)
+	//while (player->hp > 0 && enemy->hp > 0)
+	//{
+	std::cout << "Playertask: " << playerTask << std::endl;
+	std::cout << "entered fightRound()" << std::endl;
+	if (stage == 1u)
 	{
-		std::shared_ptr<Creature> creature1 = nullptr;
-		std::shared_ptr<Creature> creature2 = nullptr;
+		std::wcout << "stage=1u" << std::endl;
+		creature1 = nullptr;
+		creature2 = nullptr;
+
+		activeAttackType = playerTask;
+#if 0
+
+		chosenTask1 = Attacks::UNKNOWN;
+		chosenTask2 = Attacks::UNKNOWN;
 
 		unsigned int firstAttackTemp = determineFirstAttack();
 
@@ -37,88 +48,89 @@ std::shared_ptr<Creature> Fight::fight()
 		{
 			creature1 = player;
 			creature2 = enemy;
+			chosenTask1 = playerTask;
+			chosenTask2 = Chances::randomAttackType();
 			// this.attackScreen = AttackScreen.MAIN;
 		}
 		else if (firstAttackTemp == 2)
 		{
 			creature1 = enemy;
 			creature2 = player;
+			chosenTask1 = Chances::randomAttackType();
+			chosenTask2 = playerTask;
 			// this.attackScreen = AttackScreen.WAITING;
 		}
 
 		// thread.sleep(1000);
 
 		//perform Attack of creature in first round
-		attackControl(creature1, creature2);
+		attackControl(creature1, creature2, chosenTask1);
 
 		// potion effects for a creature are applied after its attack
 		potionEffects(creature1);
-
-		if (player->hp <= 0 || enemy->hp <= 0)
-		{
-			break;
-		}
-
+#endif
+		activeRound = 2u;
+	}
+	else if (stage == 2u)
+	{
+		std::cout << "stage=2u" << std::endl;
 		// set to null between attacks of player and enemy to determine if attack was already chosen
 		activeAttack = nullptr;
 		activeAttackType = Attacks::UNKNOWN;
-
-
-		/*
-
-		//change attack screen
-		if (firstAttackTemp == 1)
-		{
-			this.attackScreen = AttackScreens.WAITING;
-		}
-		else if
-		{
-			this.attackScreen = AttackScreens.MAIN
-		}
-
-		*/
-
-		// Thread.sleep(1000);
+#if 0
 
 		// perform Attack of creature first in round
-		attackControl(creature2, creature1);
+		//std::cout << "Creature2: " << creature2->getCreatureType() << std::endl;
+		//std::cout << "Creature1: " << creature1->getCreatureType() << std::endl;
+		//std::cout << "ChosenTask: " << chosenTask2 << std::endl;
+		attackControl(creature2, creature1, chosenTask2);
+		std::cout << "attackControl success" << std::endl;
 
 		// Thread.sleep(1000);
 
 		// Potion effects for a creature are applied after its attack
+		//std::cout << "Creature2: " << creature2->getCreatureType() << std::endl;
 		potionEffects(creature2);
+		std::cout << "potionEffects success" << std::endl;
 
 		// reset variables that need to be changed each round
 		resetRoundVariables();
-	}
+		std::cout << "resetRoundVariables success" << std::endl;
 
-	// determine who lost the fight
-	std::shared_ptr<Creature> fightLoser = nullptr;
+		//}
 
-	if (player->hp <= 0)
-	{
-		player->resetOriginals();
-		enemy->resetOriginals();
-		fightLoser = player;
-	}
-	else
-	{
-		fightLoser = enemy;
-		//give attribute bonus to winner of the fight
-		if (fightLoser->getCreatureType() == CreatureType::MONSTER)
+		// determine who lost the fight
+		std::shared_ptr<Creature> fightLoser = nullptr;
+
+		if (player->hp <= 0)
 		{
-			attributeBonusForWinner(fightLoser);
+			player->resetOriginals();
+			enemy->resetOriginals();
+			fightLoser = player;
 		}
-		// set boostes values as new normal player values
-		player->resetOriginals();
+		else
+		{
+			fightLoser = enemy;
+			//give attribute bonus to winner of the fight
+			if (fightLoser->getCreatureType() == CreatureType::MONSTER)
+			{
+				attributeBonusForWinner(fightLoser);
+			}
+			// set boostes values as new normal player values
+			player->resetOriginals();
+		}
+
+		// empty active potion lists
+		player->emptyActivePotions();
+		enemy->emptyActivePotions();
+
+		//return loser of the fight
+		return fightLoser;
+#endif
+
+		activeRound = 1u;
 	}
-
-	// empty active potion lists
-	 player->emptyActivePotions();
-	 enemy->emptyActivePotions();
-
-	//return loser of the fight
-	return fightLoser;
+	return nullptr;
 }
 
 void Fight::resetRoundVariables()
@@ -139,6 +151,7 @@ std::shared_ptr<Potion> Fight::getSelectedPotion(std::shared_ptr<Creature> creat
 	return nullptr;
 }
 
+/*
 // replace with gui commands for player and random attack for monster
 Attacks::Enum Fight::getCommand(std::shared_ptr<Creature> creature)
 {
@@ -162,45 +175,55 @@ Attacks::Enum Fight::getCommand(std::shared_ptr<Creature> creature)
 
 	return chosenAttackType;
 }
+*/
 
-void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<Creature> creature2)
+void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<Creature> creature2, Attacks::Enum chosenTask)
 {
 	float activeAttackNumber = 0;
 
 	//player chooses what to do
-	switch (getCommand(creature1))
+	switch (chosenTask)
 	{
 	case Attacks::TORSO:
-		activeAttack = &attacks.at(Attacks::TORSO);
-
-		activeAttackNumber = 1.f;
+	{
+		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
+		//activeAttack = &attacks.at(Attacks::TORSO);
+		if (creature1 == player)
+		{
+			ResourceManager::getInstance().getSound("buttonClick").play();
+			//activeAttackNumber = 1.f;
+		}
 		break;
-
+	}
 	case Attacks::HEAD:
-
-
-		activeAttackNumber = 2.f;
+		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
+		if (creature1 == player)
+		{
+			ResourceManager::getInstance().getSound("buttonClick").play();
+			//activeAttackNumber = 1.f;
+		}
 		break;
 
 	case Attacks::ARMS:
-
-
-		activeAttackNumber = 3.f;
+		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
+		if (creature1 == player)
+		{
+			ResourceManager::getInstance().getSound("buttonClick").play();
+			//activeAttackNumber = 1.f;
+		}
 		break;
 
 	case Attacks::LEGS:
-
-
-		activeAttackNumber = 4.f;
+		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
+		if (creature1 == player)
+		{
+			ResourceManager::getInstance().getSound("buttonClick").play();
+			//activeAttackNumber = 1.f;
+		}
 		break;
 
 	case Attacks::SET:
-
-		if (creature1 == player)	// only switch if it's players turn
-		{
-			// switch Set
-		}
-		activeAttackNumber = 5.f;
+		//activeAttackNumber = 5.f;
 		break;
 
 	case Attacks::POTION:
@@ -211,32 +234,34 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 			// manage the handling of a used potion
 			usePotion(creature1, creature2, selectedPotion);
 		}
-		activeAttackNumber = 6.f;
+		//activeAttackNumber = 6.f;
 		break;
 
 	case Attacks::PARRY:
-		//if (parrySuccess(creature1, creature2))
-		//{
-		//	// when creature (player) parries successful, he deals x times the damage of a normal torso attack
-		//	parryMultiplier = 2.f;
-		//	activeAttack = &attacks.at(Attacks::TORSO);
-		//}
-		//else
-		//{
-		//	parryMultiplier = 0.f;
-		//	activeAttack = &attacks.at(Attacks::TORSO);
-		//}
-		activeAttackNumber = 7.f;
+		if (parrySuccess(creature1, creature2))
+		{
+			// when creature (player) parries successful, he deals x times the damage of a normal torso attack
+			parryMultiplier = 2.f;
+			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
+		}
+		else
+		{
+			parryMultiplier = 0.f;
+			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
+		}
+		//activeAttackNumber = 7.f;
 		break;
 
 	default:
 		break;
 	}
 
+
 	// actual attack
-	if (activeAttackNumber < 5.f || activeAttackNumber > 6.f)
+	if (chosenTask == Attacks::HEAD || chosenTask == Attacks::TORSO || chosenTask == Attacks::ARMS || chosenTask == Attacks::LEGS/*activeAttackNumber < 5.f || activeAttackNumber > 6.f*/)
 	{
-		//attack(creature1, creature2);
+		attack(creature1, creature2);
+		std::cout << "attack successful" << std::endl;
 	}
 
 	// parryMultiplier is used on every attack and only temporarily increased when parrying -> needs to be resetted
@@ -261,6 +286,18 @@ void Fight::attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature>
 		{
 			healthDmg = calcHealthDamage(attacker, defender);
 			attributeDmg = calcAttributeDamage(attacker);
+			if (attacker->getCreatureType() == CreatureType::MONSTER)
+			{
+				ResourceManager::getInstance().getSound("humanHit").play();
+			}
+			else
+			{
+				ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getAttackSound()).play();
+			}
+		}
+		else
+		{
+			ResourceManager::getInstance().getSound("miss").play();
 		}
 	}
 	else
@@ -698,25 +735,42 @@ void Fight::usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Crea
 void Fight::potionEffects(std::shared_ptr<Creature> creature)
 {
 	// apply all non temporary potion effects
-	for (std::shared_ptr<Potion> potion : creature->activePotions)
+	if (creature != nullptr)
 	{
-		potion->setDuration(potion->getDuration() - 1);
-		switch (potion->getMode())
+		std::cout << "creature exists" << std::endl;
+		for (std::shared_ptr<Potion> potion : creature->activePotions)
 		{
-		case Mode::TEMPORARY_INCREASE:
-			potionIncrease(creature, potion);
-			break;
-		case Mode::TEMPORARY_DECREASE:
-			potionDecrease(creature, potion);
-			break;
-		default:
-			break;
+			std::cout << "Active Potion: " << potion << std::endl;
+			potion->setDuration(potion->getDuration() - 1);
+			switch (potion->getMode())
+			{
+			case Mode::TEMPORARY_INCREASE:
+				std::cout << "potion mode: TEMPORARY_INCREASE" << std::endl;
+				potionIncrease(creature, potion);
+				std::cout << "potionIncrease successful" << std::endl;
+				break;
+			case Mode::TEMPORARY_DECREASE:
+				std::cout << "potion mode: TEMPORARY_DECREASE" << std::endl;
+				potionDecrease(creature, potion);
+				std::cout << "potionDecrease successful" << std::endl;
+				break;
+			default:
+				std::cout << "potion mode: DEFAULT" << std::endl << "ERROR!!" << std::endl;
+				break;
+			}
+			if (potion->getDuration() <= 0)
+			{
+				std::cout << "potionDuration <= 0" << std::endl;
+				revertEffect(creature, potion);
+				std::cout << "revertEffect successful" << std::endl;
+				creature->removeActivePotions(potion);
+				std::cout << "removeActivePotions sucessful" << std::endl;
+			}
 		}
-		if (potion->getDuration() <= 0)
-		{
-			revertEffect(creature, potion);
-			creature->removeActivePotions(potion);
-		}
+	}
+	else
+	{
+		std::cout << "creature == nullptr" << std::endl;
 	}
 }
 

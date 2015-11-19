@@ -55,6 +55,8 @@ private:
 	sf::Sprite playerSprite;
 	sf::Sprite enemySprite;
 
+	sf::RectangleShape fightBackground;
+
 	std::shared_ptr<RenderableObject> draggedItem = nullptr;
 	bool dragging = false;
 	bool draggedFromEquipment;
@@ -67,7 +69,11 @@ private:
 	bool inAttackOptions = false;
 	bool inFight = false;
 	bool choseChangeSet = false;
+	bool interactionPermitted = true;
 	std::shared_ptr<Fight> fight = nullptr;
+
+	float fightStageSpan = 1.f; // second
+	float fightStageAccumulator = 0.f;
 
 	// gui
 	float topVerSplit;
@@ -107,6 +113,8 @@ private:
 	tgui::Label::Ptr accuracyLabel;
 	tgui::Label::Ptr strengthLabel;
 	tgui::Label::Ptr speedLabel;
+	tgui::Label::Ptr playerNameFightLabel;
+	tgui::Label::Ptr enemyNameFightLabel;
 
 	sf::Sprite hpSprite;
 	sf::Sprite accuracySprite;

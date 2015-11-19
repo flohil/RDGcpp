@@ -212,7 +212,7 @@ public:
 
 	void init(Map* map_, const unsigned int tileSize_, tgui::ChatBox::Ptr chatBox_);
 	void update(const float deltaTime);
-	void handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem);
+	std::shared_ptr<Monster> handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem); // returns true if fight is being started
 	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object) { return putInInventory(object, true); };
 	std::shared_ptr<RenderableObject> putInInventory(std::shared_ptr<RenderableObject> object, bool output); // return object if inventory is full
 	Point getPlayerPosition() const { return playerPosition; };
@@ -243,8 +243,6 @@ public:
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos, bool remove);
 	void setChatbox(tgui::ChatBox::Ptr chatbox_) { activeSet->setChatbox(chatbox_); };
-	std::shared_ptr<Monster> getPendingFightEnemy() const { return pendingFightEnemy; };
-	void setPendingFightEnemy(std::shared_ptr<Monster> pendingFightEnemy_) { pendingFightEnemy = pendingFightEnemy_; };
 
 private:
 
@@ -283,8 +281,6 @@ private:
 	unsigned int inventoryHorItemCount = 3u;
 
 	tgui::ChatBox::Ptr chatBox;
-
-	std::shared_ptr<Monster> pendingFightEnemy = nullptr;
 
 	void setPosition(Point position_);
 	void preMove();
@@ -364,7 +360,7 @@ class Weapon : public Item, public DebugPrintObject
 public:
 
 	Weapon::Weapon(const std::string& name_, const Classes::Enum itemClass_, const WeaponType::Enum type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
-		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_), attackSound(ResourceManager::getInstance().getSound(name_ + "_attack")) {};
+		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_), attackSound(name_ + "_attack") {};
 
 	WeaponType::Enum getType() const { return type; };
 	float getAttack() const { return attack; };
@@ -372,15 +368,16 @@ public:
 	float getAccuracy() const { return accuracy; };
 	float getDefence() const { return defence; };
 	unsigned int getSlots() const { return slots; };
-	unsigned int getMaxWeapons() const { return maxWeapons; };
+	inline unsigned int getMaxWeapons() const { return maxWeapons; };
 	virtual void debugPrint() const;
+	inline std::string getAttackSound() const { return attackSound; };
 
 protected:
 
 	const WeaponType::Enum type;
 	const float attack, speed, accuracy, defence;
 	const unsigned int slots, maxWeapons;
-	sf::Sound& attackSound;
+	std::string attackSound;
 };
 
 class Attack : public GameObject, public DebugPrintObject

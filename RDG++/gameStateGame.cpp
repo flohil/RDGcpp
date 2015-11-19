@@ -220,7 +220,8 @@ GameState(game_)
 	OutputFormatter::chat(chatbox, "Hello " + player->getPlayerName() + ", welcome to the Dungeon!", sf::Color::White);
 
 	// test fill set
-	/*player->getEquipmentSet()->setBoots(game.getPrototypeStorage()->armamentFactory->create("Leather Boots"));
+#if 0
+	player->getEquipmentSet()->setBoots(game.getPrototypeStorage()->armamentFactory->create("Leather Boots"));
 	player->getEquipmentSet()->setCuisse(game.getPrototypeStorage()->armamentFactory->create("Leather Cuisse"));
 	player->getEquipmentSet()->setGauntlets(game.getPrototypeStorage()->armamentFactory->create("Leather Gauntlets"));
 	player->getEquipmentSet()->setHarness(game.getPrototypeStorage()->armamentFactory->create("Leather Harness"));
@@ -229,7 +230,8 @@ GameState(game_)
 	player->getEquipmentSet()->setSecondaryWeapon(game.getPrototypeStorage()->weaponFactory->create("Axt"));
 	player->getEquipmentSet()->setPotion1(game.getPrototypeStorage()->potionFactory->create("Antidote"));
 	player->getEquipmentSet()->setPotion2(game.getPrototypeStorage()->potionFactory->create("Antidote"));
-	player->getEquipmentSet()->setPotion3(game.getPrototypeStorage()->potionFactory->create("Antidote"));*/
+	player->getEquipmentSet()->setPotion3(game.getPrototypeStorage()->potionFactory->create("Antidote"));
+#endif
 }
 
 void GameStateGame::draw(const float deltaTime)
@@ -248,10 +250,9 @@ void GameStateGame::draw(const float deltaTime)
 	if (inFight)
 	{
 		game.window.setView(fightView);
-		//enemySprite.setPosition(verSplitAbs, 0.f);
-		//enemySprite.setScale(sf::Vector2f(1.f, 1.f));
-		//game.window.draw(enemySprite);
 		game.window.clear(sf::Color::White);
+		game.window.draw(fightBackground);
+		game.window.draw(enemySprite);
 		game.window.draw(playerSprite);
 		fightGui.draw();
 	}
@@ -297,14 +298,22 @@ void GameStateGame::update(const float deltaTime)
 	if (!inFight)
 	{
 		player->update(deltaTime); // move player
-
-		std::shared_ptr<Monster> pendingFightEnemy = player->getPendingFightEnemy();
-
-		if (pendingFightEnemy != nullptr)
+	}
+	else {
+#if 1
+		if (fight->getActiveRound() == 2u)
 		{
-			//enemySprite.setTexture(ResourceManager::getInstance().getTexture(pendingFightEnemy->getName() + "_big"));
-			startFight(player, pendingFightEnemy);
+			fightStageAccumulator += deltaTime;
+
+			if (fightStageAccumulator >= fightStageSpan)
+			{
+				std::cout << "fightStageAccumulator >= fightStageSpan" << std::endl;
+				if (fight != nullptr) { std::cout << "fight != nullptr" << std::endl; }
+				fight->fightRound(fight->getActiveAttackType(), 2u); //set attacktype enum in gameStateGame header
+				fightStageAccumulator = 0;
+			}
 		}
+#endif
 	}
 	
 	map->update(deltaTime);
@@ -417,7 +426,6 @@ void GameStateGame::handleInput()
 					game.changeMusic("game", 0.7f, 1.5f, 0.5f, true);
 
 					fight.reset();
-					player->setPendingFightEnemy(nullptr);
 					inFight = false;
 				}
 				else
@@ -447,7 +455,12 @@ void GameStateGame::handleInput()
 			}
 			else
 			{
-				player->handleInput(event, draggedItem);
+				std::shared_ptr<Monster> enemy = nullptr;
+
+				if ((enemy = player->handleInput(event, draggedItem)) != nullptr)
+				{
+					startFight(player, enemy);
+				}
 			}
 		}
 		else if (event.type == sf::Event::MouseButtonPressed)
@@ -641,11 +654,37 @@ void GameStateGame::loadGui()
 	float healthBarWidth = 300.f;
 	float healthBarHeight = 15.f;
 	float spriteSpacer = 395.f;
+	unsigned int grayScaleComponent = 100;
+
+	fightBackground = sf::RectangleShape(sf::Vector2f(static_cast<float>(rightHorSplitAbs), static_cast<float>(bottomVerSplitAbs - topVerSplitAbs)));
+	fightBackground.setFillColor(sf::Color(grayScaleComponent, grayScaleComponent, grayScaleComponent));
 
 	fightGui.setView(fightView);
 
+#if 1
+	playerNameFightLabel = std::make_shared<tgui::Label>();
+	playerNameFightLabel->setAutoSize(true);
+	playerNameFightLabel->setTextSize(25.f);
+	playerNameFightLabel->setTextColor(sf::Color::Black);
+	playerNameFightLabel->setText(settings->playerName);
+	fightGui.add(playerNameFightLabel);
+	playerNameFightLabel->setPosition(spacer, spacer - (float)playerNameFightLabel->getTextSize() / 2.f);
+#endif
+#if 1
+	enemyNameFightLabel = std::make_shared<tgui::Label>();
+	enemyNameFightLabel->setAutoSize(true);
+	enemyNameFightLabel->setTextSize(25.f);
+	enemyNameFightLabel->setTextColor(sf::Color::Black);
+	enemyNameFightLabel->setText("Enemy");
+	fightGui.add(enemyNameFightLabel);
+	enemyNameFightLabel->setPosition(bottomVerSplitAbs + healthBarWidth/2, spacer - (float)enemyNameFightLabel->getTextSize() / 2.f);
+#endif
+
 	playerSprite.setPosition(spacer, bottomVerSplitAbs - topVerSplitAbs - spriteSpacer);
 	playerSprite.setScale(sf::Vector2f(1.5f, 1.5f));
+
+	enemySprite.setPosition(bottomVerSplitAbs + 6.f * spacer, bottomVerSplitAbs - topVerSplitAbs - spriteSpacer);
+	enemySprite.setScale(sf::Vector2f(1.5f, 1.5f));
 
 	enemyHealthBar = std::make_shared<tgui::ProgressBar>();
 	enemyHealthBar->setPosition(bottomVerSplitAbs + healthBarWidth/2, spacer*2);
@@ -1211,28 +1250,33 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
 	inFight = true;
 
-	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
 
-	fight.reset(new Fight(player_, monster_));
+	enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));
+	enemyNameFightLabel->setText(monster_->getName());
+	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
+	fight.reset(new Fight(player_, monster_, game.getPrototypeStorage()));
 }
 
 void GameStateGame::toggleAttackGui()
 {
-	usePotionActive = false;
-	if (!inAttackOptions)
-	{
-		fightGui.add(headButton);
-		fightGui.add(torsoButton);
-		fightGui.add(armsButton);
-		fightGui.add(legsButton);
-		inAttackOptions = true;
-		return;
+	if (interactionPermitted) {
+		ResourceManager::getInstance().getSound("buttonClick").play();
+		usePotionActive = false;
+		if (!inAttackOptions)
+		{
+			fightGui.add(headButton);
+			fightGui.add(torsoButton);
+			fightGui.add(armsButton);
+			fightGui.add(legsButton);
+			inAttackOptions = true;
+			return;
+		}
+		fightGui.remove(headButton);
+		fightGui.remove(torsoButton);
+		fightGui.remove(armsButton);
+		fightGui.remove(legsButton);
+		inAttackOptions = false;
 	}
-	fightGui.remove(headButton);
-	fightGui.remove(torsoButton);
-	fightGui.remove(armsButton);
-	fightGui.remove(legsButton);
-	inAttackOptions = false;
 }
 
 void GameStateGame::hideAttackGui()
@@ -1249,49 +1293,80 @@ void GameStateGame::hideAttackGui()
 
 void GameStateGame::parry()
 {
-	usePotionActive = false;
-	hideAttackGui();
-	OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
+	if (interactionPermitted)
+	{
+		ResourceManager::getInstance().getSound("buttonClick").play();
+		usePotionActive = false;
+		hideAttackGui();
+		OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
+		fight->fightRound(Attacks::PARRY, 1u);
+	}
 }
 
 void GameStateGame::usePotion()
 {
-	hideAttackGui();
-	usePotionActive = true;
-	OutputFormatter::chat(chatbox, "Trying to use Potion", sf::Color::White);
+	if (interactionPermitted)
+	{
+		ResourceManager::getInstance().getSound("buttonClick").play();
+		hideAttackGui();
+		usePotionActive = true;
+		OutputFormatter::chat(chatbox, "Trying to use Potion", sf::Color::White);
+		//fight->fightRound(Attacks::POTION, 1u);
+		//finishedFirstRound = true;
+	}
 }
 
 void GameStateGame::toggleEquipment()
 {
-	usePotionActive = false;
-	hideAttackGui();
-	choseChangeSet = true;
-	changeSet(true);
-	OutputFormatter::chat(chatbox, "Changing Equipment", sf::Color::White);
+	if (interactionPermitted)
+	{
+		usePotionActive = false;
+		hideAttackGui();
+		choseChangeSet = true;
+		changeSet(true);
+		OutputFormatter::chat(chatbox, "Changing Equipment", sf::Color::White);
+		fight->fightRound(Attacks::SET, 1u);
+	}
 }
 
 void GameStateGame::attackHead()
 {
-	hideAttackGui();
-	OutputFormatter::chat(chatbox, "Trying to attack the enemy's head", sf::Color::White);
+	if (interactionPermitted)
+	{
+		hideAttackGui();
+		OutputFormatter::chat(chatbox, "Trying to attack the enemy's head", sf::Color::White);
+		fight->fightRound(Attacks::HEAD, 1u);
+	}
 }
 
 void GameStateGame::attackTorso()
 {
-	hideAttackGui();
-	OutputFormatter::chat(chatbox, "Trying to attack the enemy's torso", sf::Color::White);
+	if (interactionPermitted)
+	{
+		hideAttackGui();
+		OutputFormatter::chat(chatbox, "Trying to attack the enemy's torso", sf::Color::White);
+		fight->fightRound(Attacks::TORSO, 1u);
+	}
 }
 
 void GameStateGame::attackArms()
 {
-	hideAttackGui();
-	OutputFormatter::chat(chatbox, "Tring to attack the enemy's arms", sf::Color::White);
+	if (interactionPermitted)
+	{
+		hideAttackGui();
+		OutputFormatter::chat(chatbox, "Tring to attack the enemy's arms", sf::Color::White);
+		fight->fightRound(Attacks::ARMS, 1u);
+	}
 }
 
 void GameStateGame::attackLegs()
 {
-	hideAttackGui();
-	OutputFormatter::chat(chatbox, "Trying to attack the enemy's legs", sf::Color::White);
+	if (interactionPermitted)
+	{
+		hideAttackGui();
+		OutputFormatter::chat(chatbox, "Trying to attack the enemy's legs", sf::Color::White);
+		fight->fightRound(Attacks::LEGS, 1u);
+	}
 }
 
 GameStateGame::~GameStateGame()

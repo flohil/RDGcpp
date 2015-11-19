@@ -555,6 +555,11 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 
 			// add to active Potions list
 			//fight->(potion)...
+			if (fight != nullptr)
+			{
+				fight->addPotionToBeUsed(potion);
+				fight->fightRound(Attacks::POTION, 1u);
+			}
 		}
 		else
 		{
@@ -828,7 +833,7 @@ void Player::move(const float deltaTime)
 	}
 }
 
-void Player::handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem)
+std::shared_ptr<Monster> Player::handleInput(sf::Event event, std::shared_ptr<RenderableObject> draggedItem)
 {
 
 	if (event.key.code == sf::Keyboard::E)
@@ -863,7 +868,7 @@ void Player::handleInput(sf::Event event, std::shared_ptr<RenderableObject> drag
 					if (creature->getCreatureType() == CreatureType::MONSTER)
 					{
 						std::shared_ptr<Monster> monster = std::dynamic_pointer_cast<Monster>(creature);
-						pendingFightEnemy = monster;
+						return monster;
 					}
 
 					break;
@@ -874,6 +879,8 @@ void Player::handleInput(sf::Event event, std::shared_ptr<RenderableObject> drag
 			}
 		}
 	}
+
+	return nullptr;
 }
 
 std::shared_ptr<RenderableObject> Player::putInInventory(std::shared_ptr<RenderableObject> object, bool output)
