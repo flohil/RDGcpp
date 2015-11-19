@@ -35,6 +35,8 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 		std::wcout << "stage=1u" << std::endl;
 		creature1 = nullptr;
 		creature2 = nullptr;
+
+		activeAttackType = playerTask;
 #if 0
 
 		chosenTask1 = Attacks::UNKNOWN;
