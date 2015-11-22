@@ -988,15 +988,15 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		std::cout << "mapViewCenter: x = " << mapViewCenter.x << ", y = " << mapViewCenter.y << std::endl;
 		std::cout << "mapCenter: x = " << mapCenter.x << ", y = " << mapCenter.y << std::endl;
 
-		std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
-
-		relPos.x = relPos.x - static_cast<int>(mapCenter.x - mapViewCenter.x);
-		relPos.y = relPos.y - static_cast<int>(mapCenter.y - mapViewCenter.y);
-
-		std::cout << "after relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
-
 		if (!inFight)
 		{
+			std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
+
+			relPos.x = relPos.x - static_cast<int>(mapCenter.x - mapViewCenter.x);
+			relPos.y = relPos.y - static_cast<int>(mapCenter.y - mapViewCenter.y);
+
+			std::cout << "after relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
+
 			if (eventType == MouseEvent::DRAGSTART)
 			{
 				draggedItem = nullptr;
@@ -1043,15 +1043,11 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			{
 				hideAttackGui();
 			}
-
-			//std::cout << "fight relPos.x: " << relPos.x << ", relPos.y: " << relPos.y << std::endl;
-
-			float left = enemySprite.getPosition().x;
-			float top = enemySprite.getPosition().y;
+			
+			float left = enemySprite.getGlobalBounds().left;
+			float top = enemySprite.getGlobalBounds().top;
 			float right = (left + enemySprite.getGlobalBounds().width);
 			float bottom = (top + enemySprite.getGlobalBounds().height);
-
-			//std::cout << "fight after relPos.x: " << relPos.x << ", relPos.y: " << relPos.y << std::endl;
 
 			// show monster details 
 			if (relPos.x >= left && relPos.y >= top && relPos.x < right && relPos.y < bottom)
@@ -1292,8 +1288,7 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
 	inFight = true;
 
-	//enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));
-	enemySprite.setTexture(ResourceManager::getInstance().getTexture("player_big"));
+	enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));
 	enemyNameFightLabel->setText(monster_->getName());
 	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
 	fight.reset(new Fight(player_, monster_, game.getPrototypeStorage(), chatbox));
