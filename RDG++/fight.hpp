@@ -37,6 +37,7 @@ public:
 	void setActiveRound(unsigned int activeRound_) { activeRound = activeRound_; };
 	Attacks::Enum getPlayerAttackType() { return playerAttackType; }
 	std::shared_ptr<Creature> getLoser() const { return loser; };
+	std::shared_ptr<Monster> getEnemy() const { return enemy; };
 
 private:
 

@@ -226,39 +226,18 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 	case Attacks::TORSO:
 	{
 		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
-		//activeAttack = &attacks.at(Attacks::TORSO);
-		if (creature1 == player)
-		{
-			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getSoundName()).play();
-			//activeAttackNumber = 1.f;
-		}
 		break;
 	}
 	case Attacks::HEAD:
 		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
-		if (creature1 == player)
-		{
-			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getSoundName()).play();
-			//activeAttackNumber = 1.f;
-		}
 		break;
 
 	case Attacks::ARMS:
 		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
-		if (creature1 == player)
-		{
-			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getSoundName()).play();
-			//activeAttackNumber = 1.f;
-		}
 		break;
 
 	case Attacks::LEGS:
 		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
-		if (creature1 == player)
-		{
-			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getSoundName()).play();
-			//activeAttackNumber = 1.f;
-		}
 		break;
 
 	case Attacks::SET:
@@ -292,13 +271,14 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 			parryMultiplier = 2.f;
 			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(Attacks::TORSO));
 			parrySucceeded = false;
-			OutputFormatter::chat(chatbox, player->getPlayerName() + " forced " + enemy->getName() + " to parry", sf::Color::White);
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " burst through " + enemy->getName() + "'s attack", sf::Color::White);
 		}
 		else
 		{
 			parryMultiplier = 0.f;
 			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(Attacks::TORSO));
-			OutputFormatter::chat(chatbox, player->getPlayerName() + " failed in forcing " + enemy->getName() + " to parry", sf::Color::White);
+			ResourceManager::getInstance().getSound("forceParry").play();
+			OutputFormatter::chat(chatbox, enemy->getName() + " parried " + player->getPlayerName() + "'s attack", sf::Color::White);
 		}
 		//activeAttackNumber = 7.f;
 		break;
