@@ -20,9 +20,6 @@ Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> enemy_, s
 	enemyAttackType = Attacks::UNKNOWN;
 	chosenTask1 = Attacks::UNKNOWN;
 	chosenTask2 = Attacks::UNKNOWN;
-
-	OutputFormatter::chat(chatbox, "Started fight against " + enemy_->getName(), sf::Color::White);
-	ResourceManager::getInstance().getSound(enemy_->getSoundName()).play();
 }
 
 Fight::~Fight()

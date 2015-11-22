@@ -1289,6 +1289,11 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	enemyNameFightLabel->setText(monster_->getName());
 	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
 	fight.reset(new Fight(player_, monster_, game.getPrototypeStorage(), chatbox));
+
+	OutputFormatter::chat(chatbox, "Started fight against " + fight->getEnemy()->getName(), sf::Color::White);
+	ResourceManager::getInstance().getSound(fight->getEnemy()->getSoundName()).play();
+	updateDetails(DetailsBag(fight->getEnemy(), false));
+	showingEnemyDetails = true;
 }
 
 void GameStateGame::endFight(std::shared_ptr<Creature> loser)
