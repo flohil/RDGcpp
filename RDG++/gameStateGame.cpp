@@ -663,7 +663,7 @@ void GameStateGame::loadGui()
 
 	/* FIGHT STUFF */
 
-	float spacer = 30.f;
+	float spacer = 15.f * settings->widthScaleFactor;
 	float buttonWidth = (rightHorSplitAbs - spacer) / 4.f;
 	float buttonHeight = bottomVerSplitAbs / 8.f;
 	float buttonCount = 4.f;
@@ -672,54 +672,15 @@ void GameStateGame::loadGui()
 	float heightSpacer = 6.f;
 	float healthBarWidth = 300.f;
 	float healthBarHeight = 15.f;
-	float spriteSpacer = 395.f;
+	float spriteSpacer = 200.f;
+	float spriteSize = 200.f * 1.5f;
+	float healthBarTopSpace = 10.f;
 	unsigned int grayScaleComponent = 100;
 
 	fightBackground = sf::RectangleShape(sf::Vector2f(static_cast<float>(rightHorSplitAbs), static_cast<float>(bottomVerSplitAbs - topVerSplitAbs)));
 	fightBackground.setFillColor(sf::Color(grayScaleComponent, grayScaleComponent, grayScaleComponent));
 
 	fightGui.setView(fightView);
-
-#if 1
-	playerNameFightLabel = std::make_shared<tgui::Label>();
-	playerNameFightLabel->setAutoSize(true);
-	playerNameFightLabel->setTextSize(static_cast<unsigned int>(25.f));
-	playerNameFightLabel->setTextColor(sf::Color::Black);
-	playerNameFightLabel->setText(settings->playerName);
-	fightGui.add(playerNameFightLabel);
-	playerNameFightLabel->setPosition(spacer, spacer - (float)playerNameFightLabel->getTextSize() / 2.f);
-#endif
-#if 1
-	enemyNameFightLabel = std::make_shared<tgui::Label>();
-	enemyNameFightLabel->setAutoSize(true);
-	enemyNameFightLabel->setTextSize(static_cast<unsigned int>(25.f));
-	enemyNameFightLabel->setTextColor(sf::Color::Black);
-	enemyNameFightLabel->setText("Enemy");
-	fightGui.add(enemyNameFightLabel);
-	enemyNameFightLabel->setPosition(bottomVerSplitAbs + healthBarWidth/2, spacer - (float)enemyNameFightLabel->getTextSize() / 2.f);
-#endif
-
-	playerSprite.setPosition(spacer, bottomVerSplitAbs - topVerSplitAbs - spriteSpacer);
-	playerSprite.setScale(sf::Vector2f(1.5f, 1.5f));
-
-	enemySprite.setPosition(bottomVerSplitAbs + 6.f * spacer, bottomVerSplitAbs - topVerSplitAbs - spriteSpacer);
-	enemySprite.setScale(sf::Vector2f(1.5f, 1.5f));
-
-	enemyHealthBar = std::make_shared<tgui::ProgressBar>();
-	enemyHealthBar->setPosition(bottomVerSplitAbs + healthBarWidth/2, spacer*2);
-	enemyHealthBar->setSize(healthBarWidth, healthBarHeight);
-	enemyHealthBar->setMinimum(0u);
-	enemyHealthBar->setMaximum(100u);
-	enemyHealthBar->setValue(50u);
-	fightGui.add(enemyHealthBar);
-
-	playerHealthBar = std::make_shared<tgui::ProgressBar>();
-	playerHealthBar->setPosition(spacer, spacer*2);
-	playerHealthBar->setSize(healthBarWidth, healthBarHeight);
-	playerHealthBar->setMinimum(0u);
-	playerHealthBar->setMaximum(100u);
-	playerHealthBar->setValue(50u);
-	fightGui.add(playerHealthBar);
 
 	attackButton = theme->load("Button");
 	attackButton->setText("Attack");
@@ -789,6 +750,45 @@ void GameStateGame::loadGui()
 	legsButton->connect("pressed", [&](){ attackLegs(); });
 	legsButton->setSize(buttonWidth, buttonHeight);
 	legsButton->setPosition(0.f * buttonWithSpacer + spacePerButton / 2.f, bottomVerSplitAbs - topVerSplitAbs - buttonHeight - heightSpacer - 4.f * buttonHeight);
+
+	playerNameFightLabel = std::make_shared<tgui::Label>();
+	playerNameFightLabel->setAutoSize(true);
+	playerNameFightLabel->setTextSize(static_cast<unsigned int>(25.f));
+	playerNameFightLabel->setTextColor(sf::Color::Black);
+	playerNameFightLabel->setText(settings->playerName);
+	fightGui.add(playerNameFightLabel);
+	playerNameFightLabel->setPosition(spacer, spacer);
+
+	enemyNameFightLabel = std::make_shared<tgui::Label>();
+	enemyNameFightLabel->setAutoSize(true);
+	enemyNameFightLabel->setTextSize(static_cast<unsigned int>(25.f));
+	enemyNameFightLabel->setTextColor(sf::Color::Black);
+	enemyNameFightLabel->setText("Enemy");
+	fightGui.add(enemyNameFightLabel);
+	enemyNameFightLabel->setPosition(rightHorSplitAbs - spriteSize - spacer, spacer);
+
+	playerHealthBar = std::make_shared<tgui::ProgressBar>();
+	playerHealthBar->setPosition(spacer, playerNameFightLabel->getPosition().y + playerNameFightLabel->getTextSize() + healthBarTopSpace);
+	playerHealthBar->setSize(healthBarWidth, healthBarHeight);
+	playerHealthBar->setMinimum(0u);
+	playerHealthBar->setMaximum(100u);
+	playerHealthBar->setValue(50u);
+	fightGui.add(playerHealthBar);
+
+	enemyHealthBar = std::make_shared<tgui::ProgressBar>();
+	enemyHealthBar->setPosition(rightHorSplitAbs - spriteSize - spacer, playerNameFightLabel->getPosition().y + playerNameFightLabel->getTextSize() + healthBarTopSpace);
+	enemyHealthBar->setSize(healthBarWidth, healthBarHeight);
+	enemyHealthBar->setMinimum(0u);
+	enemyHealthBar->setMaximum(100u);
+	enemyHealthBar->setValue(50u);
+	fightGui.add(enemyHealthBar);
+
+	playerSprite.setPosition(spacer, attackButton->getPosition().y - spacer - spriteSize);
+	playerSprite.setScale(sf::Vector2f(1.5f, 1.5f));
+
+	//enemySprite.setPosition(bottomVerSplitAbs + 6.f * spacer, bottomVerSplitAbs - topVerSplitAbs - spriteSpacer);
+	enemySprite.setPosition(rightHorSplitAbs - spriteSize - spacer, attackButton->getPosition().y - spacer - spriteSize);
+	enemySprite.setScale(sf::Vector2f(1.5f, 1.5f));
 
 	/* FIGHT STUFF END */
 
@@ -1044,10 +1044,17 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 				hideAttackGui();
 			}
 
+			//std::cout << "fight relPos.x: " << relPos.x << ", relPos.y: " << relPos.y << std::endl;
+
+			float left = enemySprite.getPosition().x;
+			float top = enemySprite.getPosition().y;
+			float right = (left + enemySprite.getGlobalBounds().width);
+			float bottom = (top + enemySprite.getGlobalBounds().height);
+
+			//std::cout << "fight after relPos.x: " << relPos.x << ", relPos.y: " << relPos.y << std::endl;
+
 			// show monster details 
-			if (relPos.x >= enemySprite.getGlobalBounds().left && relPos.y >= enemySprite.getGlobalBounds().top
-				&& relPos.x < (enemySprite.getGlobalBounds().left + enemySprite.getGlobalBounds().width)
-				&& relPos.y < (enemySprite.getGlobalBounds().top + enemySprite.getGlobalBounds().height))
+			if (relPos.x >= left && relPos.y >= top && relPos.x < right && relPos.y < bottom)
 			{
 				ResourceManager::getInstance().getSound(fight->getEnemy()->getSoundName()).play();
 				updateDetails(DetailsBag(fight->getEnemy(), false));
@@ -1285,7 +1292,8 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
 	inFight = true;
 
-	enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));
+	//enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));
+	enemySprite.setTexture(ResourceManager::getInstance().getTexture("player_big"));
 	enemyNameFightLabel->setText(monster_->getName());
 	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
 	fight.reset(new Fight(player_, monster_, game.getPrototypeStorage(), chatbox));
