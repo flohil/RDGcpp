@@ -162,10 +162,11 @@ class Item : public RenderableObject
 {
 public:
 
-	class Item(const std::string& name_, const ObjectType::Enum objectType_, const Classes::Enum itemClass_, const ItemType::Enum itemType_) : RenderableObject(name_, objectType_), itemClass(itemClass_), itemType(itemType_), sound(ResourceManager::getInstance().getSound(name_)) {};
+	class Item(const std::string& name_, const ObjectType::Enum objectType_, const Classes::Enum itemClass_, const ItemType::Enum itemType_) : RenderableObject(name_, objectType_), itemClass(itemClass_), itemType(itemType_), soundName(name_) {};
 
 	Classes::Enum getItemClass() const { return itemClass; };
 	ItemType::Enum getItemType() const { return itemType; };
+	std::string getSoundName() const { return soundName; };
 
 	virtual ~Item() = 0;
 
@@ -173,7 +174,7 @@ protected:
 
 	const Classes::Enum itemClass;
 	const ItemType::Enum itemType;
-	sf::Sound& sound;
+	std::string soundName;
 };
 
 class Creature
@@ -243,6 +244,7 @@ public:
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos) { return getInventoryItemAtPixels(pos, false); };
 	std::shared_ptr<RenderableObject> getInventoryItemAtPixels(sf::Vector2i pos, bool remove);
 	void setChatbox(tgui::ChatBox::Ptr chatbox_) { activeSet->setChatbox(chatbox_); };
+	void setPlayerPosition(Point position_);
 
 private:
 
@@ -314,19 +316,20 @@ class Monster : public RenderableObject, public Creature, public DebugPrintObjec
 public:
 
 	Monster(const std::string& name_, const DifficultyLevel::Enum level_, const Attribute::Enum killBonusType_, float killBonus_, float hp_, float strength_, float speed_, float accuracy_) :
-		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER), level(level_), killBonusType(killBonusType_), killBonus(killBonus_), sound(ResourceManager::getInstance().getSound(name_)) {};
+		RenderableObject(name_, ObjectType::CREATURE), Creature(hp_, strength_, speed_, accuracy_, CreatureType::MONSTER), level(level_), killBonusType(killBonusType_), killBonus(killBonus_), soundName(name_) {};
 
 	Attribute::Enum getKillBonusType() const { return killBonusType; };
 	float getKillBonus() const { return killBonus; };
 	virtual void debugPrint() const;
 	DifficultyLevel::Enum getLevel() const { return level; };
+	std::string getSoundName() const { return soundName; };
 
 protected:
 
 	const DifficultyLevel::Enum level;
 	const Attribute::Enum killBonusType;
 	const float killBonus;
-	sf::Sound& sound;
+	std::string soundName;
 };
 
 class Potion : public Item, public DebugPrintObject
@@ -360,7 +363,7 @@ class Weapon : public Item, public DebugPrintObject
 public:
 
 	Weapon::Weapon(const std::string& name_, const Classes::Enum itemClass_, const WeaponType::Enum type_, const float attack_, const float speed_, const float accuracy_, const float defence_, const unsigned int slots_, const unsigned int max_) :
-		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_), attackSound(name_ + "_attack") {};
+		Item(name_, ObjectType::ITEM, itemClass_, ItemType::WEAPON), type(type_), attack(attack_), speed(speed_), accuracy(accuracy_), defence(defence_), slots(slots_), maxWeapons(max_), attackSoundName(name_ + "_attack") {};
 
 	WeaponType::Enum getType() const { return type; };
 	float getAttack() const { return attack; };
@@ -370,14 +373,14 @@ public:
 	unsigned int getSlots() const { return slots; };
 	inline unsigned int getMaxWeapons() const { return maxWeapons; };
 	virtual void debugPrint() const;
-	inline std::string getAttackSound() const { return attackSound; };
+	inline std::string getAttackSoundName() const { return attackSoundName; };
 
 protected:
 
 	const WeaponType::Enum type;
 	const float attack, speed, accuracy, defence;
 	const unsigned int slots, maxWeapons;
-	std::string attackSound;
+	std::string attackSoundName;
 };
 
 class Attack : public GameObject, public DebugPrintObject

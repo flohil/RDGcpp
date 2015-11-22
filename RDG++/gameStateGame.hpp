@@ -165,6 +165,7 @@ private:
 	void updateDetails(DetailsBag& detailsBag);
 	void updateStats();
 	void startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_);
+	void endFight(std::shared_ptr<Creature> loser);
 	void toggleAttackGui();
 	void hideAttackGui();
 	void parry();

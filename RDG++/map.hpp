@@ -31,6 +31,7 @@ public:
 	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pixelPos, bool remove) { return handleItemAtPixels(pixelPos, remove, nullptr); };
 	std::shared_ptr<RenderableObject> setItemAtPixels(sf::Vector2i pixelPos, std::shared_ptr<RenderableObject> obj) { return handleItemAtPixels(pixelPos, false, obj); };
 	std::shared_ptr<RenderableObject> handleItemAtPixels(sf::Vector2i pixelPos, bool remove, std::shared_ptr<RenderableObject> obj);
+	Point getInitialPlayerPosition() const { return initialPlayerPosition; };
 
 private:
 
@@ -74,6 +75,9 @@ private:
 	float treasureDoorOneAngle;
 	float treasureDoorTwoAngle;
 	bool treasureDoorOpened = false;
+
+	// initial player position
+	Point initialPlayerPosition;
 
 	void fillWithRooms();
 	RoomTypes::Enum detectRoomType(Point indizes) const;

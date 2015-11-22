@@ -397,19 +397,19 @@ std::string EnumMapper::mapAttackName(Attacks::Enum input)
 	switch (input)
 	{
 		case Attacks::ARMS:
-			return "arms";
+			return "Arms";
 		case Attacks::HEAD:
-			return "head";
+			return "Head";
 		case Attacks::LEGS:
-			return "legs";
+			return "Legs";
 		case Attacks::PARRY:
-			return "parry";
+			return "Parry";
 		case Attacks::POTION:
-			return "potion";
+			return "Potion";
 		case Attacks::SET:
-			return "set";
+			return "Set";
 		case Attacks::TORSO:
-			return "torso";
+			return "Torso";
 		case Attacks::UNKNOWN:
 			LOG(ERROR) << "Unknown input for Attacks::Enum: " << input;
 			return "Unknown";

@@ -1,10 +1,11 @@
 #include "fight.hpp"
 #include "chances.hpp"
+#include "OutputFormatter.hpp"
 
-Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> enemy_, std::shared_ptr<PrototypeStorage> prototypeStorage_)
-	: player(player_), enemy(enemy_), prototypeStorage(prototypeStorage_)
+Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> enemy_, std::shared_ptr<PrototypeStorage> prototypeStorage_, tgui::ChatBox::Ptr chatbox_)
+	: player(player_), enemy(enemy_), prototypeStorage(prototypeStorage_), chatbox(chatbox_), loser(nullptr)
 {
-	/*attackSet = false;
+	/*
 	activeAttack = nullptr;
 	activeAttackType = Attacks::UNKNOWN;
 	selectedPotion = nullptr;
@@ -14,6 +15,9 @@ Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> enemy_, s
 
 	changeTabActive = false;
 	potionTakingActive = false;*/
+
+	OutputFormatter::chat(chatbox, "Started fight against " + enemy_->getName(), sf::Color::White);
+	ResourceManager::getInstance().getSound(enemy_->getSoundName()).play();
 }
 
 
@@ -22,14 +26,18 @@ Fight::~Fight()
 
 }
 
-std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
+void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 {
 	/* MAIN FIGHT LOOP */
 	//while (player->hp > 0 && enemy->hp > 0)
 	//{
+
+	bool playerLost = false;
+	bool enemyLost = false;
+
 	std::cout << "Playertask: " << playerTask << std::endl;
 	std::cout << "Entered fightRound()" << std::endl << std::endl;
-	if (stage == 1u && attackSet)
+	if (stage == 1u)
 	{
 		std::wcout << "Stage = 1u" << std::endl;
 		creature1 = nullptr;
@@ -42,6 +50,11 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 		chosenTask2 = Attacks::UNKNOWN;
 
 		unsigned int firstAttackTemp = determineFirstAttack();
+
+		if (playerTask == Attacks::SET || playerTask == Attacks::POTION) // potions and set changes always come first - DON'T CHANGE THIS!
+		{
+			firstAttackTemp = 1;
+		}
 
 		if (firstAttackTemp == 1)
 		{
@@ -69,33 +82,18 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 #endif
 		if (player->hp <= 0)
 		{
-			player->resetOriginals();
-			enemy->resetOriginals();
-
-			// empty active potion lists
-			player->emptyActivePotions();
-			enemy->emptyActivePotions();
-			resetRoundVariables();
-			std::cout << "Player LOST the fight" << std::endl << std::endl;
-			return player;
+			playerLost = true;
 		}
 		else if (enemy->hp <= 0)
 		{
-
-			// empty active potion lists
-			player->emptyActivePotions();
-			enemy->emptyActivePotions();
-			resetRoundVariables();
-			std::cout << "Player WON the fight" << std::endl << std::endl;
-			return enemy;
+			enemyLost = true;
 		}
 		activeRound = 2u;
 	}
-	else if (stage == 2u && attackSet)
+	else if (stage == 2u)
 	{
 		std::cout << "Stage = 2u" << std::endl;
 		// set to null between attacks of player and enemy to determine if attack was already chosen
-		activeAttack = nullptr;
 		activeAttackType = Attacks::UNKNOWN;
 #if 1
 
@@ -115,38 +113,48 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 
 		//}
 #endif
+		
 		if (player->hp <= 0)
 		{
-			player->resetOriginals();
-			enemy->resetOriginals();
-			resetRoundVariables();
-			std::cout << "Player LOST the fight" << std::endl << std::endl;
-			return player;
+			playerLost = true;
 		}
 		else if (enemy->hp <= 0)
 		{
-			//give attribute bonus to winner of the fight
-			attributeBonusForWinner(enemy);
-			// set boostes values as new normal player values
-			player->resetOriginals();
-			// empty active potion lists
-			player->emptyActivePotions();
-			enemy->emptyActivePotions();
-			resetRoundVariables();
-			std::cout << "Player WON the fight" << std::endl << std::endl;
-			return enemy;
+			enemyLost = true;
 		}
 		activeRound = 1u;
 	}
+
+	if (playerLost)
+	{
+		player->resetOriginals();
+		enemy->resetOriginals();
+		ResourceManager::getInstance().getSound("humanDies").play();
+		std::cout << "Player LOST the fight" << std::endl << std::endl;
+		OutputFormatter::chat(chatbox, player->getPlayerName() + " lost the fight against " + enemy->getName(), sf::Color::White);
+		loser = player;
+	}
+	else if (enemyLost)
+	{
+		//give attribute bonus to winner of the fight
+		attributeBonusForWinner(enemy);
+		// set boostes values as new normal player values
+		player->resetOriginals();
+		// empty active potion lists
+		player->emptyActivePotions();
+		enemy->emptyActivePotions();
+		ResourceManager::getInstance().getSound(enemy->getSoundName()).play();
+		std::cout << "Player WON the fight" << std::endl << std::endl;
+		OutputFormatter::chat(chatbox, player->getPlayerName() + " won the fight against " + enemy->getName(), sf::Color::White);
+		loser = enemy;
+	}
+
 	// reset variables that need to be changed each round
 	resetRoundVariables();
-	return nullptr;
 }
 
 void Fight::resetRoundVariables()
 {
-	attackSet = false;
-	activeAttack = nullptr;
 	activeAttackType = Attacks::UNKNOWN;
 	selectedPotion = nullptr;
 	enemyAttackHealthDamage = 0;
@@ -157,7 +165,14 @@ void Fight::resetRoundVariables()
 
 std::shared_ptr<Potion> Fight::getSelectedPotion(std::shared_ptr<Creature> creature1)
 {
-	return nullptr;
+	if (creature1->getCreatureType() == CreatureType::PLAYER)
+	{
+		return selectedPotion;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 /*
@@ -189,8 +204,10 @@ Attacks::Enum Fight::getCommand(std::shared_ptr<Creature> creature)
 void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<Creature> creature2, Attacks::Enum chosenTask)
 {
 	float activeAttackNumber = 0;
+	std::shared_ptr<Attack> activeAttack = nullptr;
+	bool parrySucceeded = false; // can only be true if chosenTask is Parry and parrySuccess() calculation returned true
 
-	//player chooses what to do
+	//attacker chooses what to do
 	switch (chosenTask)
 	{
 	case Attacks::TORSO:
@@ -199,7 +216,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 		//activeAttack = &attacks.at(Attacks::TORSO);
 		if (creature1 == player)
 		{
-			ResourceManager::getInstance().getSound("buttonClick").play();
+			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getSoundName()).play();
 			//activeAttackNumber = 1.f;
 		}
 		break;
@@ -208,7 +225,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
 		if (creature1 == player)
 		{
-			ResourceManager::getInstance().getSound("buttonClick").play();
+			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getSoundName()).play();
 			//activeAttackNumber = 1.f;
 		}
 		break;
@@ -217,7 +234,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
 		if (creature1 == player)
 		{
-			ResourceManager::getInstance().getSound("buttonClick").play();
+			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getSoundName()).play();
 			//activeAttackNumber = 1.f;
 		}
 		break;
@@ -226,22 +243,31 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 		activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
 		if (creature1 == player)
 		{
-			ResourceManager::getInstance().getSound("buttonClick").play();
+			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getSoundName()).play();
 			//activeAttackNumber = 1.f;
 		}
 		break;
 
 	case Attacks::SET:
 		//activeAttackNumber = 5.f;
+		OutputFormatter::chat(chatbox, player->getPlayerName() + " changed Equipment Set", sf::Color::White);
+		ResourceManager::getInstance().getSound("changeSet").play();
 		break;
 
 	case Attacks::POTION:
 		selectedPotion = getSelectedPotion(creature1);
 
+		std::cout << "selected potion for " << creature1 << ": " << selectedPotion << std::endl;
+
 		if (selectedPotion != nullptr)
 		{
 			// manage the handling of a used potion
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " used " + selectedPotion->getName(), sf::Color::White);
+			ResourceManager::getInstance().getSound("drink").play();
 			usePotion(creature1, creature2, selectedPotion);
+
+			// reset selected Potion
+			selectedPotion = nullptr;
 		}
 		//activeAttackNumber = 6.f;
 		break;
@@ -251,12 +277,13 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 		{
 			// when creature (player) parries successful, he deals x times the damage of a normal torso attack
 			parryMultiplier = 2.f;
-			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
+			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(Attacks::TORSO));
+			parrySucceeded = false;
 		}
 		else
 		{
 			parryMultiplier = 0.f;
-			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(chosenTask));
+			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(Attacks::TORSO));
 		}
 		//activeAttackNumber = 7.f;
 		break;
@@ -267,52 +294,57 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 
 
 	// actual attack
-	if (chosenTask == Attacks::HEAD || chosenTask == Attacks::TORSO || chosenTask == Attacks::ARMS || chosenTask == Attacks::LEGS/*activeAttackNumber < 5.f || activeAttackNumber > 6.f*/)
+	if (chosenTask == Attacks::HEAD || chosenTask == Attacks::TORSO || chosenTask == Attacks::ARMS || chosenTask == Attacks::LEGS || chosenTask == (Attacks::PARRY && parrySucceeded)/*activeAttackNumber < 5.f || activeAttackNumber > 6.f*/)
 	{
-		attack(creature1, creature2);
+		attack(creature1, creature2, activeAttack, parrySucceeded);
 		std::cout << "attack successful" << std::endl;
 	}
 
 	// parryMultiplier is used on every attack and only temporarily increased when parrying -> needs to be resetted
 	parryMultiplier = 1.f;
-
-	// reset selected Potion
-	selectedPotion = nullptr;
-
 }
 
-void Fight::attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender)
+void Fight::attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack, bool parrySuccess)
 {
 	if (activeAttack == nullptr) return;
 
 	float healthDmg = 0.f;
 	float attributeDmg = 0.f;
+	bool hitSuccess = false;
 
-	if (attacker == player)
+	if (parrySuccess || calcHitSuccess(attacker, defender, activeAttack))
 	{
-		// now calculate actual attack
-		if (calcHitSuccess(attacker, defender))
+		healthDmg = calcHealthDamage(attacker, defender, activeAttack);
+		attributeDmg = calcAttributeDamage(attacker, activeAttack);
+		hitSuccess = true;
+	}
+
+	hitSuccess = true; // for testing
+
+	if (hitSuccess)
+	{
+		if (attacker->getCreatureType() == CreatureType::MONSTER)
 		{
-			healthDmg = calcHealthDamage(attacker, defender);
-			attributeDmg = calcAttributeDamage(attacker);
-			if (attacker->getCreatureType() == CreatureType::MONSTER)
-			{
-				ResourceManager::getInstance().getSound("humanHit").play();
-			}
-			else
-			{
-				ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getAttackSound()).play();
-			}
+			OutputFormatter::chat(chatbox, enemy->getName() + " hit " + player->getPlayerName() + " on the " + EnumMapper::mapAttackName(activeAttackType), sf::Color::White);
+			ResourceManager::getInstance().getSound("humanHit").play();
 		}
 		else
 		{
-			ResourceManager::getInstance().getSound("miss").play();
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " hit " + enemy->getName() + " on the " + EnumMapper::mapAttackName(activeAttackType), sf::Color::White);
+			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getAttackSoundName()).play();
 		}
 	}
 	else
 	{
-		healthDmg = enemyAttackHealthDamage;
-		attributeDmg = enemyAttackAttributeDamage;
+		if (attacker->getCreatureType() == CreatureType::MONSTER)
+		{
+			OutputFormatter::chat(chatbox, enemy->getName() + "'s attack missed " + player->getPlayerName(), sf::Color::White);
+		}
+		else
+		{
+			OutputFormatter::chat(chatbox, player->getPlayerName() + "'s attack missed " + enemy->getName(), sf::Color::White);
+		}
+		ResourceManager::getInstance().getSound("miss").play();
 	}
 
 	if (healthDmg > 0)
@@ -322,7 +354,7 @@ void Fight::attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature>
 
 	if (attributeDmg > 0)
 	{
-		updateAttributes(defender, attributeDmg);
+		updateAttributes(defender, attributeDmg, activeAttack);
 	}
 
 	// reset values
@@ -460,7 +492,7 @@ float Fight::calcCreatureAccuracy(std::shared_ptr<Creature> creature)
 	return accuracy;
 }
 
-float Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender)
+float Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack)
 {
 	//constants
 	float const randAccuracyLow = 0.5f;
@@ -509,7 +541,7 @@ float Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<
 	return hitSuccess;
 }
 
-float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender)
+float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack)
 {
 	//constants
 	float const baseDefensePlayer = 100.f;
@@ -598,7 +630,7 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	return randHealthDamage;
 }
 
-float Fight::calcAttributeDamage(std::shared_ptr<Creature> defender)
+float Fight::calcAttributeDamage(std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack)
 {
 	// constants
 	float const playerAttributeDamageMult = 1.f;
@@ -668,7 +700,7 @@ void Fight::updateHealth(std::shared_ptr<Creature> defender, float healthDamage)
 	defender->hp = hp;
 }
 
-void Fight::updateAttributes(std::shared_ptr<Creature> defender, float attributeDamage)
+void Fight::updateAttributes(std::shared_ptr<Creature> defender, float attributeDamage, std::shared_ptr<Attack> activeAttack)
 {
 	switch (activeAttack->getEffect())
 	{

@@ -238,8 +238,6 @@ void GameStateGame::draw(const float deltaTime)
 {
 	game.window.clear(sf::Color::Black);
 
-
-
 	game.window.setView(mapView);
 	if (!inFight)
 	{
@@ -300,24 +298,22 @@ void GameStateGame::update(const float deltaTime)
 		player->update(deltaTime); // move player
 	}
 	else {
-#if 1
-		if (fight->getActiveRound() == 1u)
-		{
-			fightStageAccumulator += deltaTime;
 
-			if (fightStageAccumulator >= fightStageSpan)
-			{
-				fight->fightRound(fight->getActiveAttackType(), 1u); // set attacktype enum in gameStageGame header
-				fightStageAccumulator = 0;
-			}
+		std::shared_ptr<Creature> loser = fight->getLoser();
+
+		if (loser != nullptr)
+		{
+			endFight(loser);
 		}
-		else if (fight->getActiveRound() == 2u)
+#if 1
+		else if (fight->getActiveRound() == 2u) // only automatically enter 2nd round, 1st round is triggered by buttons in gui
 		{
 			fightStageAccumulator += deltaTime;
 
 			if (fightStageAccumulator >= fightStageSpan)
 			{
-				fight->fightRound(fight->getActiveAttackType(), 2u); //set attacktype enum in gameStateGame header
+				std::cout << "triggered second round from update" << std::endl;
+				fight->fightRound(fight->getActiveAttackType(), 2u);
 				fightStageAccumulator = 0;
 			}
 		}
@@ -672,7 +668,7 @@ void GameStateGame::loadGui()
 #if 1
 	playerNameFightLabel = std::make_shared<tgui::Label>();
 	playerNameFightLabel->setAutoSize(true);
-	playerNameFightLabel->setTextSize(25.f);
+	playerNameFightLabel->setTextSize(static_cast<unsigned int>(25.f));
 	playerNameFightLabel->setTextColor(sf::Color::Black);
 	playerNameFightLabel->setText(settings->playerName);
 	fightGui.add(playerNameFightLabel);
@@ -681,7 +677,7 @@ void GameStateGame::loadGui()
 #if 1
 	enemyNameFightLabel = std::make_shared<tgui::Label>();
 	enemyNameFightLabel->setAutoSize(true);
-	enemyNameFightLabel->setTextSize(25.f);
+	enemyNameFightLabel->setTextSize(static_cast<unsigned int>(25.f));
 	enemyNameFightLabel->setTextColor(sf::Color::Black);
 	enemyNameFightLabel->setText("Enemy");
 	fightGui.add(enemyNameFightLabel);
@@ -1262,7 +1258,23 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));
 	enemyNameFightLabel->setText(monster_->getName());
 	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
-	fight.reset(new Fight(player_, monster_, game.getPrototypeStorage()));
+	fight.reset(new Fight(player_, monster_, game.getPrototypeStorage(), chatbox));
+}
+
+void GameStateGame::endFight(std::shared_ptr<Creature> loser)
+{
+	if (loser->getCreatureType() == CreatureType::PLAYER)
+	{
+		player->setPlayerPosition(map->getInitialPlayerPosition());
+	}
+	else
+	{
+		Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
+		map->setOverlayObject(facingPoint, nullptr);
+	}
+
+	inFight = false;
+	fightStageAccumulator = 0;
 }
 
 void GameStateGame::toggleAttackGui()
@@ -1306,7 +1318,6 @@ void GameStateGame::parry()
 		ResourceManager::getInstance().getSound("buttonClick").play();
 		usePotionActive = false;
 		hideAttackGui();
-		fight->setAttackSet();
 		OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
 		fight->fightRound(Attacks::PARRY, 1u);
 	}
@@ -1318,9 +1329,7 @@ void GameStateGame::usePotion()
 	{
 		ResourceManager::getInstance().getSound("buttonClick").play();
 		hideAttackGui();
-		fight->setAttackSet();
 		usePotionActive = true;
-		OutputFormatter::chat(chatbox, "Trying to use Potion", sf::Color::White);
 		//fight->fightRound(Attacks::POTION, 1u);
 		//finishedFirstRound = true;
 	}
@@ -1333,8 +1342,7 @@ void GameStateGame::toggleEquipment()
 		usePotionActive = false;
 		hideAttackGui();
 		choseChangeSet = true;
-		changeSet(true);
-		OutputFormatter::chat(chatbox, "Changing Equipment", sf::Color::White);
+		changeSet(false);
 		fight->fightRound(Attacks::SET, 1u);
 	}
 }
@@ -1344,7 +1352,6 @@ void GameStateGame::attackHead()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
-		fight->setAttackSet();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's head", sf::Color::White);
 		fight->fightRound(Attacks::HEAD, 1u);
 	}
@@ -1355,7 +1362,6 @@ void GameStateGame::attackTorso()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
-		fight->setAttackSet();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's torso", sf::Color::White);
 		fight->fightRound(Attacks::TORSO, 1u);
 	}
@@ -1366,8 +1372,7 @@ void GameStateGame::attackArms()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
-		fight->setAttackSet();
-		OutputFormatter::chat(chatbox, "Tring to attack the enemy's arms", sf::Color::White);
+		OutputFormatter::chat(chatbox, "Trying to attack the enemy's arms", sf::Color::White);
 		fight->fightRound(Attacks::ARMS, 1u);
 	}
 }
@@ -1377,7 +1382,6 @@ void GameStateGame::attackLegs()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
-		fight->setAttackSet();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's legs", sf::Color::White);
 		fight->fightRound(Attacks::LEGS, 1u);
 	}

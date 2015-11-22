@@ -549,9 +549,6 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 		{
 			std::shared_ptr<Potion> potion = std::dynamic_pointer_cast<Potion>(item);
 
-			OutputFormatter::chat(chatbox, "Used " + potion->getName(), sf::Color::White);
-			ResourceManager::getInstance().getSound("drink").play();
-
 			// add to active Potions list
 			//fight->(potion)...
 			if (fight != nullptr)
@@ -1052,4 +1049,11 @@ std::shared_ptr<RenderableObject> Player::getInventoryItemAtPixels(sf::Vector2i 
 	}
 
 	return retObj;
+}
+
+void Player::setPlayerPosition(Point position_)
+{
+	prevPlayerPosition = position_;
+	playerPosition = prevPlayerPosition;
+	RenderableObject::setPosition(sf::Vector2f(static_cast<float>(playerPosition.x * tileSize), static_cast<float>(playerPosition.y * tileSize)));
 }
