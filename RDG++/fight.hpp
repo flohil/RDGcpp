@@ -28,55 +28,33 @@ struct AttDefMinAvgMax
 class Fight
 {
 public:
-	Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_, std::shared_ptr<PrototypeStorage> prototypeStorage);
+	Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_, std::shared_ptr<PrototypeStorage> prototypeStorage, tgui::ChatBox::Ptr chatbox_);
 	~Fight();
 
-	std::shared_ptr<Creature> fightRound(Attacks::Enum, unsigned int stage);
-
-	// METHODS
-	void resetRoundVariables();
-	std::shared_ptr<Potion> getSelectedPotion(std::shared_ptr<Creature> creature1);
-	Attacks::Enum getCommand(std::shared_ptr<Creature> creature);
-	Attacks::Enum getActiveAttackType() { return activeAttackType; }
-	void attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<Creature> creature2, Attacks::Enum);
-	void attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
-	float calcCreatureSpeed(std::shared_ptr<Creature> creature);
-	AttDefMinAvgMax speedBasedSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
-	unsigned int determineFirstAttack();
-	bool parrySuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
-	float calcCreatureAccuracy(std::shared_ptr<Creature> creature);
-	float calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
-	float calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
-	float calcAttributeDamage(std::shared_ptr<Creature> defender);
-	void updateHealth(std::shared_ptr<Creature> defender, float attributeDamage);
-	void updateAttributes(std::shared_ptr<Creature> defender, float attributeDamage);
+	void fightRound(Attacks::Enum, unsigned int stage);
 	void addPotionToBeUsed(std::shared_ptr<Potion> potion) { selectedPotion = potion; }
-	void usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Creature> opponent, std::shared_ptr<Potion> potion);
-	void potionEffects(std::shared_ptr<Creature> creature);
-	void revertEffect(std::shared_ptr<Creature>, std::shared_ptr<Potion> potion);
-	void potionDecrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
-	void potionIncrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
-	void attributeBonusForWinner(std::shared_ptr<Creature>);
-	std::shared_ptr<Monster> getPendingAttacker() const { return pendingAttacker; };
-	std::shared_ptr<Monster> getPendingDefender() const { return pendingDefender; };
-	std::shared_ptr<Monster> getFightEnemy() const { return enemy; };
 	unsigned int getActiveRound() const { return activeRound; };
 	void setActiveRound(unsigned int activeRound_) { activeRound = activeRound_; };
+	Attacks::Enum getPlayerAttackType() { return playerAttackType; }
+	std::shared_ptr<Creature> getLoser() const { return loser; };
+	std::shared_ptr<Monster> getEnemy() const { return enemy; };
 
 private:
 
 	// VARIABLES
+	tgui::ChatBox::Ptr chatbox;
+	std::shared_ptr<Creature> loser;
 	bool activeFight;
 	std::map<Attacks::Enum, Attack> attacks; // ?
-	std::shared_ptr<Attack> activeAttack;
 	float parryMultiplier;
 	std::shared_ptr<Monster> enemy;
 	std::shared_ptr<Player> player;
 	bool changeTabActive;
 	bool potionTakingActive;
 	float finishedStages;
-	bool attackSet;
 	Attacks::Enum activeAttackType;
+	Attacks::Enum playerAttackType;
+	Attacks::Enum enemyAttackType;
 	std::shared_ptr<Potion> selectedPotion;
 	float enemyAttackHealthDamage;
 	float enemyAttackAttributeDamage;
@@ -93,6 +71,29 @@ private:
 
 	Attacks::Enum chosenTask1 = Attacks::UNKNOWN;
 	Attacks::Enum chosenTask2 = Attacks::UNKNOWN;
+
+	// METHODS
+	void resetRoundVariables();
+	std::shared_ptr<Potion> getSelectedPotion(std::shared_ptr<Creature> creature1);
+	Attacks::Enum getCommand(std::shared_ptr<Creature> creature);
+	void attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<Creature> creature2, Attacks::Enum);
+	void attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack, bool parrySuccess);
+	float calcCreatureSpeed(std::shared_ptr<Creature> creature);
+	AttDefMinAvgMax speedBasedSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
+	unsigned int determineFirstAttack();
+	bool parrySuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
+	float calcCreatureAccuracy(std::shared_ptr<Creature> creature);
+	float calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack);
+	float calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack);
+	float calcAttributeDamage(std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack);
+	void updateHealth(std::shared_ptr<Creature> defender, float attributeDamage);
+	void updateAttributes(std::shared_ptr<Creature> defender, float attributeDamage, std::shared_ptr<Attack> activeAttack);
+	void usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Creature> opponent, std::shared_ptr<Potion> potion);
+	void potionEffects(std::shared_ptr<Creature> creature);
+	void revertEffect(std::shared_ptr<Creature>, std::shared_ptr<Potion> potion);
+	void potionDecrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
+	void potionIncrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
+	void attributeBonusForWinner(std::shared_ptr<Creature>);
 };
 
 #endif //FIGHT_INCLUDE

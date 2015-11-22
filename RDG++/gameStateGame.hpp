@@ -16,7 +16,8 @@ public:
 	sf::Texture& getDetailsPic() const { return detailsPic; };
 
 	//consturctor for different item types and key and monsters
-	DetailsBag(std::shared_ptr<RenderableObject> obj);
+	DetailsBag(std::shared_ptr<RenderableObject> obj) : DetailsBag(obj, true) {	};
+	DetailsBag(std::shared_ptr<RenderableObject> obj, bool playSound);
 
 private:
 
@@ -153,6 +154,8 @@ private:
 	tgui::Button::Ptr torsoButton;
 	tgui::Button::Ptr armsButton;
 	tgui::Button::Ptr legsButton;
+	bool pressedAttackMainMenuButton = false;
+	bool showingEnemyDetails = false;
 
 	tgui::ProgressBar::Ptr enemyHealthBar;
 	tgui::ProgressBar::Ptr playerHealthBar;
@@ -162,9 +165,11 @@ private:
 	void changeSet(bool playSound, unsigned int numerator);
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType) { handleMouseEvent(pos_, eventType, false); };
 	void handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventType, bool noScale);
-	void updateDetails(DetailsBag& detailsBag);
+	void updateDetails(DetailsBag& detailsBag) { updateDetails(detailsBag, false); };
+	void updateDetails(DetailsBag& detailsBag, bool showingEnemyDetails_);
 	void updateStats();
 	void startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_);
+	void endFight(std::shared_ptr<Creature> loser);
 	void toggleAttackGui();
 	void hideAttackGui();
 	void parry();

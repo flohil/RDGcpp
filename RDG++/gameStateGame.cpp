@@ -15,15 +15,16 @@ void DetailsBag::addRow(std::string key, std::string value)
 	details.push_back(row);
 }
 
-DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj) : detailsPic(ResourceManager::getInstance().getTexture(obj->getName()))
+DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj, bool playSound) : detailsPic(ResourceManager::getInstance().getTexture(obj->getName()))
 {
-	std::cout << "constructing detailsBag for GameObject " << obj->getName() << std::endl;
-
 	if (obj->getObjectType() == ObjectType::KEY)
 	{
 		name = "Key";
 		addRow("description", "unlocks treasure chamber door");
-		ResourceManager::getInstance().getSound("key").play();
+		if (playSound)
+		{
+			ResourceManager::getInstance().getSound("key").play();
+		}
 	}
 	else if (obj->getObjectType() == ObjectType::ITEM)
 	{
@@ -77,7 +78,10 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj) : detailsPic(Resou
 			addRow("item class", EnumMapper::mapClassesName(potion->getItemClass()));
 		}
 
-		ResourceManager::getInstance().getSound(item->getName()).play();
+		if (playSound)
+		{
+			ResourceManager::getInstance().getSound(item->getName()).play();
+		}
 	}
 	else if (obj->getObjectType() == ObjectType::CREATURE)
 	{
@@ -96,7 +100,10 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj) : detailsPic(Resou
 			addRow("accuracy", OutputFormatter::shortFloat(monster->accuracy) + " (" + OutputFormatter::shortFloat(monster->getOrAccuracy()) + ")");
 			addRow("kill bonus", OutputFormatter::shortFloat(monster->getKillBonus()) + "  " + EnumMapper::mapAttributeName(monster->getKillBonusType()));
 
-			ResourceManager::getInstance().getSound(monster->getName()).play();
+			if (playSound)
+			{
+				ResourceManager::getInstance().getSound(monster->getName()).play();
+			}
 		}
 	}
 	else
@@ -238,8 +245,6 @@ void GameStateGame::draw(const float deltaTime)
 {
 	game.window.clear(sf::Color::Black);
 
-
-
 	game.window.setView(mapView);
 	if (!inFight)
 	{
@@ -300,17 +305,31 @@ void GameStateGame::update(const float deltaTime)
 		player->update(deltaTime); // move player
 	}
 	else {
-#if 1
-		if (fight->getActiveRound() == 2u)
-		{
-			fightStageAccumulator += deltaTime;
 
-			if (fightStageAccumulator >= fightStageSpan)
+		std::shared_ptr<Creature> loser = fight->getLoser();
+
+		if (loser != nullptr)
+		{
+			endFight(loser);
+		}
+#if 1
+		else
+		{
+			if (fight->getActiveRound() == 2u) // only automatically enter 2nd round, 1st round is triggered by buttons in gui
 			{
-				std::cout << "fightStageAccumulator >= fightStageSpan" << std::endl;
-				if (fight != nullptr) { std::cout << "fight != nullptr" << std::endl; }
-				fight->fightRound(fight->getActiveAttackType(), 2u); //set attacktype enum in gameStateGame header
-				fightStageAccumulator = 0;
+				fightStageAccumulator += deltaTime;
+
+				if (fightStageAccumulator >= fightStageSpan)
+				{
+					std::cout << "triggered second round from update" << std::endl;
+					fight->fightRound(fight->getPlayerAttackType(), 2u);
+					fightStageAccumulator = 0;
+				}
+			}
+
+			if (showingEnemyDetails)
+			{
+				updateDetails(DetailsBag(fight->getEnemy(), false), true);
 			}
 		}
 #endif
@@ -664,7 +683,7 @@ void GameStateGame::loadGui()
 #if 1
 	playerNameFightLabel = std::make_shared<tgui::Label>();
 	playerNameFightLabel->setAutoSize(true);
-	playerNameFightLabel->setTextSize(25.f);
+	playerNameFightLabel->setTextSize(static_cast<unsigned int>(25.f));
 	playerNameFightLabel->setTextColor(sf::Color::Black);
 	playerNameFightLabel->setText(settings->playerName);
 	fightGui.add(playerNameFightLabel);
@@ -673,7 +692,7 @@ void GameStateGame::loadGui()
 #if 1
 	enemyNameFightLabel = std::make_shared<tgui::Label>();
 	enemyNameFightLabel->setAutoSize(true);
-	enemyNameFightLabel->setTextSize(25.f);
+	enemyNameFightLabel->setTextSize(static_cast<unsigned int>(25.f));
 	enemyNameFightLabel->setTextColor(sf::Color::Black);
 	enemyNameFightLabel->setText("Enemy");
 	fightGui.add(enemyNameFightLabel);
@@ -712,7 +731,7 @@ void GameStateGame::loadGui()
 	fightGui.add(attackButton);
 
 	parryButton = theme->load("Button");
-	parryButton->setText("Parry");
+	parryButton->setText("Force Parry");
 	parryButton->setOpacity(1.f);
 	parryButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	parryButton->connect("pressed", [&](){ parry(); });
@@ -957,7 +976,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 	}
 
-	if (pos.x < rightHorSplitAbs && pos.y < bottomVerSplitAbs && pos.y >= topVerSplitAbs && !inFight) // inside map
+	if (pos.x < rightHorSplitAbs && pos.y < bottomVerSplitAbs && pos.y >= topVerSplitAbs) // inside map
 	{
 		sf::Vector2i relPos;
 		sf::Vector2f mapViewCenter = mapView.getCenter();
@@ -976,43 +995,66 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 		std::cout << "after relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
 
-		if (eventType == MouseEvent::DRAGSTART)
+		if (!inFight)
 		{
-			draggedItem = nullptr;
-			dragging = false;
-		}
-		else if (eventType == MouseEvent::CLICK)
-		{
-			std::shared_ptr<RenderableObject> retObj = map->getItemAtPixels(relPos);
+			if (eventType == MouseEvent::DRAGSTART)
+			{
+				draggedItem = nullptr;
+				dragging = false;
+			}
+			else if (eventType == MouseEvent::CLICK)
+			{
+				std::shared_ptr<RenderableObject> retObj = map->getItemAtPixels(relPos);
+
+				if (retObj != nullptr)
+				{
+					if (retObj->getObjectType() == ObjectType::ITEM || retObj->getObjectType() == ObjectType::CREATURE || retObj->getObjectType() == ObjectType::KEY)
+					{
+						updateDetails(DetailsBag(retObj));
+					}
+				}
+			}
+			else if (eventType == MouseEvent::DRAGRELEASE)
+			{
+				if (draggedItem != nullptr)
+				{
+					Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
+					if (map->getOverlayObject(facingPoint) == nullptr)
+					{
+						ResourceManager::getInstance().getSound("dropItem").play();
+						OutputFormatter::chat(chatbox, "Dropped " + draggedItem->getName(), sf::Color::White);
+						map->setOverlayObject(facingPoint, draggedItem); // place dragged item on map if there is a free tile in front of the player
+						draggedItem = nullptr;
+					}
+					else
+					{
+						ResourceManager::getInstance().getSound("error").play();
+						OutputFormatter::chat(chatbox, "Could not drop " + draggedItem->getName(), sf::Color::White);
+						handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE, true); // return dragged item to where it came from if there is no free tile in front of the player
+					}
+				}
+				dragging = false;
+			}
+		} 
+		else { // clicked into fight window
+
+			// hide attack menu when clicking somewhere different than the button, need to consume event
+			if (!pressedAttackMainMenuButton)
+			{
+				hideAttackGui();
+			}
+
+			// show monster details 
+			if (relPos.x >= enemySprite.getGlobalBounds().left && relPos.y >= enemySprite.getGlobalBounds().top
+				&& relPos.x < (enemySprite.getGlobalBounds().left + enemySprite.getGlobalBounds().width)
+				&& relPos.y < (enemySprite.getGlobalBounds().top + enemySprite.getGlobalBounds().height))
+			{
+				ResourceManager::getInstance().getSound(fight->getEnemy()->getSoundName()).play();
+				updateDetails(DetailsBag(fight->getEnemy(), false));
+				showingEnemyDetails = true;
+			}
 			
-			if (retObj != nullptr)
-			{
-				if (retObj->getObjectType() == ObjectType::ITEM || retObj->getObjectType() == ObjectType::CREATURE || retObj->getObjectType() == ObjectType::KEY)
-				{
-				updateDetails(DetailsBag(retObj));
-			}
-		}
-		}
-		else if (eventType == MouseEvent::DRAGRELEASE)
-		{
-			if (draggedItem != nullptr)
-			{
-				Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
-				if (map->getOverlayObject(facingPoint) == nullptr)
-				{
-					ResourceManager::getInstance().getSound("dropItem").play();
-					OutputFormatter::chat(chatbox, "Dropped " + draggedItem->getName(), sf::Color::White);
-					map->setOverlayObject(facingPoint, draggedItem); // place dragged item on map if there is a free tile in front of the player
-					draggedItem = nullptr;
-				}
-				else
-				{
-					ResourceManager::getInstance().getSound("error").play();
-					OutputFormatter::chat(chatbox, "Could not drop " + draggedItem->getName(), sf::Color::White);
-					handleMouseEvent(dragStartPos, MouseEvent::DRAGRELEASE, true); // return dragged item to where it came from if there is no free tile in front of the player
-				}
-			}
-			dragging = false;
+			pressedAttackMainMenuButton = false;
 		}
 	}
 	else if (pos.x > rightHorSplitAbs && pos.y < rightVerSplitAbs) // inside armor
@@ -1142,8 +1184,13 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	std::cout << "End of Mouse Handling: draggedItem = " << draggedItem << ", primaryWeapon = " << player->getEquipmentSet()->getPrimaryWeapon() << ", secondaryWEapon = " << player->getEquipmentSet()->getSecondaryWeapon() << std::endl;
 }
 
-void GameStateGame::updateDetails(DetailsBag& detailsBag)
+void GameStateGame::updateDetails(DetailsBag& detailsBag, bool showingEnemyDetails_)
 {
+	if (!showingEnemyDetails_)
+	{
+		showingEnemyDetails = false;
+	}
+
 	// empty all entries
 	detailsHeader->setText("");
 	for (unsigned int row = 0; row < detailRows; ++row)
@@ -1155,18 +1202,6 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag)
 	}
 
 	detailsHeader->setText(detailsBag.getName());
-
-	std::cout << "detailsGrid: rows = " << details.size() << ", cols = " << details[0].size() << std::endl;
-	std::cout << "detailsBag: rows = " << detailsBag.getDetails().size();
-
-	if (detailsBag.getDetails().size() == 0)
-	{
-		std::cout << std::endl << "detialsBag was empty" << std::endl;
-	}
-	else
-	{
-		std::cout << ", cols = " << detailsBag.getDetails()[0].size() << std::endl;
-	}
 	
 	for (unsigned int row = 0; row < detailsBag.getDetails().size(); ++row)
 	{
@@ -1250,15 +1285,36 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
 	inFight = true;
 
-
 	enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));
 	enemyNameFightLabel->setText(monster_->getName());
 	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
-	fight.reset(new Fight(player_, monster_, game.getPrototypeStorage()));
+	fight.reset(new Fight(player_, monster_, game.getPrototypeStorage(), chatbox));
+
+	OutputFormatter::chat(chatbox, "Started fight against " + fight->getEnemy()->getName(), sf::Color::White);
+	ResourceManager::getInstance().getSound(fight->getEnemy()->getSoundName()).play();
+	updateDetails(DetailsBag(fight->getEnemy(), false));
+	showingEnemyDetails = true;
+}
+
+void GameStateGame::endFight(std::shared_ptr<Creature> loser)
+{
+	if (loser->getCreatureType() == CreatureType::PLAYER)
+	{
+		player->setPlayerPosition(map->getInitialPlayerPosition());
+	}
+	else
+	{
+		Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
+		map->setOverlayObject(facingPoint, nullptr);
+	}
+
+	inFight = false;
+	fightStageAccumulator = 0;
 }
 
 void GameStateGame::toggleAttackGui()
 {
+	pressedAttackMainMenuButton = true;
 	if (interactionPermitted) {
 		ResourceManager::getInstance().getSound("buttonClick").play();
 		usePotionActive = false;
@@ -1297,8 +1353,6 @@ void GameStateGame::parry()
 	{
 		ResourceManager::getInstance().getSound("buttonClick").play();
 		usePotionActive = false;
-		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
 		fight->fightRound(Attacks::PARRY, 1u);
 	}
 }
@@ -1308,11 +1362,7 @@ void GameStateGame::usePotion()
 	if (interactionPermitted)
 	{
 		ResourceManager::getInstance().getSound("buttonClick").play();
-		hideAttackGui();
 		usePotionActive = true;
-		OutputFormatter::chat(chatbox, "Trying to use Potion", sf::Color::White);
-		//fight->fightRound(Attacks::POTION, 1u);
-		//finishedFirstRound = true;
 	}
 }
 
@@ -1321,10 +1371,8 @@ void GameStateGame::toggleEquipment()
 	if (interactionPermitted)
 	{
 		usePotionActive = false;
-		hideAttackGui();
 		choseChangeSet = true;
-		changeSet(true);
-		OutputFormatter::chat(chatbox, "Changing Equipment", sf::Color::White);
+		changeSet(false);
 		fight->fightRound(Attacks::SET, 1u);
 	}
 }
@@ -1333,8 +1381,6 @@ void GameStateGame::attackHead()
 {
 	if (interactionPermitted)
 	{
-		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Trying to attack the enemy's head", sf::Color::White);
 		fight->fightRound(Attacks::HEAD, 1u);
 	}
 }
@@ -1343,8 +1389,6 @@ void GameStateGame::attackTorso()
 {
 	if (interactionPermitted)
 	{
-		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Trying to attack the enemy's torso", sf::Color::White);
 		fight->fightRound(Attacks::TORSO, 1u);
 	}
 }
@@ -1353,8 +1397,6 @@ void GameStateGame::attackArms()
 {
 	if (interactionPermitted)
 	{
-		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Tring to attack the enemy's arms", sf::Color::White);
 		fight->fightRound(Attacks::ARMS, 1u);
 	}
 }
@@ -1363,8 +1405,6 @@ void GameStateGame::attackLegs()
 {
 	if (interactionPermitted)
 	{
-		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Trying to attack the enemy's legs", sf::Color::White);
 		fight->fightRound(Attacks::LEGS, 1u);
 	}
 }

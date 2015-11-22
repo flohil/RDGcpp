@@ -533,8 +533,9 @@ void Map::draw(sf::RenderWindow& window, float deltaTime)
 Point Map::initPlayerPosition()
 {
 	Point randPoint = Chances::randomFreeTile(rooms[0][0]->overlay, settings->MAX_TRIES).point;
+	initialPlayerPosition = Point{ randPoint.x + 1, randPoint.y + 1 };
 
-	return Point{ randPoint.x + 1, randPoint.y + 1 }; // consider wall 
+	return initialPlayerPosition; // consider wall 
 }
 
 void Map::update(const float deltaTime)
