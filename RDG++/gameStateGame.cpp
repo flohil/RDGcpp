@@ -301,14 +301,22 @@ void GameStateGame::update(const float deltaTime)
 	}
 	else {
 #if 1
-		if (fight->getActiveRound() == 2u)
+		if (fight->getActiveRound() == 1u)
 		{
 			fightStageAccumulator += deltaTime;
 
 			if (fightStageAccumulator >= fightStageSpan)
 			{
-				std::cout << "fightStageAccumulator >= fightStageSpan" << std::endl;
-				if (fight != nullptr) { std::cout << "fight != nullptr" << std::endl; }
+				fight->fightRound(fight->getActiveAttackType(), 1u); // set attacktype enum in gameStageGame header
+				fightStageAccumulator = 0;
+			}
+		}
+		else if (fight->getActiveRound() == 2u)
+		{
+			fightStageAccumulator += deltaTime;
+
+			if (fightStageAccumulator >= fightStageSpan)
+			{
 				fight->fightRound(fight->getActiveAttackType(), 2u); //set attacktype enum in gameStateGame header
 				fightStageAccumulator = 0;
 			}
@@ -1298,6 +1306,7 @@ void GameStateGame::parry()
 		ResourceManager::getInstance().getSound("buttonClick").play();
 		usePotionActive = false;
 		hideAttackGui();
+		fight->setAttackSet();
 		OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
 		fight->fightRound(Attacks::PARRY, 1u);
 	}
@@ -1309,6 +1318,7 @@ void GameStateGame::usePotion()
 	{
 		ResourceManager::getInstance().getSound("buttonClick").play();
 		hideAttackGui();
+		fight->setAttackSet();
 		usePotionActive = true;
 		OutputFormatter::chat(chatbox, "Trying to use Potion", sf::Color::White);
 		//fight->fightRound(Attacks::POTION, 1u);
@@ -1334,6 +1344,7 @@ void GameStateGame::attackHead()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
+		fight->setAttackSet();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's head", sf::Color::White);
 		fight->fightRound(Attacks::HEAD, 1u);
 	}
@@ -1344,6 +1355,7 @@ void GameStateGame::attackTorso()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
+		fight->setAttackSet();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's torso", sf::Color::White);
 		fight->fightRound(Attacks::TORSO, 1u);
 	}
@@ -1354,6 +1366,7 @@ void GameStateGame::attackArms()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
+		fight->setAttackSet();
 		OutputFormatter::chat(chatbox, "Tring to attack the enemy's arms", sf::Color::White);
 		fight->fightRound(Attacks::ARMS, 1u);
 	}
@@ -1364,6 +1377,7 @@ void GameStateGame::attackLegs()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
+		fight->setAttackSet();
 		OutputFormatter::chat(chatbox, "Trying to attack the enemy's legs", sf::Color::White);
 		fight->fightRound(Attacks::LEGS, 1u);
 	}

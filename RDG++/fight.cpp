@@ -11,7 +11,6 @@ Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> enemy_, s
 	enemyAttackHealthDamage = 0;
 	enemyAttackAttributeDamage = 0;
 	enemyArmorSum = 0;
-	attackSet = false;
 
 	changeTabActive = false;
 	potionTakingActive = false;*/
@@ -29,15 +28,15 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 	//while (player->hp > 0 && enemy->hp > 0)
 	//{
 	std::cout << "Playertask: " << playerTask << std::endl;
-	std::cout << "entered fightRound()" << std::endl;
-	if (stage == 1u)
+	std::cout << "Entered fightRound()" << std::endl << std::endl;
+	if (stage == 1u && attackSet)
 	{
-		std::wcout << "stage=1u" << std::endl;
+		std::wcout << "Stage = 1u" << std::endl;
 		creature1 = nullptr;
 		creature2 = nullptr;
 
 		activeAttackType = playerTask;
-#if 0
+#if 1
 
 		chosenTask1 = Attacks::UNKNOWN;
 		chosenTask2 = Attacks::UNKNOWN;
@@ -50,7 +49,7 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 			creature2 = enemy;
 			chosenTask1 = playerTask;
 			chosenTask2 = Chances::randomAttackType();
-			// this.attackScreen = AttackScreen.MAIN;
+			std::cout << "Player attacks first" << std::endl;
 		}
 		else if (firstAttackTemp == 2)
 		{
@@ -58,28 +57,49 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 			creature2 = player;
 			chosenTask1 = Chances::randomAttackType();
 			chosenTask2 = playerTask;
-			// this.attackScreen = AttackScreen.WAITING;
+			std::cout << "Enemys attacks first" << std::endl;
 		}
 
-		// thread.sleep(1000);
-
-		//perform Attack of creature in first round
+		//perform Attack in first round
 		attackControl(creature1, creature2, chosenTask1);
 
 		// potion effects for a creature are applied after its attack
 		potionEffects(creature1);
+
 #endif
+		if (player->hp <= 0)
+		{
+			player->resetOriginals();
+			enemy->resetOriginals();
+
+			// empty active potion lists
+			player->emptyActivePotions();
+			enemy->emptyActivePotions();
+			resetRoundVariables();
+			std::cout << "Player LOST the fight" << std::endl << std::endl;
+			return player;
+		}
+		else if (enemy->hp <= 0)
+		{
+
+			// empty active potion lists
+			player->emptyActivePotions();
+			enemy->emptyActivePotions();
+			resetRoundVariables();
+			std::cout << "Player WON the fight" << std::endl << std::endl;
+			return enemy;
+		}
 		activeRound = 2u;
 	}
-	else if (stage == 2u)
+	else if (stage == 2u && attackSet)
 	{
-		std::cout << "stage=2u" << std::endl;
+		std::cout << "Stage = 2u" << std::endl;
 		// set to null between attacks of player and enemy to determine if attack was already chosen
 		activeAttack = nullptr;
 		activeAttackType = Attacks::UNKNOWN;
-#if 0
+#if 1
 
-		// perform Attack of creature first in round
+		// perform Attack in second round
 		//std::cout << "Creature2: " << creature2->getCreatureType() << std::endl;
 		//std::cout << "Creature1: " << creature1->getCreatureType() << std::endl;
 		//std::cout << "ChosenTask: " << chosenTask2 << std::endl;
@@ -93,43 +113,33 @@ std::shared_ptr<Creature> Fight::fightRound(Attacks::Enum playerTask, unsigned i
 		potionEffects(creature2);
 		std::cout << "potionEffects success" << std::endl;
 
-		// reset variables that need to be changed each round
-		resetRoundVariables();
-		std::cout << "resetRoundVariables success" << std::endl;
-
 		//}
-
-		// determine who lost the fight
-		std::shared_ptr<Creature> fightLoser = nullptr;
-
+#endif
 		if (player->hp <= 0)
 		{
 			player->resetOriginals();
 			enemy->resetOriginals();
-			fightLoser = player;
+			resetRoundVariables();
+			std::cout << "Player LOST the fight" << std::endl << std::endl;
+			return player;
 		}
-		else
+		else if (enemy->hp <= 0)
 		{
-			fightLoser = enemy;
 			//give attribute bonus to winner of the fight
-			if (fightLoser->getCreatureType() == CreatureType::MONSTER)
-			{
-				attributeBonusForWinner(fightLoser);
-			}
+			attributeBonusForWinner(enemy);
 			// set boostes values as new normal player values
 			player->resetOriginals();
+			// empty active potion lists
+			player->emptyActivePotions();
+			enemy->emptyActivePotions();
+			resetRoundVariables();
+			std::cout << "Player WON the fight" << std::endl << std::endl;
+			return enemy;
 		}
-
-		// empty active potion lists
-		player->emptyActivePotions();
-		enemy->emptyActivePotions();
-
-		//return loser of the fight
-		return fightLoser;
-#endif
-
 		activeRound = 1u;
 	}
+	// reset variables that need to be changed each round
+	resetRoundVariables();
 	return nullptr;
 }
 
@@ -141,7 +151,6 @@ void Fight::resetRoundVariables()
 	selectedPotion = nullptr;
 	enemyAttackHealthDamage = 0;
 	enemyAttackAttributeDamage = 0;
-	attackSet = false;
 	changeTabActive = false;
 	potionTakingActive = false;
 }

@@ -62,6 +62,7 @@ public:
 	std::shared_ptr<Monster> getFightEnemy() const { return enemy; };
 	unsigned int getActiveRound() const { return activeRound; };
 	void setActiveRound(unsigned int activeRound_) { activeRound = activeRound_; };
+	void setAttackSet() { attackSet = true; };
 
 private:
 
