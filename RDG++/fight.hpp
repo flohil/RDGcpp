@@ -35,7 +35,7 @@ public:
 	void addPotionToBeUsed(std::shared_ptr<Potion> potion) { selectedPotion = potion; }
 	unsigned int getActiveRound() const { return activeRound; };
 	void setActiveRound(unsigned int activeRound_) { activeRound = activeRound_; };
-	Attacks::Enum getActiveAttackType() { return activeAttackType; }
+	Attacks::Enum getPlayerAttackType() { return playerAttackType; }
 	std::shared_ptr<Creature> getLoser() const { return loser; };
 
 private:
@@ -52,6 +52,8 @@ private:
 	bool potionTakingActive;
 	float finishedStages;
 	Attacks::Enum activeAttackType;
+	Attacks::Enum playerAttackType;
+	Attacks::Enum enemyAttackType;
 	std::shared_ptr<Potion> selectedPotion;
 	float enemyAttackHealthDamage;
 	float enemyAttackAttributeDamage;

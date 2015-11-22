@@ -857,8 +857,6 @@ std::shared_ptr<Monster> Player::handleInput(sf::Event event, std::shared_ptr<Re
 					break;
 				case ObjectType::CREATURE:
 				{
-					OutputFormatter::chat(chatBox, "Started fight against " + object->getName(), sf::Color::White);
-
 					std::shared_ptr<Creature> creature = std::dynamic_pointer_cast<Creature>(object);
 
 					if (creature->getCreatureType() == CreatureType::MONSTER)

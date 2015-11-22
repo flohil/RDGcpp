@@ -313,7 +313,7 @@ void GameStateGame::update(const float deltaTime)
 			if (fightStageAccumulator >= fightStageSpan)
 			{
 				std::cout << "triggered second round from update" << std::endl;
-				fight->fightRound(fight->getActiveAttackType(), 2u);
+				fight->fightRound(fight->getPlayerAttackType(), 2u);
 				fightStageAccumulator = 0;
 			}
 		}
@@ -716,7 +716,7 @@ void GameStateGame::loadGui()
 	fightGui.add(attackButton);
 
 	parryButton = theme->load("Button");
-	parryButton->setText("Parry");
+	parryButton->setText("Force Parry");
 	parryButton->setOpacity(1.f);
 	parryButton->setTextSize(static_cast<unsigned int>(0.8f * settings->buttonTextSize));
 	parryButton->connect("pressed", [&](){ parry(); });
@@ -1254,7 +1254,6 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
 	inFight = true;
 
-
 	enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));
 	enemyNameFightLabel->setText(monster_->getName());
 	game.changeMusic("fight", 0.7f, 0.0f, 0.0f);
@@ -1318,7 +1317,6 @@ void GameStateGame::parry()
 		ResourceManager::getInstance().getSound("buttonClick").play();
 		usePotionActive = false;
 		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Trying to parry the Enemy", sf::Color::White);
 		fight->fightRound(Attacks::PARRY, 1u);
 	}
 }
@@ -1352,7 +1350,6 @@ void GameStateGame::attackHead()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Trying to attack the enemy's head", sf::Color::White);
 		fight->fightRound(Attacks::HEAD, 1u);
 	}
 }
@@ -1362,7 +1359,6 @@ void GameStateGame::attackTorso()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Trying to attack the enemy's torso", sf::Color::White);
 		fight->fightRound(Attacks::TORSO, 1u);
 	}
 }
@@ -1372,7 +1368,6 @@ void GameStateGame::attackArms()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Trying to attack the enemy's arms", sf::Color::White);
 		fight->fightRound(Attacks::ARMS, 1u);
 	}
 }
@@ -1382,7 +1377,6 @@ void GameStateGame::attackLegs()
 	if (interactionPermitted)
 	{
 		hideAttackGui();
-		OutputFormatter::chat(chatbox, "Trying to attack the enemy's legs", sf::Color::White);
 		fight->fightRound(Attacks::LEGS, 1u);
 	}
 }

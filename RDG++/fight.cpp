@@ -16,10 +16,14 @@ Fight::Fight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> enemy_, s
 	changeTabActive = false;
 	potionTakingActive = false;*/
 
+	playerAttackType = Attacks::UNKNOWN;
+	enemyAttackType = Attacks::UNKNOWN;
+	chosenTask1 = Attacks::UNKNOWN;
+	chosenTask2 = Attacks::UNKNOWN;
+
 	OutputFormatter::chat(chatbox, "Started fight against " + enemy_->getName(), sf::Color::White);
 	ResourceManager::getInstance().getSound(enemy_->getSoundName()).play();
 }
-
 
 Fight::~Fight()
 {
@@ -43,7 +47,8 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 		creature1 = nullptr;
 		creature2 = nullptr;
 
-		activeAttackType = playerTask;
+		playerAttackType = playerTask;
+		enemyAttackType = Chances::randomAttackType();
 #if 1
 
 		chosenTask1 = Attacks::UNKNOWN;
@@ -61,17 +66,19 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 			creature1 = player;
 			creature2 = enemy;
 			chosenTask1 = playerTask;
-			chosenTask2 = Chances::randomAttackType();
+			chosenTask2 = enemyAttackType;
 			std::cout << "Player attacks first" << std::endl;
 		}
 		else if (firstAttackTemp == 2)
 		{
 			creature1 = enemy;
 			creature2 = player;
-			chosenTask1 = Chances::randomAttackType();
+			chosenTask1 = enemyAttackType;
 			chosenTask2 = playerTask;
 			std::cout << "Enemys attacks first" << std::endl;
 		}
+
+		activeAttackType = chosenTask1;
 
 		//perform Attack in first round
 		attackControl(creature1, creature2, chosenTask1);
@@ -94,7 +101,7 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 	{
 		std::cout << "Stage = 2u" << std::endl;
 		// set to null between attacks of player and enemy to determine if attack was already chosen
-		activeAttackType = Attacks::UNKNOWN;
+		activeAttackType = chosenTask2;
 #if 1
 
 		// perform Attack in second round
@@ -122,7 +129,13 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 		{
 			enemyLost = true;
 		}
+
+		// reset full round variables (after finishing both round1 and round2)
 		activeRound = 1u;
+		playerAttackType = Attacks::UNKNOWN;
+		enemyAttackType = Attacks::UNKNOWN;
+		chosenTask1 = Attacks::UNKNOWN;
+		chosenTask2 = Attacks::UNKNOWN;
 	}
 
 	if (playerLost)
@@ -197,7 +210,7 @@ Attacks::Enum Fight::getCommand(std::shared_ptr<Creature> creature)
 		//chosenAttackType = Chances.randomAttackType();	// actually need chances class
 	}
 
-	return chosenAttackType;
+	return chosenAttackType;s
 }
 */
 
@@ -275,15 +288,17 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 	case Attacks::PARRY:
 		if (parrySuccess(creature1, creature2))
 		{
-			// when creature (player) parries successful, he deals x times the damage of a normal torso attack
+			// when creature (player) parries successfully, he deals x times the damage of a normal torso attack
 			parryMultiplier = 2.f;
 			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(Attacks::TORSO));
 			parrySucceeded = false;
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " forced " + enemy->getName() + " to parry", sf::Color::White);
 		}
 		else
 		{
 			parryMultiplier = 0.f;
 			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(Attacks::TORSO));
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " failed in forcing " + enemy->getName() + " to parry", sf::Color::White);
 		}
 		//activeAttackNumber = 7.f;
 		break;
@@ -294,7 +309,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 
 
 	// actual attack
-	if (chosenTask == Attacks::HEAD || chosenTask == Attacks::TORSO || chosenTask == Attacks::ARMS || chosenTask == Attacks::LEGS || chosenTask == (Attacks::PARRY && parrySucceeded)/*activeAttackNumber < 5.f || activeAttackNumber > 6.f*/)
+	if (chosenTask == Attacks::HEAD || chosenTask == Attacks::TORSO || chosenTask == Attacks::ARMS || chosenTask == Attacks::LEGS || (chosenTask == Attacks::PARRY && parrySucceeded)/*activeAttackNumber < 5.f || activeAttackNumber > 6.f*/)
 	{
 		attack(creature1, creature2, activeAttack, parrySucceeded);
 		std::cout << "attack successful" << std::endl;
