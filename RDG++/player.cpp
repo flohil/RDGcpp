@@ -149,6 +149,8 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 {
 	std::shared_ptr<Weapon> oldWeapon = primaryWeapon;
 
+	primaryWeapon = weapon_;
+
 	if (weapon_ != nullptr) // position new weapon
 	{
 		if (weapon_->getName() == "Shield")
@@ -158,7 +160,6 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 			return weapon_;
 		}
 
-		primaryWeapon = weapon_;
 		primaryWeapon->setSize(itemSize, itemSize);
 		primaryWeapon->setPosition(primaryWeaponPos);
 	}
