@@ -1376,6 +1376,7 @@ void GameStateGame::toggleEquipment()
 		usePotionActive = false;
 		choseChangeSet = true;
 		changeSet(false);
+		ResourceManager::getInstance().getSound("changeSet").play();
 		fight->fightRound(Attacks::SET, 1u);
 	}
 }

@@ -240,7 +240,6 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 	case Attacks::SET:
 		//activeAttackNumber = 5.f;
 		OutputFormatter::chat(chatbox, player->getPlayerName() + " changed Equipment Set", sf::Color::White);
-		ResourceManager::getInstance().getSound("changeSet").play();
 		break;
 
 	case Attacks::POTION:
