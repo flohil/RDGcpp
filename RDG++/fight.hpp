@@ -38,6 +38,7 @@ public:
 	Attacks::Enum getPlayerAttackType() { return playerAttackType; }
 	std::shared_ptr<Creature> getLoser() const { return loser; };
 	std::shared_ptr<Monster> getEnemy() const { return enemy; };
+	std::shared_ptr<Player> getPlayer() const { return player; };
 
 private:
 
@@ -83,7 +84,7 @@ private:
 	unsigned int determineFirstAttack();
 	bool parrySuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender);
 	float calcCreatureAccuracy(std::shared_ptr<Creature> creature);
-	float calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack);
+	bool calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack);
 	float calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack);
 	float calcAttributeDamage(std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack);
 	void updateHealth(std::shared_ptr<Creature> defender, float attributeDamage);

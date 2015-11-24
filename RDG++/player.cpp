@@ -3,12 +3,147 @@
 #include "OutputFormatter.hpp"
 #include "fight.hpp"
 
-float EquipmentSet::getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum)
+float EquipmentSet::getStats(ArmorStatsMode::Enum mode, ArmorStatsAttributes::Enum attribute)
 {
-	//implement this!!!
+	float value = 0.f;
+	float subvalue = 0.f;
+	int itemCtr = 0; // needed for average calculation
 
-	return 0.f;
+	if (mode == ArmorStatsMode::SUM)
+	{
+		if (attribute == ArmorStatsAttributes::ATTACK)
+		{
+			if (primaryWeapon != nullptr)
+			{
+				value += primaryWeapon->getAttack();
+			}
+			if (secondaryWeapon != nullptr)
+			{
+				value += secondaryWeapon->getAttack();
+			}
+		}
+		else if (attribute == ArmorStatsAttributes::ARMOR)
+		{
+			if (primaryWeapon != nullptr)
+			{
+				value += primaryWeapon->getDefence();
+			}
+			if (secondaryWeapon != nullptr)
+			{
+				value += secondaryWeapon->getDefence();
+			}
+			if (helmet != nullptr)
+			{
+				value += helmet->getSpeed();
+			}
+			if (harness != nullptr)
+			{
+				value += harness->getSpeed();
+			}
+			if (gauntlets != nullptr)
+			{
+				value += gauntlets->getSpeed();
+			}
+			if (cuisse != nullptr)
+			{
+				value += cuisse->getSpeed();
+			}
+			if (boots != nullptr)
+			{
+				value += boots->getSpeed();
+			}
+		}
+		else if (attribute == ArmorStatsAttributes::SPEED)
+		{
+			if (primaryWeapon != nullptr)
+			{
+				value += primaryWeapon->getSpeed();
+			}
+			if (secondaryWeapon != nullptr)
+			{
+				value += secondaryWeapon->getSpeed();
+			}
+			if (helmet != nullptr)
+			{
+				value += helmet->getSpeed();
+			}
+			if (harness != nullptr)
+			{
+				value += harness->getSpeed();
+			}
+			if (gauntlets != nullptr)
+			{
+				value += gauntlets->getSpeed();
+			}
+			if (cuisse != nullptr)
+			{
+				value += cuisse->getSpeed();
+			}
+			if (boots != nullptr)
+			{
+				value += boots->getSpeed();
+			}
+		}
+	}
+	else if (mode == ArmorStatsMode::AVG)
+	{
+		if (attribute == ArmorStatsAttributes::ACCURACY)
+		{
+			if (primaryWeapon != nullptr)
+			{
+				value += primaryWeapon->getAccuracy();
+				itemCtr++;
+			}
+			if (secondaryWeapon != nullptr)
+			{
+				value += secondaryWeapon->getAccuracy();
+				itemCtr++;
+			}
+		}
+	}
+	else if (mode == ArmorStatsMode::MAX)
+	{
+		if (attribute == ArmorStatsAttributes::SPEED)
+		{
+			if (primaryWeapon != nullptr)
+			{
+				if ((100.f - primaryWeapon->getSpeed()) > value)
+				{
+					value = primaryWeapon->getSpeed();
+				}
+			}
+			if (secondaryWeapon != nullptr)
+			{
+				if ((100.f - secondaryWeapon->getSpeed()) > value)
+				{
+					value = secondaryWeapon->getSpeed();
+				}
+			}
+		}
+	}
+
+	if (mode == ArmorStatsMode::SUM && attribute == ArmorStatsAttributes::ARMOR)
+	{
+		if (helmet != nullptr) // TODO check if all armaments are of the same type && not null
+		{
+			if (helmet->getItemClass() == harness->getItemClass() && helmet->getItemClass() == gauntlets->getItemClass() && helmet->getItemClass() == cuisse->getItemClass() && helmet->getItemClass() == boots->getItemClass())
+			{
+				value *= helmet->getBonus();
+			}
+		}
+	}
+
+	/* calculate average */
+	if (itemCtr > 0 && mode == ArmorStatsMode::AVG) {
+		value = value / itemCtr;
+	}
+
+	//value = value + subvalue;
+
+	return value;
 }
+
+
 
 std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> weapon_)
 {

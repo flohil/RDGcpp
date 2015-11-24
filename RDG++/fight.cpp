@@ -36,8 +36,6 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 	bool playerLost = false;
 	bool enemyLost = false;
 
-	std::cout << "Playertask: " << playerTask << std::endl;
-	std::cout << "Entered fightRound()" << std::endl << std::endl;
 	if (stage == 1u)
 	{
 		std::wcout << "Stage = 1u" << std::endl;
@@ -72,7 +70,7 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 			creature2 = player;
 			chosenTask1 = enemyAttackType;
 			chosenTask2 = playerTask;
-			std::cout << "Enemys attacks first" << std::endl;
+			std::cout << "Enemy attacks first" << std::endl;
 		}
 
 		activeAttackType = chosenTask1;
@@ -106,16 +104,13 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 		//std::cout << "Creature1: " << creature1->getCreatureType() << std::endl;
 		//std::cout << "ChosenTask: " << chosenTask2 << std::endl;
 		attackControl(creature2, creature1, chosenTask2);
-		std::cout << "attackControl success" << std::endl;
 
 		// Thread.sleep(1000);
 
 		// Potion effects for a creature are applied after its attack
 		//std::cout << "Creature2: " << creature2->getCreatureType() << std::endl;
 		potionEffects(creature2);
-		std::cout << "potionEffects success" << std::endl;
 
-		//}
 #endif
 		
 		if (player->hp <= 0)
@@ -289,7 +284,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 	if (chosenTask == Attacks::HEAD || chosenTask == Attacks::TORSO || chosenTask == Attacks::ARMS || chosenTask == Attacks::LEGS || (chosenTask == Attacks::PARRY && parrySucceeded)/*activeAttackNumber < 5.f || activeAttackNumber > 6.f*/)
 	{
 		attack(creature1, creature2, activeAttack, parrySucceeded);
-		std::cout << "attack successful" << std::endl;
+		//std::cout << "attack successful" << std::endl;
 	}
 
 	// parryMultiplier is used on every attack and only temporarily increased when parrying -> needs to be resetted
@@ -302,27 +297,29 @@ void Fight::attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature>
 
 	float healthDmg = 0.f;
 	float attributeDmg = 0.f;
-	bool hitSuccess = false;
+	bool hitSuccess = calcHitSuccess(attacker, defender, activeAttack);
 
-	if (parrySuccess || calcHitSuccess(attacker, defender, activeAttack))
+	if (parrySuccess || hitSuccess)
 	{
-		healthDmg = calcHealthDamage(attacker, defender, activeAttack);
+		healthDmg = float(int(calcHealthDamage(attacker, defender, activeAttack)*100))/100;
 		attributeDmg = calcAttributeDamage(attacker, activeAttack);
 		hitSuccess = true;
 	}
 
-	hitSuccess = true; // for testing
+	//hitSuccess = true; // for testing
 
 	if (hitSuccess)
 	{
 		if (attacker->getCreatureType() == CreatureType::MONSTER)
 		{
 			OutputFormatter::chat(chatbox, enemy->getName() + " hit " + player->getPlayerName() + " on the " + EnumMapper::mapAttackName(activeAttackType), sf::Color::White);
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " suffers " + OutputFormatter::shortFloat(healthDmg) + " HP damage", sf::Color::White);
 			ResourceManager::getInstance().getSound("humanHit").play();
 		}
 		else
 		{
 			OutputFormatter::chat(chatbox, player->getPlayerName() + " hit " + enemy->getName() + " on the " + EnumMapper::mapAttackName(activeAttackType), sf::Color::White);
+			OutputFormatter::chat(chatbox, enemy->getName() + " suffers " + OutputFormatter::shortFloat(healthDmg) + " HP damage", sf::Color::White);
 			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getAttackSoundName()).play();
 		}
 	}
@@ -376,8 +373,8 @@ float Fight::calcCreatureSpeed(std::shared_ptr<Creature> creature)
 	}
 
 	// get Speed of player
-	playerArmorSpeedMalusSum = player->getEquipmentSet()->getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::SPEED);
-	playerWeaponSpeedMalusMax = player->getEquipmentSet()->getStats(ItemType::WEAPON, ArmorStatsMode::MAX, ArmorStatsAttributes::SPEED);
+	playerArmorSpeedMalusSum = player->getEquipmentSet()->getStats(ArmorStatsMode::SUM, ArmorStatsAttributes::SPEED);
+	playerWeaponSpeedMalusMax = player->getEquipmentSet()->getStats(ArmorStatsMode::MAX, ArmorStatsAttributes::SPEED);
 
 	// perform calculations
 	playerArmorSpeedMalus = creature->speed / 100 * playerArmorSpeedMalusSum * armorSpeedMalusMult;
@@ -479,12 +476,12 @@ float Fight::calcCreatureAccuracy(std::shared_ptr<Creature> creature)
 	}
 
 	//perform calculations
-	accuracy = creature->accuracy / 100 * player->getEquipmentSet()->getStats(ItemType::WEAPON, ArmorStatsMode::AVG, ArmorStatsAttributes::ACCURACY) * accuracyMultiplier;
+	accuracy = creature->accuracy / 100 * player->getEquipmentSet()->getStats(ArmorStatsMode::AVG, ArmorStatsAttributes::ACCURACY) * accuracyMultiplier;
 
 	return accuracy;
 }
 
-float Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack)
+bool Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> defender, std::shared_ptr<Attack> activeAttack)
 {
 	//constants
 	float const randAccuracyLow = 0.5f;
@@ -517,18 +514,30 @@ float Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<
 	attackerAccuracy = MinAvgMax(randAccuracyLow, randAccuracyHigh, attackerAccuracyBase);
 	defenderSpeed = speedBasedSuccess(attacker, defender).defender;
 
+	std::cout << "AttackerAccuracy: min " << attackerAccuracy.min << std::endl;
+	std::cout << "AttackerAccuracy: avg " << attackerAccuracy.avg << std::endl;
+	std::cout << "AttackerAccuracy: max " << attackerAccuracy.max << std::endl;
+	std::cout << "DefenderSpeed: min" << defenderSpeed.min << std::endl;
+	std::cout << "DefenderSpeed: avg" << defenderSpeed.avg << std::endl;
+	std::cout << "DefenderSpeed: max" << defenderSpeed.max << std::endl;
+
 	// calculate randomized values
 	randAttackerAccuracy = Chances::randomFloat(attackerAccuracy.min, attackerAccuracy.max);
 	randDefenderSpeed = Chances::randomFloat(defenderSpeed.min, defenderSpeed.max);
+
+	std::cout << "randAttackerAccuracy: " << randAttackerAccuracy << std::endl;
+	std::cout << "randDefenderSpeed: " << randDefenderSpeed << std::endl;
 
 	//determine hitSuccess - always hit after successful parry
 	if (randAttackerAccuracy >= randDefenderSpeed || parryMultiplier > 1.f)
 	{
 		hitSuccess = true;
+		std::cout << "hitSuccess = true" << std::endl;
 	}
 	else
 	{
 		hitSuccess = false;
+		std::cout << "hitSuccess = false" << std::endl;
 	}
 	return hitSuccess;
 }
@@ -569,7 +578,7 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	}
 	else
 	{
-		attackerWeaponDamage = player->getEquipmentSet()->getStats(ItemType::WEAPON, ArmorStatsMode::SUM, ArmorStatsAttributes::ATTACK);
+		attackerWeaponDamage = player->getEquipmentSet()->getStats(ArmorStatsMode::SUM, ArmorStatsAttributes::ATTACK);
 		finishedStagesMult = 1;
 	}
 
@@ -592,7 +601,7 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 	}
 	else if (defender == player)
 	{
-		defenderArmor = player->getEquipmentSet()->getStats(ItemType::ARMAMENT, ArmorStatsMode::SUM, ArmorStatsAttributes::ARMOR);
+		defenderArmor = player->getEquipmentSet()->getStats(ArmorStatsMode::SUM, ArmorStatsAttributes::ARMOR);
 		finishedStagesMult = 1;
 		baseDefense = baseDefensePlayer;
 	}
@@ -616,8 +625,18 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 		parryMultiplier * attackerRawDamage.max / defenderDefense * damageMult
 	);
 
+	std::cout << "Calculated Damage: min:" << attackDamage.min << std::endl;
+	std::cout << "Calculated Damage: avg:" << attackDamage.avg << std::endl;
+	std::cout << "Calculated Damage: max:" << attackDamage.max << std::endl;
+	std::cout << "Calculated Defense: " << defenderDefense << std::endl;
+	std::cout << "Calculated HealthDamage: min:" << healthDamage.min << std::endl;
+	std::cout << "Calculated HealthDamage: avg:" << healthDamage.avg << std::endl;
+	std::cout << "Calculated HealthDamage: max:" << healthDamage.max << std::endl;
+
 	// calculate a randomized result
 	randHealthDamage = Chances::randomFloat(healthDamage.min, healthDamage.max);
+
+	std::cout << "Actual Randomized Damage: " << randHealthDamage << std::endl;
 
 	return randHealthDamage;
 }
@@ -770,7 +789,6 @@ void Fight::potionEffects(std::shared_ptr<Creature> creature)
 	// apply all non temporary potion effects
 	if (creature != nullptr)
 	{
-		std::cout << "creature exists" << std::endl;
 		for (std::shared_ptr<Potion> potion : creature->activePotions)
 		{
 			std::cout << "Active Potion: " << potion << std::endl;

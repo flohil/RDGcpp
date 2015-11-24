@@ -710,7 +710,6 @@ void GameStateGame::loadGui()
 	enemyHealthBar->setSize(healthBarWidth, healthBarHeight);
 	enemyHealthBar->setMinimum(0u);
 	enemyHealthBar->setMaximum(100u);
-	enemyHealthBar->setValue(50u);
 	fightGui.add(enemyHealthBar);
 
 	playerHealthBar = std::make_shared<tgui::ProgressBar>();
@@ -718,7 +717,6 @@ void GameStateGame::loadGui()
 	playerHealthBar->setSize(healthBarWidth, healthBarHeight);
 	playerHealthBar->setMinimum(0u);
 	playerHealthBar->setMaximum(100u);
-	playerHealthBar->setValue(50u);
 	fightGui.add(playerHealthBar);
 
 	attackButton = theme->load("Button");
@@ -959,7 +957,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		pos.y = static_cast<int>(pos_.y * settings->heightDownScaleFactor);
 	}
 
-	std::cout << "mouseEvent: pos = " << pos.x << ", " << pos.y << ", type: " << eventType << std::endl;
+	//std::cout << "mouseEvent: pos = " << pos.x << ", " << pos.y << ", type: " << eventType << std::endl;
 
 	if (eventType == MouseEvent::DRAGSTART)
 	{
@@ -985,15 +983,15 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		relPos.x = pos.x/* + static_cast<int>(mapCenter.x - mapViewCenter.x)*/;
 		relPos.y = pos.y - topVerSplitAbs /*+ static_cast<int>(mapCenter.y - mapViewCenter.y)*/;
 
-		std::cout << "mapViewCenter: x = " << mapViewCenter.x << ", y = " << mapViewCenter.y << std::endl;
-		std::cout << "mapCenter: x = " << mapCenter.x << ", y = " << mapCenter.y << std::endl;
+		//std::cout << "mapViewCenter: x = " << mapViewCenter.x << ", y = " << mapViewCenter.y << std::endl;
+		//std::cout << "mapCenter: x = " << mapCenter.x << ", y = " << mapCenter.y << std::endl;
 
-		std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
+		//std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
 
 		relPos.x = relPos.x - static_cast<int>(mapCenter.x - mapViewCenter.x);
 		relPos.y = relPos.y - static_cast<int>(mapCenter.y - mapViewCenter.y);
 
-		std::cout << "after relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
+		//std::cout << "after relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
 
 		if (!inFight)
 		{
@@ -1070,7 +1068,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			{
 				draggedItem = player->getArmorItemAtPixels(relPos, true, usePotionActive);
 
-			std::cout << "draggedItem: " << draggedItem << std::endl;
+			//std::cout << "draggedItem: " << draggedItem << std::endl;
 
 			if (draggedItem != nullptr)
 			{
@@ -1090,23 +1088,23 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 		else if (eventType == MouseEvent::DRAGRELEASE)
 		{
-			std::cout << "draggedItem: " << draggedItem << std::endl;
+			//std::cout << "draggedItem: " << draggedItem << std::endl;
 
 			std::shared_ptr<RenderableObject> oldDraggedItem = draggedItem;
 
 			std::list<std::shared_ptr<RenderableObject>> retObjs = player->getEquipmentSet()->setItemAtPixels(relPos, draggedItem, usePotionActive, fight);
 			bool contains = false;
 
-			std::cout << "  RETURNED: - " << retObjs.size() << std::endl;
+			//std::cout << "  RETURNED: - " << retObjs.size() << std::endl;
 
 			for (std::shared_ptr<RenderableObject> obj : retObjs)
 			{
-				std::cout << "       " << obj->getName() << std::endl;
+				//std::cout << "       " << obj->getName() << std::endl;
 				if (obj == oldDraggedItem)
 				{
 					contains = true;
 				}
-				std::cout << obj << std::endl;
+				//std::cout << obj << std::endl;
 				draggedItem = obj;
 				if (!draggedFromEquipment)
 				{
@@ -1181,7 +1179,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		}
 	}
 
-	std::cout << "End of Mouse Handling: draggedItem = " << draggedItem << ", primaryWeapon = " << player->getEquipmentSet()->getPrimaryWeapon() << ", secondaryWEapon = " << player->getEquipmentSet()->getSecondaryWeapon() << std::endl;
+	//std::cout << "End of Mouse Handling: draggedItem = " << draggedItem << ", primaryWeapon = " << player->getEquipmentSet()->getPrimaryWeapon() << ", secondaryWEapon = " << player->getEquipmentSet()->getSecondaryWeapon() << std::endl;
 }
 
 void GameStateGame::updateDetails(DetailsBag& detailsBag, bool showingEnemyDetails_)
@@ -1238,6 +1236,9 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag, bool showingEnemyDetai
 		}
 	}
 
+	enemyHealthBar->setValue(fight->getEnemy()->hp / fight->getEnemy()->getOrHP() * 100);
+	playerHealthBar->setValue(fight->getPlayer()->hp / fight->getPlayer()->getOrHP() * 100);
+
 	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeader->getPosition().y);
 	detailsSprite.setTexture(detailsBag.getDetailsPic());
 }
@@ -1282,7 +1283,7 @@ void GameStateGame::updateStats()
 
 void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_)
 {
-	std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
+	//std::cout << "about to start fight between " << player_->getName() << " and " << monster_->getName() << std::endl;
 	inFight = true;
 
 	enemySprite.setTexture(ResourceManager::getInstance().getTexture(monster_->getName() + "_big"));

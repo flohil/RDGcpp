@@ -97,7 +97,7 @@ public:
 	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos, bool remove, bool usePotion);
 	std::list<std::shared_ptr<RenderableObject>> setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj, bool usePotion, std::shared_ptr<Fight> fight);
 
-	float getStats(ItemType::Enum, ArmorStatsMode::Enum, ArmorStatsAttributes::Enum);
+	float getStats(ArmorStatsMode::Enum mode, ArmorStatsAttributes::Enum attribute);
 };
 
 class GameObject
