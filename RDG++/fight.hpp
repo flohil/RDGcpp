@@ -40,6 +40,7 @@ public:
 	std::shared_ptr<Monster> getEnemy() const { return enemy; };
 	void Fight::end();
 	bool isFightEnded() const { return isEnded; };
+	void attributeBonusForWinner();
 
 private:
 
@@ -65,6 +66,7 @@ private:
 	bool enemyFinished;
 	unsigned int activeRound = 0u;
 	std::shared_ptr<PrototypeStorage> prototypeStorage;
+	float minBaseMult = 0.35f;
 
 	std::shared_ptr<Creature> creature1;
 	std::shared_ptr<Creature> creature2;
@@ -96,7 +98,6 @@ private:
 	void revertEffect(std::shared_ptr<Creature>, std::shared_ptr<Potion> potion);
 	void potionDecrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
 	void potionIncrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion);
-	void attributeBonusForWinner(std::shared_ptr<Creature>);
 };
 
 #endif //FIGHT_INCLUDE

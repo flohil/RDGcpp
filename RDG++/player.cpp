@@ -124,7 +124,7 @@ float EquipmentSet::getStats(ArmorStatsMode::Enum mode, ArmorStatsAttributes::En
 
 	if (mode == ArmorStatsMode::SUM && attribute == ArmorStatsAttributes::ARMOR)
 	{
-		if (helmet != nullptr) // TODO check if all armaments are of the same type && not null
+		if (helmet != nullptr && harness != nullptr && gauntlets != nullptr && cuisse != nullptr && boots != nullptr) // TODO check if all armaments are of the same type && not null
 		{
 			if (helmet->getItemClass() == harness->getItemClass() && helmet->getItemClass() == gauntlets->getItemClass() && helmet->getItemClass() == cuisse->getItemClass() && helmet->getItemClass() == boots->getItemClass())
 			{

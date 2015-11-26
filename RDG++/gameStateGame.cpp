@@ -213,7 +213,7 @@ GameState(game_)
 	speedSprite.setTexture(ResourceManager::getInstance().getTexture("speed"));
 	playerSprite.setTexture(ResourceManager::getInstance().getTexture("player_big"));
 
-	player.reset(new Player("player", 50.f, 25.f, 0.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
+	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
 
 	map = new Map(game);
@@ -1264,8 +1264,8 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag, bool showingEnemyDetai
 
 	if (inFight)
 	{
-		enemyHealthBar->setValue(fight->getEnemy()->hp / fight->getEnemy()->getOrHP() * 100);
-		playerHealthBar->setValue(player->hp / player->getOrHP() * 100);
+		enemyHealthBar->setValue(static_cast<unsigned int>(fight->getEnemy()->hp / fight->getEnemy()->getOrHP() * 100));
+		playerHealthBar->setValue(static_cast<unsigned int>(player->hp / player->getOrHP() * 100));
 	}
 
 	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeader->getPosition().y);
@@ -1337,6 +1337,7 @@ void GameStateGame::endFight(std::shared_ptr<Creature> loser)
 	}
 	else
 	{
+		fight->attributeBonusForWinner();
 		player->resetOriginals();
 		Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
 		map->setOverlayObject(facingPoint, nullptr);
@@ -1416,6 +1417,7 @@ void GameStateGame::attackHead()
 {
 	if (interactionPermitted)
 	{
+		hideAttackGui();
 		fight->fightRound(Attacks::HEAD, 1u);
 	}
 }
@@ -1424,6 +1426,7 @@ void GameStateGame::attackTorso()
 {
 	if (interactionPermitted)
 	{
+		hideAttackGui();
 		fight->fightRound(Attacks::TORSO, 1u);
 	}
 }
@@ -1432,6 +1435,7 @@ void GameStateGame::attackArms()
 {
 	if (interactionPermitted)
 	{
+		hideAttackGui();
 		fight->fightRound(Attacks::ARMS, 1u);
 	}
 }
@@ -1440,6 +1444,7 @@ void GameStateGame::attackLegs()
 {
 	if (interactionPermitted)
 	{
+		hideAttackGui();
 		fight->fightRound(Attacks::LEGS, 1u);
 	}
 }

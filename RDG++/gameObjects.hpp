@@ -190,6 +190,12 @@ public:
 	float getOrSpeed() { return orSpeed; };
 	float getOrAccuracy() { return orAccuracy; };
 	float getOrStrength() { return orStrength; };
+
+	void addToOrHP(float hp_) { orHp += hp_; };
+	void addToOrAccuracy(float accuracy_) { orAccuracy += accuracy_; };
+	void addToOrStrength(float strength_) { orStrength += strength_; };
+	void addToOrSpeed(float speed_) { orSpeed += speed_; };
+
 	virtual DifficultyLevel::Enum getLevel() const = 0;
 	void resetOriginals();
 	CreatureType::Enum getCreatureType() { return creatureType; };
@@ -200,7 +206,7 @@ public:
 
 private:
 
-	float const orHp, orStrength, orSpeed, orAccuracy;
+	float orHp, orStrength, orSpeed, orAccuracy;
 	CreatureType::Enum creatureType;
 };
 
