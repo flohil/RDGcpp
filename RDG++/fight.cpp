@@ -544,6 +544,8 @@ bool Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<C
 	float const randAccuracyHigh = 1.5f;
 	float const accuracyBase = 50.f;
 	float const finishedStagesDivisor = 40.f;
+	float const speedBase = 0.9f;
+	float accuracyMult = 1.0f;
 
 	// variables
 	float attackerAccuracyBase;
@@ -551,6 +553,8 @@ bool Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<C
 	MinAvgMax defenderSpeed;
 	float randAttackerAccuracy;
 	float randDefenderSpeed;
+	float weaponSpeedAvg;
+	float weaponSpeedFact;
 
 	// speed
 	bool hitSuccess;
@@ -558,10 +562,12 @@ bool Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<C
 	// set finishedStagesMult Bonus for Monsters
 	if (attacker->getCreatureType() == CreatureType::MONSTER)
 	{
-	
+		accuracyMult = 1.5f;
 	}
-	else	{
-
+	else
+	{
+		weaponSpeedAvg = player->getEquipmentSet()->getStats(ArmorStatsMode::AVG, ArmorStatsAttributes::SPEED);
+		weaponSpeedFact = (speedBase + weaponSpeedAvg / 100) / (1 + speedBase);
 	}
 
 	float scaledAttackerAccuracy = 0.f;
@@ -569,10 +575,11 @@ bool Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<C
 	if (attacker->accuracy > 0.f)
 	{
 		scaledAttackerAccuracy = calcCreatureAccuracy(attacker) / attacker->accuracy;
+		weaponSpeedFact = 1;
 	}
 
 	//perform calculations
-	attackerAccuracyBase = activeAttack->getHitProbability() * (attacker->accuracy + scaledAttackerAccuracy * accuracyBase);
+	attackerAccuracyBase = activeAttack->getHitProbability() * (attacker->accuracy + scaledAttackerAccuracy * accuracyBase) * weaponSpeedFact * accuracyMult * speedBase;
 	attackerAccuracy = MinAvgMax(randAccuracyLow, randAccuracyHigh, attackerAccuracyBase);
 	defenderSpeed = speedBasedSuccess(attacker, defender).defender;
 

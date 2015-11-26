@@ -213,7 +213,7 @@ GameState(game_)
 	speedSprite.setTexture(ResourceManager::getInstance().getTexture("speed"));
 	playerSprite.setTexture(ResourceManager::getInstance().getTexture("player_big"));
 
-	player.reset(new Player("player", 50.f, 25.f, 40.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
+	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
 
 	map = new Map(game);
@@ -302,6 +302,16 @@ void GameStateGame::draw(const float deltaTime)
 
 void GameStateGame::update(const float deltaTime)
 {
+	bool updateStatsAndDetails = false;
+
+	statsUpdateAccumulator += deltaTime;
+
+	if (statsUpdateAccumulator > statsUpdateSpan)
+	{
+		statsUpdateAccumulator = 0;
+		updateStatsAndDetails = true;
+	}
+
 	if (!inFight)
 	{
 		player->update(deltaTime); // move player
@@ -345,7 +355,7 @@ void GameStateGame::update(const float deltaTime)
 				}
 			}
 
-			if (showingEnemyDetails)
+			if (showingEnemyDetails && updateStatsAndDetails)
 			{
 				updateDetails(DetailsBag(fight->getEnemy(), false), true);
 			}
@@ -381,7 +391,10 @@ void GameStateGame::update(const float deltaTime)
 		}
 	}
 
-	updateStats();
+	if (updateStatsAndDetails)
+	{
+		updateStats();
+	}
 
 	return;
 }

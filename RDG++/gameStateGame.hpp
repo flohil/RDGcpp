@@ -76,6 +76,9 @@ private:
 	float fightStageSpan = 1.f; // second
 	float fightStageAccumulator = 0.f;
 
+	float statsUpdateSpan = 0.25f;
+	float statsUpdateAccumulator = 0.f;
+
 	// gui
 	float topVerSplit;
 	float rightHorSplit;

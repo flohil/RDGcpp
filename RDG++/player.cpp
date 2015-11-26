@@ -92,6 +92,19 @@ float EquipmentSet::getStats(ArmorStatsMode::Enum mode, ArmorStatsAttributes::En
 				itemCtr++;
 			}
 		}
+		if (attribute == ArmorStatsAttributes::SPEED)
+		{
+			if (primaryWeapon != nullptr)
+			{
+				value += primaryWeapon->getSpeed();
+				itemCtr++;
+			}
+			if (secondaryWeapon != nullptr)
+			{
+				value += secondaryWeapon->getSpeed();
+				itemCtr++;
+			}
+		}
 	}
 	else if (mode == ArmorStatsMode::MAX)
 	{
