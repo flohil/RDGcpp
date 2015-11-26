@@ -213,7 +213,7 @@ GameState(game_)
 	speedSprite.setTexture(ResourceManager::getInstance().getTexture("speed"));
 	playerSprite.setTexture(ResourceManager::getInstance().getTexture("player_big"));
 
-	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
+	player.reset(new Player("player", 50.f, 25.f, 40.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
 
 	map = new Map(game);
@@ -1094,14 +1094,14 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			{
 				draggedItem = player->getArmorItemAtPixels(relPos, true, usePotionActive);
 
-			//std::cout << "draggedItem: " << draggedItem << std::endl;
+				//std::cout << "draggedItem: " << draggedItem << std::endl;
 
-			if (draggedItem != nullptr)
-			{
-				draggedItem->setSize(settings->tileSize, settings->tileSize);
-				draggedFromEquipment = true;
+				if (draggedItem != nullptr)
+				{
+					draggedItem->setSize(settings->tileSize, settings->tileSize);
+					draggedFromEquipment = true;
+				}
 			}
-		}
 		}
 		else if (eventType == MouseEvent::CLICK)
 		{
@@ -1118,7 +1118,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 			std::shared_ptr<RenderableObject> oldDraggedItem = draggedItem;
 
-			std::list<std::shared_ptr<RenderableObject>> retObjs = player->getEquipmentSet()->setItemAtPixels(relPos, draggedItem, usePotionActive, fight);
+			std::list<std::shared_ptr<RenderableObject>> retObjs = player->getEquipmentSet()->setItemAtPixels(relPos, draggedItem, usePotionActive, fight, draggedFromEquipment);
 			bool contains = false;
 
 			//std::cout << "  RETURNED: - " << retObjs.size() << std::endl;
@@ -1262,12 +1262,6 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag, bool showingEnemyDetai
 		}
 	}
 
-	if (inFight)
-	{
-		enemyHealthBar->setValue(static_cast<unsigned int>(fight->getEnemy()->hp / fight->getEnemy()->getOrHP() * 100));
-		playerHealthBar->setValue(static_cast<unsigned int>(player->hp / player->getOrHP() * 100));
-	}
-
 	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeader->getPosition().y);
 	detailsSprite.setTexture(detailsBag.getDetailsPic());
 }
@@ -1308,6 +1302,12 @@ void GameStateGame::updateStats()
 
 	rightOffsetSum -= (statsPicSize + statsSpacing);
 	hpSprite.setPosition(sf::Vector2f(rightOffsetSum, (topVerSplitAbs - statsPicSize) * 0.5f));
+
+	if (inFight)
+	{
+		enemyHealthBar->setValue(static_cast<unsigned int>(fight->getEnemy()->hp / fight->getEnemy()->getOrHP() * 100));
+		playerHealthBar->setValue(static_cast<unsigned int>(player->hp / player->getOrHP() * 100));
+	}
 }
 
 void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<Monster> monster_)
@@ -1342,6 +1342,8 @@ void GameStateGame::endFight(std::shared_ptr<Creature> loser)
 		Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
 		map->setOverlayObject(facingPoint, nullptr);
 	}
+
+	game.changeMusic("game", 0.7f, 1.0f, 0.5f, true);
 
 	inFight = false;
 	fightStageAccumulator = 0;

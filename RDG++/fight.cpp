@@ -389,10 +389,20 @@ float Fight::calcCreatureSpeed(std::shared_ptr<Creature> creature)
 	playerArmorSpeedMalusSum = player->getEquipmentSet()->getStats(ArmorStatsMode::SUM, ArmorStatsAttributes::SPEED);
 	playerWeaponSpeedMalusMax = player->getEquipmentSet()->getStats(ArmorStatsMode::MAX, ArmorStatsAttributes::SPEED);
 
+	std::cout << "playerArmorSpeedMalusSum: " << playerArmorSpeedMalusSum << std::endl;
+	std::cout << "playerWeaponSpeedMalusMax: " << playerWeaponSpeedMalusMax << std::endl;
+
 	// perform calculations
 	playerArmorSpeedMalus = creature->speed / 100 * playerArmorSpeedMalusSum * armorSpeedMalusMult;
 	playerWeaponSpeedMalus = creature->speed / 100 * playerWeaponSpeedMalusMax * weaponSpeedMult;
+
+	std::cout << "playerArmorSpeedMalus: " << playerArmorSpeedMalus << std::endl;
+	std::cout << "playerWeaponSpeedMalus: " << playerWeaponSpeedMalus << std::endl;
+
 	speed = creature->speed - playerArmorSpeedMalus - playerWeaponSpeedMalus;
+
+	std::cout << "speed: " << speed << std::endl;
+
 	return speed;
 }
 
@@ -417,29 +427,41 @@ AttDefMinAvgMax Fight::speedBasedSuccess(std::shared_ptr<Creature> attacker, std
 	attackerSpeedTemp = attacker->speed;
 	defenderSpeedTemp = defender->speed;
 
+	if (defenderSpeedTemp > 0)
+	{
+		scaledDefenderSpeed = (calcCreatureSpeed(defender) / defenderSpeedTemp);
+	}
+
+	if (attackerSpeedTemp > 0)
+	{
+		scaledAttackerSpeed = (calcCreatureSpeed(attacker) / attackerSpeedTemp);
+	}
+
+	std::cout << "scaledAttackerSpeed: " << scaledAttackerSpeed << std::endl;
+	std::cout << "scaledDefenderSpeed: " << scaledDefenderSpeed << std::endl;
+
 	// include a finishedStages Bonus for Monsters
 	if (defender->getCreatureType() == CreatureType::MONSTER)
 	{
 		defenderSpeedTemp = defenderSpeedTemp * (1 + finishedStages / finishedStagesDivisor);
-		if (defenderSpeedTemp > 0)
-		{
-			scaledDefenderSpeed = (calcCreatureSpeed(defender) / defenderSpeedTemp);
-		}
 	}
 	if (attacker->getCreatureType() == CreatureType::MONSTER)
 	{
 		attackerSpeedTemp = attackerSpeedTemp * (1 + finishedStages / finishedStagesDivisor);
-		if (attackerSpeedTemp > 0)
-		{
-			scaledAttackerSpeed = (calcCreatureSpeed(attacker) / attackerSpeedTemp);
-		}
 	}
+
+	std::cout << "attackerSpeedTemp: " << attackerSpeedTemp << std::endl;
+	std::cout << "defenderSpeedTemp: " << defenderSpeedTemp << std::endl;
 
 	// perform caltulations
 	attackerSpeedBase = attackerSpeedTemp + scaledAttackerSpeed * speedBase;
 	defenderSpeedBase = defenderSpeedTemp + scaledDefenderSpeed * speedBase;
 	MinAvgMax attackerSpeed(speedRandLow, speedRandHigh, attackerSpeedBase);
 	MinAvgMax defenderSpeed(speedRandLow, speedRandHigh, defenderSpeedBase);
+
+	std::cout << "attackerSpeedBase: " << attackerSpeedBase << std::endl;
+	std::cout << "defenderSpeedBase: " << defenderSpeedBase << std::endl;
+
 
 	return AttDefMinAvgMax(attackerSpeed, defenderSpeed);
 } 
@@ -452,8 +474,18 @@ unsigned int Fight::determineFirstAttack()
 
 	// perform randomizing alculations
 	AttDefMinAvgMax speedBasedSuccessRetVal = speedBasedSuccess(player, enemy);
-	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker.min, speedBasedSuccessRetVal.attacker.min);
+
+
+	std::cout << "speedBasedSuccessRetVal.attacker.min: " << speedBasedSuccessRetVal.attacker.min << std::endl;
+	std::cout << "speedBasedSuccessRetVal.attacker.max: " << speedBasedSuccessRetVal.attacker.max << std::endl;
+	std::cout << "speedBasedSuccessRetVal.defender.min: " << speedBasedSuccessRetVal.defender.min << std::endl;
+	std::cout << "speedBasedSuccessRetVal.defender.max: " << speedBasedSuccessRetVal.defender.max << std::endl;
+
+	randAttackerSpeed = Chances::randomFloat(speedBasedSuccessRetVal.attacker.min, speedBasedSuccessRetVal.attacker.max);
 	randDefenderSpeed = Chances::randomFloat(speedBasedSuccessRetVal.defender.min, speedBasedSuccessRetVal.defender.max);
+
+	std::cout << "randAttackerSpeed: " << randAttackerSpeed << std::endl;
+	std::cout << "randDefenderSpeed: " << randDefenderSpeed << std::endl;
 
 	// determine which player comes first
 	if (randAttackerSpeed >= randDefenderSpeed)	return 1u;

@@ -58,7 +58,7 @@ private:
 	sf::Vector2f potion2Pos;
 	sf::Vector2f potion3Pos;
 
-	std::list<std::shared_ptr<RenderableObject>> setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot);
+	std::list<std::shared_ptr<RenderableObject>> setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot, bool draggedFromEquipment);
 
 public:
 
@@ -95,7 +95,7 @@ public:
 	void setChatbox(tgui::ChatBox::Ptr chatbox_) { chatbox = chatbox_; };
 	void setGeometry(sf::Vector2f armorOffsets_, sf::Vector2f potionOffsets_, sf::Vector2f armorDims_, sf::Vector2f potionDims_, int itemSize_);
 	std::shared_ptr<RenderableObject> getItemAtPixels(sf::Vector2i pos, bool remove, bool usePotion);
-	std::list<std::shared_ptr<RenderableObject>> setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj, bool usePotion, std::shared_ptr<Fight> fight);
+	std::list<std::shared_ptr<RenderableObject>> setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj, bool usePotion, std::shared_ptr<Fight> fight, bool draggedFromEquipment);
 
 	float getStats(ArmorStatsMode::Enum mode, ArmorStatsAttributes::Enum attribute);
 };

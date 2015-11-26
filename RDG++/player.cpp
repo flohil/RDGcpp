@@ -55,14 +55,6 @@ float EquipmentSet::getStats(ArmorStatsMode::Enum mode, ArmorStatsAttributes::En
 		}
 		else if (attribute == ArmorStatsAttributes::SPEED)
 		{
-			if (primaryWeapon != nullptr)
-			{
-				value += primaryWeapon->getSpeed();
-			}
-			if (secondaryWeapon != nullptr)
-			{
-				value += secondaryWeapon->getSpeed();
-			}
 			if (helmet != nullptr)
 			{
 				value += helmet->getSpeed();
@@ -109,14 +101,14 @@ float EquipmentSet::getStats(ArmorStatsMode::Enum mode, ArmorStatsAttributes::En
 			{
 				if ((100.f - primaryWeapon->getSpeed()) > value)
 				{
-					value = primaryWeapon->getSpeed();
+					value = 100.f - primaryWeapon->getSpeed();
 				}
 			}
 			if (secondaryWeapon != nullptr)
 			{
 				if ((100.f - secondaryWeapon->getSpeed()) > value)
 				{
-					value = secondaryWeapon->getSpeed();
+					value = 100.f - secondaryWeapon->getSpeed();
 				}
 			}
 		}
@@ -143,8 +135,6 @@ float EquipmentSet::getStats(ArmorStatsMode::Enum mode, ArmorStatsAttributes::En
 	return value;
 }
 
-
-
 std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> weapon_)
 {
 	std::shared_ptr<Weapon> oldWeapon = primaryWeapon;
@@ -153,13 +143,6 @@ std::shared_ptr<Weapon> EquipmentSet::setPrimaryWeapon(std::shared_ptr<Weapon> w
 
 	if (weapon_ != nullptr) // position new weapon
 	{
-		if (weapon_->getName() == "Shield")
-		{
-			ResourceManager::getInstance().getSound("error").play();
-			OutputFormatter::chat(chatbox, "Shield can only be secondary weapon", sf::Color::White);
-			return weapon_;
-		}
-
 		primaryWeapon->setSize(itemSize, itemSize);
 		primaryWeapon->setPosition(primaryWeaponPos);
 	}
@@ -337,7 +320,7 @@ void EquipmentSet::setFists(std::shared_ptr<Weapon> fists1_, std::shared_ptr<Wea
 	secondaryWeapon = fists2;
 }
 
-std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot)
+std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_ptr<Item> obj, EquipHotspots::Enum hotspot, bool draggedFromEquipment)
 {
 	std::list<std::shared_ptr<RenderableObject>> retList;
 
@@ -356,35 +339,35 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 
 			switch (retArm->getArmamentType())
 			{
-			case ArmamentType::BOOTS:
-			{
-				retArm = setBoots(retArm);
-				break;
-			}
-			case ArmamentType::CUISSE:
-			{
-				retArm = setCuisse(retArm);
-				break;
-			}
-			case ArmamentType::GAUNTLETS:
-			{
-				retArm = setGauntlets(retArm);
-				break;
-			}
-			case ArmamentType::HARNESS:
-			{
-				retArm = setHarness(retArm);
-				break;
-			}
-			case ArmamentType::HELMET:
-			{
-				retArm = setHelmet(retArm);
-				break;
-			}
-			default:
-			{
-				break;
-			}
+				case ArmamentType::BOOTS:
+				{
+					retArm = setBoots(retArm);
+					break;
+				}
+				case ArmamentType::CUISSE:
+				{
+					retArm = setCuisse(retArm);
+					break;
+				}
+				case ArmamentType::GAUNTLETS:
+				{
+					retArm = setGauntlets(retArm);
+					break;
+				}
+				case ArmamentType::HARNESS:
+				{
+					retArm = setHarness(retArm);
+					break;
+				}
+				case ArmamentType::HELMET:
+				{
+					retArm = setHelmet(retArm);
+					break;
+				}
+				default:
+				{
+					break;
+				}
 			}
 
 			if (retArm != nullptr)
@@ -404,13 +387,22 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 		{
 			if (weapon->getSlots() == 1)
 			{
-				retArm1 = setPrimaryWeapon(weapon);
+				if (weapon->getName() == "Shield")
+				{
+					retArm1 = weapon;
+					ResourceManager::getInstance().getSound("error").play();
+					OutputFormatter::chat(chatbox, "Shield can only be a secondary weapon", sf::Color::White);
+				}
+				else
+				{
+					retArm1 = setPrimaryWeapon(weapon);
+				}
 
-				if (secondaryWeapon == nullptr)
+				if (secondaryWeapon == nullptr && weapon->getName() != "Shield")
 				{
 					retArm2 = setSecondaryWeapon(fists2);
 				}
-				else if (secondaryWeapon->getSlots() == 2)
+				else if (secondaryWeapon != nullptr && secondaryWeapon->getSlots() == 2 && weapon->getName() != "Shield")
 				{
 					retArm2 = setSecondaryWeapon(fists2);
 				}
@@ -425,7 +417,16 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItem(std::shared_p
 		{
 			if (weapon->getSlots() == 1)
 			{
-				retArm1 = setSecondaryWeapon(weapon);
+				if (secondaryWeapon != nullptr && secondaryWeapon->getName() == "Shield" && draggedFromEquipment)
+				{
+					retArm1 = weapon;
+					ResourceManager::getInstance().getSound("error").play();
+					OutputFormatter::chat(chatbox, "Shield can only be a secondary weapon", sf::Color::White);
+				}
+				else
+				{
+					retArm1 = setSecondaryWeapon(weapon);
+				}
 
 				if (primaryWeapon == nullptr)
 				{
@@ -628,7 +629,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 	return retObj;
 }
 
-std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj, bool usePotion, std::shared_ptr<Fight> fight)
+std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::Vector2i pos, std::shared_ptr<RenderableObject> obj, bool usePotion, std::shared_ptr<Fight> fight, bool draggedFromEquipment)
 {
 	std::list<std::shared_ptr<RenderableObject>> retObjs;
 	EquipHotspots::Enum hotspot = EquipHotspots::UNKNOWN;
@@ -707,7 +708,7 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 		return retObjs;
 	}
 
-	retObjs = setItem(item, hotspot);
+	retObjs = setItem(item, hotspot, draggedFromEquipment);
 
 	return retObjs;
 }
