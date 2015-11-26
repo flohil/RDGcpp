@@ -72,7 +72,7 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj, bool playSound) : 
 				description.replace(findX + 1, 1, OutputFormatter::shortFloat(potion->getStrength()));
 			}
 
-			std::cout << "description: " << description << std::endl;
+			//std::cout << "description: " << description << std::endl;
 
 			addRow("description", description);
 			addRow("item class", EnumMapper::mapClassesName(potion->getItemClass()));
@@ -321,7 +321,7 @@ void GameStateGame::update(const float deltaTime)
 
 				if (fightStageAccumulator >= fightStageSpan)
 				{
-					std::cout << "triggered second round from update" << std::endl;
+					//std::cout << "triggered second round from update" << std::endl;
 					fight->fightRound(fight->getPlayerAttackType(), 2u);
 					fightStageAccumulator = 0;
 				}
@@ -989,11 +989,9 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		//std::cout << "mapCenter: x = " << mapCenter.x << ", y = " << mapCenter.y << std::endl;
 
 		//std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
-		{		std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
-		std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
 
-			relPos.x = relPos.x - static_cast<int>(mapCenter.x - mapViewCenter.x);
-			relPos.y = relPos.y - static_cast<int>(mapCenter.y - mapViewCenter.y);
+		relPos.x = relPos.x - static_cast<int>(mapCenter.x - mapViewCenter.x);
+		relPos.y = relPos.y - static_cast<int>(mapCenter.y - mapViewCenter.y);
 
 		//std::cout << "after relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
 
@@ -1037,7 +1035,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 				}
 				dragging = false;
 			}
-		} 
+		}
 		else { // clicked into fight window
 
 			// hide attack menu when clicking somewhere different than the button, need to consume event
@@ -1045,7 +1043,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			{
 				hideAttackGui();
 			}
-			
+
 			float left = enemySprite.getGlobalBounds().left;
 			float top = enemySprite.getGlobalBounds().top;
 			float right = (left + enemySprite.getGlobalBounds().width);
@@ -1058,7 +1056,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 				updateDetails(DetailsBag(fight->getEnemy(), false));
 				showingEnemyDetails = true;
 			}
-			
+
 			pressedAttackMainMenuButton = false;
 		}
 	}
