@@ -1260,7 +1260,7 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag, bool showingEnemyDetai
 	}
 
 	enemyHealthBar->setValue(fight->getEnemy()->hp / fight->getEnemy()->getOrHP() * 100);
-	playerHealthBar->setValue(fight->getPlayer()->hp / fight->getPlayer()->getOrHP() * 100);
+	playerHealthBar->setValue(player->hp / player->getOrHP() * 100);
 
 	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeader->getPosition().y);
 	detailsSprite.setTexture(detailsBag.getDetailsPic());
