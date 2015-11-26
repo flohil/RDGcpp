@@ -6,7 +6,7 @@
 		<Stats_Low_Multiplier>0.75</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1</Stats_High_Multiplier>
 		<HP_Damage>0.5</HP_Damage>
-		<Hit_Probability>0.8</Hit_Probability>
+		<Hit_Probability>0.925</Hit_Probability>
 		<Effect>hp</Effect>
 		<x>1</x>
 	</Attack>
@@ -15,8 +15,8 @@
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.75</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1</Stats_High_Multiplier>
-		<HP_Damage>0.7</HP_Damage>
-		<Hit_Probability>0.3</Hit_Probability>
+		<HP_Damage>0.75</HP_Damage>
+		<Hit_Probability>0.75</Hit_Probability>
 		<Effect>accuracy</Effect>
 		<x>0.8</x>
 	</Attack>
@@ -25,8 +25,8 @@
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.75</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1</Stats_High_Multiplier>
-		<HP_Damage>0.3</HP_Damage>
-		<Hit_Probability>0.7</Hit_Probability>
+		<HP_Damage>0.45</HP_Damage>
+		<Hit_Probability>0.85</Hit_Probability>
 		<Effect>strength</Effect>
 		<x>0.8</x>
 	</Attack>
@@ -35,8 +35,8 @@
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.75</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1</Stats_High_Multiplier>
-		<HP_Damage>0.4</HP_Damage>
-		<Hit_Probability>0.6</Hit_Probability>
+		<HP_Damage>0.5</HP_Damage>
+		<Hit_Probability>0.83</Hit_Probability>
 		<Effect>speed</Effect>
 		<x>0.8</x>
 	</Attack>

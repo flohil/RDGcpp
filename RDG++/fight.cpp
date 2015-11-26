@@ -275,12 +275,13 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 			// when creature (player) parries successfully, he deals x times the damage of a normal torso attack
 			parryMultiplier = 2.f;
 			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(Attacks::TORSO));
-			parrySucceeded = false;
+			parrySucceeded = true;
 			OutputFormatter::chat(chatbox, player->getPlayerName() + " burst through " + enemy->getName() + "'s attack", sf::Color::White);
 		}
 		else
 		{
 			parryMultiplier = 0.f;
+			parrySucceeded = false;
 			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(Attacks::TORSO));
 			ResourceManager::getInstance().getSound("forceParry").play();
 			OutputFormatter::chat(chatbox, enemy->getName() + " parried " + player->getPlayerName() + "'s attack", sf::Color::White);
@@ -319,6 +320,11 @@ void Fight::attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature>
 		hitSuccess = true;
 	}
 
+	if (parrySuccess)
+	{
+		activeAttackType = Attacks::TORSO;
+	}
+
 	//hitSuccess = true; // for testing
 
 	if (hitSuccess)
@@ -326,13 +332,11 @@ void Fight::attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature>
 		if (attacker->getCreatureType() == CreatureType::MONSTER)
 		{
 			OutputFormatter::chat(chatbox, enemy->getName() + " hit " + player->getPlayerName() + " on the " + EnumMapper::mapAttackName(activeAttackType), sf::Color::White);
-			OutputFormatter::chat(chatbox, player->getPlayerName() + " suffers " + OutputFormatter::shortFloat(healthDmg) + " HP damage", sf::Color::White);
 			ResourceManager::getInstance().getSound("humanHit").play();
 		}
 		else
 		{
 			OutputFormatter::chat(chatbox, player->getPlayerName() + " hit " + enemy->getName() + " on the " + EnumMapper::mapAttackName(activeAttackType), sf::Color::White);
-			OutputFormatter::chat(chatbox, enemy->getName() + " suffers " + OutputFormatter::shortFloat(healthDmg) + " HP damage", sf::Color::White);
 			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getAttackSoundName()).play();
 		}
 	}
@@ -544,8 +548,8 @@ bool Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<C
 	float const randAccuracyHigh = 1.5f;
 	float const accuracyBase = 50.f;
 	float const finishedStagesDivisor = 40.f;
-	float const speedBase = 0.9f;
-	float accuracyMult = 1.0f;
+	float const speedBase = 0.5f;
+	float accuracyMult = 1.1f;
 
 	// variables
 	float attackerAccuracyBase;
@@ -562,7 +566,19 @@ bool Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<C
 	// set finishedStagesMult Bonus for Monsters
 	if (attacker->getCreatureType() == CreatureType::MONSTER)
 	{
-		accuracyMult = 1.5f;
+		/*if (enemy->getLevel() == DifficultyLevel::EASY)
+		{
+			accuracyMult = 1.0f;
+		}
+		if (enemy->getLevel() == DifficultyLevel::NORMAL)
+		{
+			accuracyMult = 1.0f;
+		}
+		if (enemy->getLevel() == DifficultyLevel::HARD)
+		{
+			accuracyMult = 1.0f;
+		}*/
+		weaponSpeedFact = 1;
 	}
 	else
 	{
@@ -575,11 +591,10 @@ bool Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<C
 	if (attacker->accuracy > 0.f)
 	{
 		scaledAttackerAccuracy = calcCreatureAccuracy(attacker) / attacker->accuracy;
-		weaponSpeedFact = 1;
 	}
 
 	//perform calculations
-	attackerAccuracyBase = activeAttack->getHitProbability() * (attacker->accuracy + scaledAttackerAccuracy * accuracyBase) * weaponSpeedFact * accuracyMult * speedBase;
+	attackerAccuracyBase = activeAttack->getHitProbability() * (attacker->accuracy + scaledAttackerAccuracy * accuracyBase) * weaponSpeedFact * accuracyMult;
 	attackerAccuracy = MinAvgMax(randAccuracyLow, randAccuracyHigh, attackerAccuracyBase);
 	defenderSpeed = speedBasedSuccess(attacker, defender).defender;
 
@@ -791,6 +806,15 @@ float Fight::calcAttributeDamage(std::shared_ptr<Creature> defender, std::shared
 
 void Fight::updateHealth(std::shared_ptr<Creature> defender, float healthDamage)
 {
+	if (defender->getCreatureType() == CreatureType::PLAYER)
+	{
+		OutputFormatter::chat(chatbox, player->getPlayerName() + " suffers " + OutputFormatter::shortFloat(healthDamage) + " HP damage", sf::Color::White);
+	}
+	else
+	{
+		OutputFormatter::chat(chatbox, enemy->getName() + " suffers " + OutputFormatter::shortFloat(healthDamage) + " HP damage", sf::Color::White);
+	}
+	
 	float hp = defender->hp - healthDamage;
 	if (hp < 0) hp = 0;
 	defender->hp = hp;

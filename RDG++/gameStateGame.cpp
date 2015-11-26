@@ -1336,6 +1336,7 @@ void GameStateGame::startFight(std::shared_ptr<Player> player_, std::shared_ptr<
 	OutputFormatter::chat(chatbox, "Started fight against " + fight->getEnemy()->getName(), sf::Color::White);
 	ResourceManager::getInstance().getSound(fight->getEnemy()->getSoundName()).play();
 	updateDetails(DetailsBag(fight->getEnemy(), false));
+	updateStats();
 	showingEnemyDetails = true;
 }
 
@@ -1357,6 +1358,8 @@ void GameStateGame::endFight(std::shared_ptr<Creature> loser)
 	}
 
 	game.changeMusic("game", 0.7f, 1.0f, 0.5f, true);
+
+	updateStats();
 
 	inFight = false;
 	fightStageAccumulator = 0;

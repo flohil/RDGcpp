@@ -227,7 +227,26 @@ ItemTypeName Chances::randomItem(RoomTemplate::ItemProbabilities itemProbabiliti
 // returns a random monster attack
 Attacks::Enum Chances::randomAttackType() {
 
-	return static_cast<Attacks::Enum>(randomUInt(3)); // 0: TORSO, 1: HEAD, 2: ARMS, 3: LEGS
+	unsigned int randInt = randomUInt(100);
+
+	if (randInt < 40)
+	{
+		randInt = 0;
+	}
+	else if (randInt < 60)
+	{
+		randInt = 1;
+	}
+	else if (randInt < 80)
+	{
+		randInt = 2;
+	}
+	else if (randInt <= 100)
+	{
+		randInt = 3;
+	}
+
+	return static_cast<Attacks::Enum>(randInt); // 0: TORSO, 1: HEAD, 2: ARMS, 3: LEGS
 }
 
 // returns a random monster attack

@@ -7,8 +7,8 @@
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
 		<Attack>5</Attack>
-		<Speed>80</Speed>
-		<Accuracy>50</Accuracy>
+		<Speed>85</Speed>
+		<Accuracy>55</Accuracy>
 		<Defence>0</Defence>
 		<Slots>1</Slots>
 		<Max>2</Max>
@@ -23,9 +23,9 @@
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
-		<Attack>10</Attack>
-		<Speed>70</Speed>
-		<Accuracy>40</Accuracy>
+		<Attack>15</Attack>
+		<Speed>75</Speed>
+		<Accuracy>50</Accuracy>
 		<Defence>0</Defence>
 		<Slots>1</Slots>
 		<Max>2</Max>
@@ -58,7 +58,7 @@
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
 		<Attack>20</Attack>
-		<Speed>60</Speed>
+		<Speed>65</Speed>
 		<Accuracy>50</Accuracy>
 		<Defence>0</Defence>
 		<Slots>1</Slots>
@@ -92,8 +92,8 @@
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
 		<Attack>25</Attack>
-		<Speed>50</Speed>
-		<Accuracy>40</Accuracy>
+		<Speed>60</Speed>
+		<Accuracy>50</Accuracy>
 		<Defence>0</Defence>
 		<Slots>1</Slots>
 		<Max>2</Max>
@@ -108,8 +108,8 @@
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
-		<Attack>60</Attack>
-		<Speed>20</Speed>
+		<Attack>80</Attack>
+		<Speed>25</Speed>
 		<Accuracy>70</Accuracy>
 		<Defence>0</Defence>
 		<Slots>2</Slots>
@@ -125,9 +125,9 @@
 		<Class_Multiplier>1</Class_Multiplier>
 		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
 		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
-		<Attack>40</Attack>
+		<Attack>65</Attack>
 		<Speed>30</Speed>
-		<Accuracy>80</Accuracy>
+		<Accuracy>75</Accuracy>
 		<Defence>0</Defence>
 		<Slots>2</Slots>
 		<Max>1</Max>
