@@ -38,11 +38,13 @@ public:
 	Attacks::Enum getPlayerAttackType() { return playerAttackType; }
 	std::shared_ptr<Creature> getLoser() const { return loser; };
 	std::shared_ptr<Monster> getEnemy() const { return enemy; };
-	std::shared_ptr<Player> getPlayer() const { return player; };
+	void Fight::end();
+	bool isFightEnded() const { return isEnded; };
 
 private:
 
 	// VARIABLES
+	bool isEnded = false;
 	tgui::ChatBox::Ptr chatbox;
 	std::shared_ptr<Creature> loser;
 	bool activeFight;

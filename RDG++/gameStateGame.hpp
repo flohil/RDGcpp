@@ -160,6 +160,8 @@ private:
 	tgui::ProgressBar::Ptr enemyHealthBar;
 	tgui::ProgressBar::Ptr playerHealthBar;
 
+	sf::Vector2f initialMapCenter;
+
 	void changeSet() { changeSet(false); };
 	void changeSet(bool playSound);
 	void changeSet(bool playSound, unsigned int numerator);

@@ -1189,5 +1189,7 @@ void Player::setPlayerPosition(Point position_)
 {
 	prevPlayerPosition = position_;
 	playerPosition = prevPlayerPosition;
+	facingDir = ViewingDirections::N;
+	setRotation(0.f);
 	RenderableObject::setPosition(sf::Vector2f(static_cast<float>(playerPosition.x * tileSize), static_cast<float>(playerPosition.y * tileSize)));
 }

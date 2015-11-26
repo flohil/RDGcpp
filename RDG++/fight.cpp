@@ -33,6 +33,12 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 	//while (player->hp > 0 && enemy->hp > 0)
 	//{
 
+	if (loser != nullptr) // fight is already over
+	{
+		activeRound = 1u;
+		return;
+	}
+
 	bool playerLost = false;
 	bool enemyLost = false;
 
@@ -134,9 +140,7 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 	{
 		player->resetOriginals();
 		enemy->resetOriginals();
-		ResourceManager::getInstance().getSound("humanDies").play();
 		std::cout << "Player LOST the fight" << std::endl << std::endl;
-		OutputFormatter::chat(chatbox, player->getPlayerName() + " lost the fight against " + enemy->getName(), sf::Color::White);
 		loser = player;
 	}
 	else if (enemyLost)
@@ -148,14 +152,28 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 		// empty active potion lists
 		player->emptyActivePotions();
 		enemy->emptyActivePotions();
-		ResourceManager::getInstance().getSound(enemy->getSoundName()).play();
 		std::cout << "Player WON the fight" << std::endl << std::endl;
-		OutputFormatter::chat(chatbox, player->getPlayerName() + " won the fight against " + enemy->getName(), sf::Color::White);
 		loser = enemy;
 	}
 
 	// reset variables that need to be changed each round
 	resetRoundVariables();
+}
+
+void Fight::end()
+{
+	if (loser->getCreatureType() == CreatureType::PLAYER)
+	{
+		ResourceManager::getInstance().getSound("humanDies").play();
+		OutputFormatter::chat(chatbox, player->getPlayerName() + " lost the fight against " + enemy->getName(), sf::Color::White);
+	}
+	else
+	{
+		ResourceManager::getInstance().getSound(enemy->getSoundName()).play();
+		OutputFormatter::chat(chatbox, player->getPlayerName() + " won the fight against " + enemy->getName(), sf::Color::White);
+	}
+
+	isEnded = true;
 }
 
 void Fight::resetRoundVariables()
@@ -235,7 +253,6 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 	case Attacks::SET:
 		//activeAttackNumber = 5.f;
 		OutputFormatter::chat(chatbox, player->getPlayerName() + " changed Equipment Set", sf::Color::White);
-		ResourceManager::getInstance().getSound("changeSet").play();
 		break;
 
 	case Attacks::POTION:

@@ -195,6 +195,8 @@ GameState(game_)
 	inventoryView.setCenter(inventoryViewSize * 0.5f);
 	completeView.setCenter(size * 0.5f);
 
+	initialMapCenter = mapView.getCenter();
+
 	// for camera center adaption
 	borderMargin.x = static_cast<float>(settings->tileSize * (settings->ROOM_WIDTH + 1));
 	borderMargin.y = static_cast<float>(settings->tileSize * (settings->ROOM_HEIGHT + 1));
@@ -306,12 +308,28 @@ void GameStateGame::update(const float deltaTime)
 	}
 	else {
 
-		std::shared_ptr<Creature> loser = fight->getLoser();
-
-		if (loser != nullptr)
+		if (fight->isFightEnded())
 		{
-			endFight(loser);
+			std::shared_ptr<Creature> loser = fight->getLoser();
+
+			fightStageAccumulator += deltaTime;
+			if (fightStageAccumulator >= 1.2f * fightStageSpan)
+			{
+				endFight(loser);
+				fightStageAccumulator = 0;
+			}
 		}
+
+		if (!fight->isFightEnded() && fight->getLoser() != nullptr)
+		{
+			fightStageAccumulator += deltaTime;
+			if (fightStageAccumulator >= fightStageSpan)
+			{
+				fight->end();
+				fightStageAccumulator = 0;
+			}
+		}
+
 #if 1
 		else
 		{
@@ -1307,6 +1325,7 @@ void GameStateGame::endFight(std::shared_ptr<Creature> loser)
 	if (loser->getCreatureType() == CreatureType::PLAYER)
 	{
 		player->setPlayerPosition(map->getInitialPlayerPosition());
+		mapView.setCenter(initialMapCenter.x, initialMapCenter.y);
 	}
 	else
 	{
@@ -1379,6 +1398,7 @@ void GameStateGame::toggleEquipment()
 		usePotionActive = false;
 		choseChangeSet = true;
 		changeSet(false);
+		ResourceManager::getInstance().getSound("changeSet").play();
 		fight->fightRound(Attacks::SET, 1u);
 	}
 }
