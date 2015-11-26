@@ -138,8 +138,6 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 
 	if (playerLost)
 	{
-		player->resetOriginals();
-		enemy->resetOriginals();
 		std::cout << "Player LOST the fight" << std::endl << std::endl;
 		loser = player;
 	}
@@ -148,7 +146,6 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 		//give attribute bonus to winner of the fight
 		attributeBonusForWinner(enemy);
 		// set boostes values as new normal player values
-		player->resetOriginals();
 		// empty active potion lists
 		player->emptyActivePotions();
 		enemy->emptyActivePotions();
@@ -172,7 +169,6 @@ void Fight::end()
 		ResourceManager::getInstance().getSound(enemy->getSoundName()).play();
 		OutputFormatter::chat(chatbox, player->getPlayerName() + " won the fight against " + enemy->getName(), sf::Color::White);
 	}
-
 	isEnded = true;
 }
 
@@ -414,6 +410,9 @@ AttDefMinAvgMax Fight::speedBasedSuccess(std::shared_ptr<Creature> attacker, std
 	float attackerSpeedBase;
 	float defenderSpeedBase;
 
+	float scaledAttackerSpeed = 0.f;
+	float scaledDefenderSpeed = 0.f;
+
 	// determine creatures' speed
 	attackerSpeedTemp = attacker->speed;
 	defenderSpeedTemp = defender->speed;
@@ -422,15 +421,23 @@ AttDefMinAvgMax Fight::speedBasedSuccess(std::shared_ptr<Creature> attacker, std
 	if (defender->getCreatureType() == CreatureType::MONSTER)
 	{
 		defenderSpeedTemp = defenderSpeedTemp * (1 + finishedStages / finishedStagesDivisor);
+		if (defenderSpeedTemp > 0)
+		{
+			scaledDefenderSpeed = (calcCreatureSpeed(defender) / defenderSpeedTemp);
+		}
 	}
 	if (attacker->getCreatureType() == CreatureType::MONSTER)
 	{
 		attackerSpeedTemp = attackerSpeedTemp * (1 + finishedStages / finishedStagesDivisor);
+		if (attackerSpeedTemp > 0)
+		{
+			scaledAttackerSpeed = (calcCreatureSpeed(attacker) / attackerSpeedTemp);
+		}
 	}
 
 	// perform caltulations
-	attackerSpeedBase = attackerSpeedTemp + (calcCreatureSpeed(attacker) / attackerSpeedTemp) * speedBase;
-	defenderSpeedBase = defenderSpeedTemp + (calcCreatureSpeed(defender) / defenderSpeedTemp) * speedBase;
+	attackerSpeedBase = (attackerSpeedTemp + attacker->getOrSpeed()) * 0.5f + scaledAttackerSpeed * speedBase;
+	defenderSpeedBase = (defenderSpeedTemp + defender->getOrSpeed()) * 0.5f + scaledDefenderSpeed * speedBase;
 	MinAvgMax attackerSpeed(speedRandLow, speedRandHigh, attackerSpeedBase);
 	MinAvgMax defenderSpeed(speedRandLow, speedRandHigh, defenderSpeedBase);
 
@@ -521,13 +528,19 @@ bool Fight::calcHitSuccess(std::shared_ptr<Creature> attacker, std::shared_ptr<C
 	{
 	
 	}
-	else
-	{
+	else	{
 
 	}
 
+	float scaledAttackerAccuracy = 0.f;
+
+	if (attacker->accuracy > 0.f)
+	{
+		scaledAttackerAccuracy = calcCreatureAccuracy(attacker) / attacker->accuracy;
+	}
+
 	//perform calculations
-	attackerAccuracyBase = activeAttack->getHitProbability() * (attacker->accuracy + calcCreatureAccuracy(attacker) / attacker->accuracy * accuracyBase);
+	attackerAccuracyBase = activeAttack->getHitProbability() * ((attacker->accuracy + attacker->getOrAccuracy()) * 0.5f + scaledAttackerAccuracy * accuracyBase);
 	attackerAccuracy = MinAvgMax(randAccuracyLow, randAccuracyHigh, attackerAccuracyBase);
 	defenderSpeed = speedBasedSuccess(attacker, defender).defender;
 
@@ -636,7 +649,7 @@ float Fight::calcHealthDamage(std::shared_ptr<Creature> attacker, std::shared_pt
 		attackDamage.max * (strengthMult * attacker->strength + weaponMult * attackerWeaponDamage)
 	);
 
-	defenderDefense = finishedStagesMult * baseDefense + armorMult * defenderArmor;
+	defenderDefense = finishedStagesMult * baseDefense + armorMult * defenderArmor; // can never fy 0 because of baseDefense
 	healthDamage = MinAvgMax(
 		parryMultiplier * attackerRawDamage.min / defenderDefense * damageMult,
 		parryMultiplier * attackerRawDamage.max / defenderDefense * damageMult

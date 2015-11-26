@@ -88,9 +88,10 @@ void Map::init(std::shared_ptr<Player> player_)
 	loadRooms();
 	fillWithRooms();
 
-	/*placeInOverlay(Point{ 1, 1 }, std::shared_ptr<RenderableObject>(game.getPrototypeStorage()->weaponFactory->create("Bow")));
-	placeInOverlay(Point{ 2, 1 }, std::shared_ptr<RenderableObject>(game.getPrototypeStorage()->weaponFactory->create("Axt")));*/
-
+#if 0
+	placeInOverlay(Point{ 1, 1 }, std::shared_ptr<RenderableObject>(game.getPrototypeStorage()->weaponFactory->create("Bow")));
+	placeInOverlay(Point{ 2, 1 }, std::shared_ptr<RenderableObject>(game.getPrototypeStorage()->weaponFactory->create("Axt")));
+#endif
 	LOG(INFO) << "successfully initialized map";
 }
 

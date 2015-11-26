@@ -213,7 +213,7 @@ GameState(game_)
 	speedSprite.setTexture(ResourceManager::getInstance().getTexture("speed"));
 	playerSprite.setTexture(ResourceManager::getInstance().getTexture("player_big"));
 
-	player.reset(new Player("player", 50.f, 25.f, 25.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
+	player.reset(new Player("player", 50.f, 25.f, 0.f, 25.f, settings->playerName, static_cast<float>(settings->tileSize), settings->maxInventorySize, sf::Vector2f(armorLeftOffset, armorTopOffset), sf::Vector2f(potionLeftOffset, potionTopOffset)));
 	player->setSize(settings->tileSize, settings->tileSize);
 
 	map = new Map(game);
@@ -447,7 +447,10 @@ void GameStateGame::handleInput()
 	while (game.window.pollEvent(event))
 	{
 		chatGui.handleEvent(event);
-		fightGui.handleEvent(event);
+		if (inFight)
+		{
+			fightGui.handleEvent(event);
+		}
 		armorGui.handleEvent(event);
 
 		if (event.type == sf::Event::Closed)
@@ -1259,8 +1262,11 @@ void GameStateGame::updateDetails(DetailsBag& detailsBag, bool showingEnemyDetai
 		}
 	}
 
-	enemyHealthBar->setValue(fight->getEnemy()->hp / fight->getEnemy()->getOrHP() * 100);
-	playerHealthBar->setValue(player->hp / player->getOrHP() * 100);
+	if (inFight)
+	{
+		enemyHealthBar->setValue(fight->getEnemy()->hp / fight->getEnemy()->getOrHP() * 100);
+		playerHealthBar->setValue(player->hp / player->getOrHP() * 100);
+	}
 
 	detailsHeader->setPosition(detailsMiddle - detailsHeader->getSize().x * 0.5f, detailsHeader->getPosition().y);
 	detailsSprite.setTexture(detailsBag.getDetailsPic());
@@ -1324,11 +1330,14 @@ void GameStateGame::endFight(std::shared_ptr<Creature> loser)
 {
 	if (loser->getCreatureType() == CreatureType::PLAYER)
 	{
+		player->resetOriginals();
+		fight->getEnemy()->resetOriginals();
 		player->setPlayerPosition(map->getInitialPlayerPosition());
 		mapView.setCenter(initialMapCenter.x, initialMapCenter.y);
 	}
 	else
 	{
+		player->resetOriginals();
 		Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());
 		map->setOverlayObject(facingPoint, nullptr);
 	}
