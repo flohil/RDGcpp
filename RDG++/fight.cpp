@@ -276,7 +276,7 @@ void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<C
 			parryMultiplier = 2.f;
 			activeAttack = prototypeStorage->attackFactory->create(EnumMapper::mapAttackName(Attacks::TORSO));
 			parrySucceeded = true;
-			OutputFormatter::chat(chatbox, player->getPlayerName() + " burst through " + enemy->getName() + "'s attack", sf::Color::White);
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " burst through " + enemy->getName() + "'s defense", sf::Color::White);
 		}
 		else
 		{
