@@ -337,7 +337,14 @@ void Fight::attack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature>
 		else
 		{
 			OutputFormatter::chat(chatbox, player->getPlayerName() + " hit " + enemy->getName() + " on the " + EnumMapper::mapAttackName(activeAttackType), sf::Color::White);
-			ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getAttackSoundName()).play();
+			if (player->getEquipmentSet()->getPrimaryWeapon() != nullptr)
+			{
+				ResourceManager::getInstance().getSound(player->getEquipmentSet()->getPrimaryWeapon()->getAttackSoundName()).play();
+			}
+			else 
+			{
+				ResourceManager::getInstance().getSound(player->getEquipmentSet()->getSecondaryWeapon()->getAttackSoundName()).play();
+			}
 		}
 	}
 	else
