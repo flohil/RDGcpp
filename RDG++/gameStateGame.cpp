@@ -98,7 +98,7 @@ DetailsBag::DetailsBag(std::shared_ptr<RenderableObject> obj, bool playSound) : 
 			addRow("strength", OutputFormatter::shortFloat(monster->strength) + " (" + OutputFormatter::shortFloat(monster->getOrStrength()) + ")");
 			addRow("speed", OutputFormatter::shortFloat(monster->speed) + " (" + OutputFormatter::shortFloat(monster->getOrSpeed()) + ")");
 			addRow("accuracy", OutputFormatter::shortFloat(monster->accuracy) + " (" + OutputFormatter::shortFloat(monster->getOrAccuracy()) + ")");
-			addRow("kill bonus", OutputFormatter::shortFloat(monster->getKillBonus()) + "  " + EnumMapper::mapAttributeName(monster->getKillBonusType()));
+			addRow("kill bonus", /*OutputFormatter::shortFloat(monster->getKillBonus()) + "  " + */ EnumMapper::mapAttributeName(monster->getKillBonusType()));
 
 			if (playSound)
 			{
