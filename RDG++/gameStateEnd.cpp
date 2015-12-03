@@ -139,8 +139,9 @@ void GameStateEnd::loadGui()
 		endCaption = "Victory!";
 
 		linesTexts.push_back("Congratulations, you rescued the world from .... uhhh ....");
-		linesTexts.push_back("Well truth is, we don't really know what you rescued the world from.");
-		linesTexts.push_back("Maybe all those creatures you killed weren't so bad after all");
+		linesTexts.push_back("Well truth is, we don't really know");
+		linesTexts.push_back("what you rescued the world from.");
+		linesTexts.push_back("Maybe those creatures you killed weren't so bad after all");
 		linesTexts.push_back("and you were just being a little paranoid...");
 		linesTexts.push_back("Maybe you're even worse than them.");
 		linesTexts.push_back("");
@@ -156,6 +157,10 @@ void GameStateEnd::loadGui()
 		linesTexts.push_back("All of them join together to praise you, cheering");
 		linesTexts.push_back("'... and he shall live forever and ever ...");
 		linesTexts.push_back("King of Kings and Lord of Lords!'");
+		linesTexts.push_back("");
+		linesTexts.push_back("");
+		linesTexts.push_back("That's all for now, sire.");
+		linesTexts.push_back("The world's most delicate virgins await your courtship!");
 	}
 	else
 	{
@@ -163,7 +168,8 @@ void GameStateEnd::loadGui()
 		endCaption = "Defeat!";
 
 		linesTexts.push_back("Shame on you, you failed to rescue the world from .... uhhh ....");
-		linesTexts.push_back("Well truth is, we don't really know what you could have saved the world from.");
+		linesTexts.push_back("Well truth is, we don't really know");
+		linesTexts.push_back("what you could have saved the world from.");
 		linesTexts.push_back("And there is no way to find out because you suck!");
 		linesTexts.push_back("You should have prepared better, young padawan.");
 		linesTexts.push_back("");
@@ -173,14 +179,20 @@ void GameStateEnd::loadGui()
 		linesTexts.push_back("where you will spend all eternity in miserable pain and torture.");
 		linesTexts.push_back("");
 		linesTexts.push_back("");
-		linesTexts.push_back("Your misery will include endless iterations of tea parties with your stepmother,");
+		linesTexts.push_back("Your misery will include endless iterations of");
+		linesTexts.push_back("tea parties with your stepmother,");
 		linesTexts.push_back("hillwalking with Hansi Hinterseer");
 		linesTexts.push_back("and Bingo evenings hosted by Peter Rapp.");
-		linesTexts.push_back("For lunch you can choose between creamed spinach, soy products and Beuschel.");
-		linesTexts.push_back("Hell's kitchen serves Pittinger beer only, the Radler tastes even worse.");
 		linesTexts.push_back("");
 		linesTexts.push_back("");
-		linesTexts.push_back("To begin with, you have been selected for conducting Lucifer's furuncle care.");
+		linesTexts.push_back("For lunch you can choose between creamed spinach,");
+		linesTexts.push_back("soy products and Beuschel.");
+		linesTexts.push_back("Hell's kitchen serves Pittinger beer only,");
+		linesTexts.push_back("the Radler tastes even worse.");
+		linesTexts.push_back("");
+		linesTexts.push_back("");
+		linesTexts.push_back("To begin with, you have been selected");
+		linesTexts.push_back("for conducting Lucifer's furuncle care.");
 		linesTexts.push_back("Off you go now!");
 	}
 

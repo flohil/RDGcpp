@@ -222,9 +222,9 @@ void Game::changeMusic(const float deltaTime)
 
 void Game::changeMusic(std::string nextMusic_, const float fadeOutSpan_, const float fadeInSpan_, const float pauseSpan_, bool fromPrevOffset_)
 {
-	std::cout << "changeMusic set parameters for " << nextMusic_ << std::endl;
+	/*std::cout << "changeMusic set parameters for " << nextMusic_ << std::endl;
 	std::cout << "fadeOut: " << fadeOutSpan_ << ", fadeIn: " << fadeInSpan_ << ", pause: " << pauseSpan_ << std::endl;
-
+*/
 	nextMusic = nextMusic_;
 	fadeOutSpan = fadeOutSpan_;
 	fadeInSpan = fadeInSpan_;

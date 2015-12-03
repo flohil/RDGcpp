@@ -50,7 +50,7 @@ int main()
 
 	LOG(INFO) << "Shutting down...";
 
-	system("pause");
+	//system("pause");
 
 	return 0;
 }
