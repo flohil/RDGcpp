@@ -79,6 +79,11 @@ private:
 	float statsUpdateSpan = 0.25f;
 	float statsUpdateAccumulator = 0.f;
 
+	bool triggeredEnd = false;
+	bool victory = false;
+	float endSpan = 0.f;
+	float endAccumulator = 0.f;
+
 	// gui
 	float topVerSplit;
 	float rightHorSplit;

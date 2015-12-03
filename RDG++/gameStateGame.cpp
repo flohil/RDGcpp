@@ -2,6 +2,7 @@
 
 #include "gameStateGame.hpp"
 #include "gameStatePauseMenu.hpp"
+#include "gameStateEnd.hpp"
 #include "gameState.hpp"
 #include "chances.hpp"
 #include "easylogging++.hpp"
@@ -306,6 +307,16 @@ void GameStateGame::update(const float deltaTime)
 
 	statsUpdateAccumulator += deltaTime;
 
+	if (triggeredEnd)
+	{
+		endAccumulator += deltaTime;
+	}
+
+	if (endAccumulator > endSpan && triggeredEnd)
+	{
+		game.changeState(std::shared_ptr<GameState>(new GameStateEnd(game, victory)));
+	}
+
 	if (statsUpdateAccumulator > statsUpdateSpan)
 	{
 		statsUpdateAccumulator = 0;
@@ -489,6 +500,22 @@ void GameStateGame::handleInput()
 			else if (event.key.code == sf::Keyboard::U) // debug
 			{
 				usePotionActive = !usePotionActive;
+			}
+			else if (event.key.code == sf::Keyboard::L)
+			{
+				triggeredEnd = true;
+				victory = false;
+				game.music.setLoop(false);
+				game.changeMusic("defeat", 0.7f, 0.0f, 0.5f, false);
+				endSpan = 1.0f;
+			}
+			else if (event.key.code == sf::Keyboard::V)
+			{
+				triggeredEnd = true;
+				victory = true;
+				game.music.setLoop(false);
+				game.changeMusic("victory", 0.7f, 0.0f, 0.5f, false);
+				endSpan = 1.0f;
 			}
 			else if (event.key.code == sf::Keyboard::Escape)
 			{
@@ -1344,6 +1371,16 @@ void GameStateGame::endFight(std::shared_ptr<Creature> loser)
 {
 	if (loser->getCreatureType() == CreatureType::PLAYER)
 	{
+		if (fight->getEnemy()->getLevel() == DifficultyLevel::HARD)
+		{
+			triggeredEnd = true;
+			victory = false;
+			game.music.setLoop(false);
+			game.changeMusic("defeat", 0.7f, 0.0f, 0.5f, false);
+			endSpan = 1.0f;
+			return;
+		}
+
 		player->resetOriginals();
 		fight->getEnemy()->resetOriginals();
 		player->setPlayerPosition(map->getInitialPlayerPosition());
@@ -1351,6 +1388,16 @@ void GameStateGame::endFight(std::shared_ptr<Creature> loser)
 	}
 	else
 	{
+		if (fight->getEnemy()->getLevel() == DifficultyLevel::HARD)
+		{
+			triggeredEnd = true;
+			victory = true;
+			game.music.setLoop(false);
+			game.changeMusic("victory", 0.7f, 0.0f, 0.5f, false);
+			endSpan = 1.0f;
+			return;
+		}
+
 		fight->attributeBonusForWinner();
 		player->resetOriginals();
 		Point facingPoint = player->getPlayerPosition().getDirPoint(player->getFacingDir());

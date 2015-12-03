@@ -77,6 +77,7 @@
     <ClCompile Include="fight.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gameObjects.cpp" />
+    <ClCompile Include="gameStateEnd.cpp" />
     <ClCompile Include="gameStateGame.cpp" />
     <ClCompile Include="gameStateLoading.cpp" />
     <ClCompile Include="gameStateOptions.cpp" />
@@ -104,6 +105,7 @@
     <ClInclude Include="game.hpp" />
     <ClInclude Include="gameObjects.hpp" />
     <ClInclude Include="gameState.hpp" />
+    <ClInclude Include="gameStateEnd.hpp" />
     <ClInclude Include="gameStateGame.hpp" />
     <ClInclude Include="gameStateLoading.hpp" />
     <ClInclude Include="gameStateMainMenu.hpp" />
@@ -120,6 +122,7 @@
     <ClInclude Include="resourceManager.hpp" />
     <ClInclude Include="settings.hpp" />
     <ClInclude Include="SettingsParser.hpp" />
+    <ClInclude Include="gameStateVictory.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

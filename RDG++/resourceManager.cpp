@@ -74,6 +74,8 @@ bool ResourceManager::loadAdditionalResources()
 	musicNames.insert(std::pair<std::string, std::string>("loading", "loading.ogg"));
 	musicNames.insert(std::pair<std::string, std::string>("game", "game.ogg"));
 	musicNames.insert(std::pair<std::string, std::string>("fight", "fight.ogg"));
+	musicNames.insert(std::pair<std::string, std::string>("victory", "victory.ogg"));
+	musicNames.insert(std::pair<std::string, std::string>("defeat", "defeat.ogg"));
 
 	// load single textures
 	for (std::map<std::string, std::string>::iterator it = textureNames.begin(); it != textureNames.end(); ++it)
