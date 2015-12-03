@@ -32,7 +32,7 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 	/* MAIN FIGHT LOOP */
 	//while (player->hp > 0 && enemy->hp > 0)
 	//{
-	std::cout << "------------" << std::endl;
+	std::cout << "------------------------------------------" << std::endl;
 
 	if (loser != nullptr) // fight is already over
 	{
@@ -111,8 +111,6 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 		//std::cout << "Creature1: " << creature1->getCreatureType() << std::endl;
 		//std::cout << "ChosenTask: " << chosenTask2 << std::endl;
 		attackControl(creature2, creature1, chosenTask2);
-
-		// Thread.sleep(1000);
 
 		// Potion effects for a creature are applied after its attack
 		//std::cout << "Creature2: " << creature2->getCreatureType() << std::endl;
@@ -193,32 +191,6 @@ std::shared_ptr<Potion> Fight::getSelectedPotion(std::shared_ptr<Creature> creat
 		return nullptr;
 	}
 }
-
-/*
-// replace with gui commands for player and random attack for monster
-Attacks::Enum Fight::getCommand(std::shared_ptr<Creature> creature)
-{
-	//check which option was selected, returns enum
-	Attacks::Enum chosenAttackType = Attacks::UNKNOWN;
-
-	if (creature->getCreatureType() == CreatureType::PLAYER)
-	{
-		// wait for the player to chose an attack - also set selected Potion, Set changes and so on...
-		while (activeAttackType == Attacks::UNKNOWN)
-		{
-			// Thread.sleep(100);
-		}
-
-		chosenAttackType = activeAttackType;
-	}
-	else
-	{
-		//chosenAttackType = Chances.randomAttackType();	// actually need chances class
-	}
-
-	return chosenAttackType;s
-}
-*/
 
 void Fight::attackControl(std::shared_ptr<Creature> creature1, std::shared_ptr<Creature> creature2, Attacks::Enum chosenTask)
 {
@@ -897,35 +869,38 @@ void Fight::usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Crea
 			if (_potion->getEffect() == Attribute::HP && _potion->getMode() == Mode::INCREMENTAL_DECREASE)
 			{
 				removablePotions.push_back(_potion);
+				OutputFormatter::chat(chatbox, potion->getName() + " has been cured from one poison", sf::Color::White);
 			}
 			break;
 		}
 	}
 	else
 	{
-		std::cout << "potionMode != CURE" << std::endl;
 		//store potions to the creature that they affect
 		if (potion->getTarget() == Target::SELF)
 		{
 			std::cout << "addActivePotion() called for player" << std::endl;
-			if (potion->getMode() == Mode::TEMPORARY_INCREASE)
+			if (potion->getMode() == Mode::TEMPORARY_INCREASE)					// potion that wears off after some time | but not hp
 			{
+				std::cout << "potionIncrease() - temp incr on self" << std::endl;
 				potionIncrease(potionUser, potion);
 			}
-			else
+			else					// increment
 			{
+				std::cout << "addActivePotion() - incr incr on self" << std::endl;
 				potionUser->addActivePotion(potion);
 			}
 		}
-		else
+		else		// target == enemy
 		{
-			std::cout << "addActivePotion() called for enemy" << std::endl;
-			if (potion->getMode() == Mode::TEMPORARY_DECREASE)
+			if (potion->getMode() == Mode::TEMPORARY_DECREASE)		// wears off
 			{
+				std::cout << "potionDecrease() - temp decr on enemy" << std::endl;
 				potionDecrease(opponent, potion);
 			}
-			else
+			else			// increment
 			{
+				std::cout << "addActivePotion() - incr decr on enemy" << std::endl;
 				opponent->addActivePotion(potion);
 			}
 		}
@@ -945,7 +920,6 @@ void Fight::potionEffects(std::shared_ptr<Creature> creature)
 
 	if (creature != nullptr)
 	{
-		std::cout << "creature != nullptr" << std::endl;
 		for (std::shared_ptr<Potion> potion : creature->activePotions)
 		{
 
@@ -966,18 +940,6 @@ void Fight::potionEffects(std::shared_ptr<Creature> creature)
 				potionDecrease(creature, potion);
 				std::cout << "potionDecrease successful" << std::endl;
 				break;
-#if 0
-			case Mode::TEMPORARY_INCREASE:
-				std::cout << "potion mode: TEMPORARY_INCREASE" << std::endl;
-				potionIncrease(creature, potion);
-				std::cout << "potionIncrease successful" << std::endl;
-				break;
-			case Mode::TEMPORARY_DECREASE:
-				std::cout << "potion mode: TEMPORARY_DECREASE" << std::endl;
-				potionDecrease(creature, potion);
-				std::cout << "potionDecrease successful" << std::endl;
-				break;
-#endif
 			case Mode::UNKNOWN:
 				std::cout << "potion mode: UNKNOWN" << std::endl;
 				break;
@@ -986,18 +948,24 @@ void Fight::potionEffects(std::shared_ptr<Creature> creature)
 				break;
 			}
 
+			std::cout << "end of switch" << std::endl;
+
 			if (potion->getDuration() <= 0)
 			{
 				std::cout << "potionDuration <= 0" << std::endl;
-				if (potion->getEffect() != Attribute::HP)
+				if (potion->getName() != "Instant Cure")
 				{
-					revertEffect(creature, potion);
-					std::cout << "revertEffect successful" << std::endl;
+					OutputFormatter::chat(chatbox, potion->getName() + " has worn off", sf::Color::White);
+
+					if (potion->getEffect() != Attribute::HP)
+					{
+						revertEffect(creature, potion);
+						std::cout << potion->getName() + ": potion effect reverted" << std::endl;
+					}
 				}
 				removablePotions.push_back(potion);
 				std::cout << "removeActivePotions sucessful" << std::endl;
 			}
-
 		}
 	}
 	else
@@ -1041,37 +1009,76 @@ void Fight::potionDecrease(std::shared_ptr<Creature> creature, std::shared_ptr<P
 	}
 	*/
 
+	float malus = potion->getStrength() * finishedStagesMult;
+
 	switch (potion->getEffect())
 	{
 		case Attribute::HP:
 		{
-			float hp = creature->hp - potion->getStrength() * finishedStagesMult;
-			if (hp < 0) hp = 0;
-			creature->hp = hp;
+			if (malus >= creature->hp)
+			{
+				creature->hp = 0;
+				if (creature == player) OutputFormatter::chat(chatbox, player->getPlayerName() + " got a " + OutputFormatter::shortFloat(creature->speed) + " Malus in health", sf::Color::White);
+				else OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got a " + OutputFormatter::shortFloat(creature->speed) + " Malus in health", sf::Color::White);
+			}
+			else
+			{
+				creature->hp -= malus;
+				if (creature == player) OutputFormatter::chat(chatbox, player->getPlayerName() + " got a " + OutputFormatter::shortFloat(malus) + " Malus in health", sf::Color::White);
+				else OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got a " + OutputFormatter::shortFloat(malus) + " Malus in health", sf::Color::White);
+			}
 			break;
 		}
 		case Attribute::SPEED:
 		{
-			float speed = creature->speed - potion->getStrength() * finishedStagesMult;
-			if (speed < 0) speed = 0;
-			creature->speed = speed;
+			if (malus >= creature->speed)
+			{
+				creature->speed = 0;
+				if (creature == player) OutputFormatter::chat(chatbox, player->getPlayerName() + " got a " + OutputFormatter::shortFloat(creature->speed) + " Malus in speed", sf::Color::White);
+				else OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got a " + OutputFormatter::shortFloat(creature->speed) + " Malus in speed", sf::Color::White);
+			}
+			else
+			{
+				creature->speed -= malus;
+				if (creature == player) OutputFormatter::chat(chatbox, player->getPlayerName() + " got a " + OutputFormatter::shortFloat(malus) + " Malus in speed", sf::Color::White);
+				else OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got a " + OutputFormatter::shortFloat(malus) + " Malus in speed", sf::Color::White);
+			}
 			break;
 		}
 		case Attribute::ACCURACY:
 		{
-			float accuracy = creature->accuracy - potion->getStrength() * finishedStagesMult;
-			if (accuracy < 0) accuracy = 0;
-			creature->accuracy = accuracy;
+			if (malus >= creature->accuracy)
+			{
+				creature->accuracy = 0;
+				if (creature == player) OutputFormatter::chat(chatbox, player->getPlayerName() + " got a " + OutputFormatter::shortFloat(creature->accuracy) + " Malus in accuracy", sf::Color::White);
+				else OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got a " + OutputFormatter::shortFloat(creature->accuracy) + " Malus in acuracy", sf::Color::White);
+			}
+			else
+			{
+				creature->accuracy -= malus;
+				if (creature == player) OutputFormatter::chat(chatbox, player->getPlayerName() + " got a " + OutputFormatter::shortFloat(malus) + " Malus in accuracy", sf::Color::White);
+				else OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got a " + OutputFormatter::shortFloat(malus) + " Malus in accuracy", sf::Color::White);
+			}
 			break;
 		}
 		case Attribute::STRENGTH:
 		{
-			float strength = creature->strength - potion->getStrength() * finishedStagesMult;
-			if (strength < 0) strength = 0;
-			creature->strength = strength;
+			if (malus >= creature->strength)
+			{
+				creature->strength = 0;
+				if (creature == player) OutputFormatter::chat(chatbox, player->getPlayerName() + " got a " + OutputFormatter::shortFloat(creature->speed) + " Malus in speed", sf::Color::White);
+				else OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got a " + OutputFormatter::shortFloat(creature->speed) + " Malus in speed", sf::Color::White);
+			}
+			else
+			{
+				creature->strength -= malus;
+				if (creature == player) OutputFormatter::chat(chatbox, player->getPlayerName() + " got a " + OutputFormatter::shortFloat(malus) + " Malus in strength", sf::Color::White);
+				else OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got a " + OutputFormatter::shortFloat(malus) + " Malus in strength", sf::Color::White);
+			}
 			break;
 		}
 		default:
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " did some weird sh**, so nothing works at all!", sf::Color::White);
 			break;
 	}
 }
@@ -1092,37 +1099,69 @@ void Fight::potionIncrease(std::shared_ptr<Creature> creature, std::shared_ptr<P
 	}
 	*/
 
+	float boost = potion->getStrength() * finishedStagesMult;
+
 	switch (potion->getEffect())
 	{
 		case Attribute::HP:
 		{
 			std::cout << "potion->getEffect() == Attrib::HP" << std::endl;
-			creature->hp += potion->getStrength() * finishedStagesMult;
-			if (creature->hp > 50) creature->hp = 50;
+			
+			if (creature->hp + boost >= creature->getOrHP())
+			{
+				boost = creature->getOrHP() - creature->hp;
+				creature->hp = creature->getOrHP();
+				if (creature == player)
+				{
+					OutputFormatter::chat(chatbox, player->getPlayerName() + " got healed " + OutputFormatter::shortFloat(boost) + " HP", sf::Color::White);
+					OutputFormatter::chat(chatbox, player->getPlayerName() + " reached maximum health", sf::Color::White);
+				}
+				else
+				{
+					OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got healed " + OutputFormatter::shortFloat(boost) + " HP", sf::Color::White);
+					OutputFormatter::chat(chatbox, enemy->getCreatureType() + " reached its maximum health", sf::Color::White);
+				}
+			}
+			else
+			{
+				creature->hp += boost;
+				if (creature == player)
+				{
+					OutputFormatter::chat(chatbox, player->getPlayerName() + " got healed " + OutputFormatter::shortFloat(boost) + " HP", sf::Color::White);
+				}
+				else
+				{
+					OutputFormatter::chat(chatbox, enemy->getCreatureType() + " got healed " + OutputFormatter::shortFloat(boost) + " HP", sf::Color::White);
+				}
+			}
 			break;
 		}
 		case Attribute::SPEED:
 		{
 			std::cout << "potion->getEffect() == Attrib::SPEED" << std::endl;
 			creature->speed += potion->getStrength() * finishedStagesMult;
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " got a boost of " + OutputFormatter::shortFloat(potion->getStrength() * finishedStagesMult) + " speed", sf::Color::White);
 			break;
 		}
 		case Attribute::ACCURACY:
 		{
 			std::cout << "potion->getEffect() == Attrib::ACCURACY" << std::endl;
 			creature->accuracy += potion->getStrength() * finishedStagesMult;
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " got a boost of " + OutputFormatter::shortFloat(potion->getStrength() * finishedStagesMult) + " speed", sf::Color::White);
 			break;
 		}
 		case Attribute::STRENGTH:
 		{
 			std::cout << "potion->getEffect() == Attrib::STRENGTH" << std::endl;
 			creature->strength += potion->getStrength() * finishedStagesMult;
+			OutputFormatter::chat(chatbox, player->getPlayerName() + " got a boost of " + OutputFormatter::shortFloat(potion->getStrength() * finishedStagesMult) + " speed", sf::Color::White);
 			break;
 		}
 		default:
 			std::cout << "potion attribute UNKNOWN!" << std::endl;
 			break;
 	}
+	if (potion->getEffect() != Attribute::HP && potion->getEffect() != Attribute::UNKNOWN) creature->addActivePotion(potion);
 }
 
 void Fight::attributeBonusForWinner()
