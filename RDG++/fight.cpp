@@ -32,6 +32,7 @@ void Fight::fightRound(Attacks::Enum playerTask, unsigned int stage)
 	/* MAIN FIGHT LOOP */
 	//while (player->hp > 0 && enemy->hp > 0)
 	//{
+	std::cout << "------------" << std::endl;
 
 	if (loser != nullptr) // fight is already over
 	{
@@ -880,6 +881,9 @@ void Fight::usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Crea
 {
 	std::cout << "usePotion() called" << std::endl;
 	std::cout << "potionUser == " << potionUser << std::endl << "opponent == " << opponent << std::endl << "potion == " << potion->getName() << std::endl << std::endl;
+
+	std::list<std::shared_ptr<Potion>> removablePotions;
+
 	// if player uses antidote / removes the first poison in the list
 	if (potion->getMode() == Mode::UNKNOWN)
 	{
@@ -892,7 +896,7 @@ void Fight::usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Crea
 		{
 			if (_potion->getEffect() == Attribute::HP && _potion->getMode() == Mode::INCREMENTAL_DECREASE)
 			{
-				potionUser->removeActivePotions(_potion);
+				removablePotions.push_back(_potion);
 			}
 			break;
 		}
@@ -926,20 +930,43 @@ void Fight::usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Crea
 			}
 		}
 	}
+	for (std::shared_ptr<Potion> _potion : removablePotions)
+	{
+		potionUser->removeActivePotions(_potion);
+	}
 }
 
 void Fight::potionEffects(std::shared_ptr<Creature> creature)
 {
 	std::cout << "potionEffects() called" << std::endl;
 	// apply all non temporary potion effects
+
+	std::list<std::shared_ptr<Potion>> removablePotions;
+
 	if (creature != nullptr)
 	{
+		std::cout << "creature != nullptr" << std::endl;
 		for (std::shared_ptr<Potion> potion : creature->activePotions)
 		{
+
+			std::cout << "potion : " << potion->getName() << std::endl << "duration: " << potion->getDuration() << std::endl;
+
 			std::cout << "Active Potion: " << potion->getName() << std::endl;
-			potion->setDuration(potion->getDuration() - 1);
+			potion->decrDuration(1);
+			std::cout << "new duration: " << potion->getDuration() << std::endl;
 			switch (potion->getMode())				// kommt nur in default!!
 			{
+			case Mode::INCREMENTAL_INCREASE:
+				std::cout << "potion mode: INCREMENTAL_DECREASE" << std::endl;
+				potionIncrease(creature, potion);
+				std::cout << "potionIncrease successful" << std::endl;
+				break;
+			case Mode::INCREMENTAL_DECREASE:
+				std::cout << "potion mode: INCREMENTAL_INCREASE" << std::endl;
+				potionDecrease(creature, potion);
+				std::cout << "potionDecrease successful" << std::endl;
+				break;
+#if 0
 			case Mode::TEMPORARY_INCREASE:
 				std::cout << "potion mode: TEMPORARY_INCREASE" << std::endl;
 				potionIncrease(creature, potion);
@@ -950,6 +977,7 @@ void Fight::potionEffects(std::shared_ptr<Creature> creature)
 				potionDecrease(creature, potion);
 				std::cout << "potionDecrease successful" << std::endl;
 				break;
+#endif
 			case Mode::UNKNOWN:
 				std::cout << "potion mode: UNKNOWN" << std::endl;
 				break;
@@ -957,19 +985,29 @@ void Fight::potionEffects(std::shared_ptr<Creature> creature)
 				std::cout << "potion mode: DEFAULT => ERROR!!" << std::endl;
 				break;
 			}
+
 			if (potion->getDuration() <= 0)
 			{
 				std::cout << "potionDuration <= 0" << std::endl;
-				revertEffect(creature, potion);
-				std::cout << "revertEffect successful" << std::endl;
-				creature->removeActivePotions(potion);
+				if (potion->getEffect() != Attribute::HP)
+				{
+					revertEffect(creature, potion);
+					std::cout << "revertEffect successful" << std::endl;
+				}
+				removablePotions.push_back(potion);
 				std::cout << "removeActivePotions sucessful" << std::endl;
 			}
+
 		}
 	}
 	else
 	{
 		std::cout << "creature == nullptr" << std::endl;
+	}
+
+	for (std::shared_ptr<Potion> _potion : removablePotions)
+	{
+		creature->removeActivePotions(_potion);
 	}
 }
 
@@ -1060,6 +1098,7 @@ void Fight::potionIncrease(std::shared_ptr<Creature> creature, std::shared_ptr<P
 		{
 			std::cout << "potion->getEffect() == Attrib::HP" << std::endl;
 			creature->hp += potion->getStrength() * finishedStagesMult;
+			if (creature->hp > 50) creature->hp = 50;
 			break;
 		}
 		case Attribute::SPEED:

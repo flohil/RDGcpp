@@ -351,7 +351,7 @@ public:
 	Mode::Enum getMode() const { return mode; };
 	float getStrength() const { return strength; };
 	unsigned int getDuration() const { return duration; };
-	void setDuration(unsigned int decrease) { duration = duration - decrease; };
+	void decrDuration(unsigned int decrease) { duration = duration - decrease; };
 	virtual void debugPrint() const;
 
 protected:

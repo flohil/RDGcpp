@@ -529,7 +529,7 @@ std::shared_ptr<RenderableObject> EquipmentSet::getItemAtPixels(sf::Vector2i pos
 {
 	std::shared_ptr<RenderableObject> retObj = nullptr;
 
-	std::cout << "called getItemAtPixels with remove " << remove << std::endl;
+	//std::cout << "called getItemAtPixels with remove " << remove << std::endl;
 
 	if (!usePotion)
 	{
@@ -681,11 +681,11 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 		}
 	}
 
-	std::cout << "hotspot: " << hotspot << std::endl;
+	//std::cout << "hotspot: " << hotspot << std::endl;
 
 	if (obj->getObjectType() != ObjectType::ITEM || hotspot == EquipHotspots::UNKNOWN)
 	{
-		std::cout << "do not equip unknown item " << std::endl;
+		//std::cout << "do not equip unknown item " << std::endl;
 		retObjs.push_back(obj);
 		return retObjs; // do not allow key to be dropped in equipment
 	}
@@ -937,8 +937,10 @@ void Player::move(const float deltaTime)
 	else
 	{
 		toMove -= distance;
-		/*if (toMove > 0)
-		std::cout << "movement left: " << toMove << std::endl;*/
+		/*
+		if (toMove > 0)
+		std::cout << "movement left: " << toMove << std::endl;
+		*/
 	}
 
 	switch (movDir)
