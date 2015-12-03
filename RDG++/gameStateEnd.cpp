@@ -11,9 +11,6 @@ GameState(game_), victory(victory_)
 
 	settings = game_.getSettings();
 	size = sf::Vector2f(static_cast<float>(settings->scaleWidth), static_cast<float>(settings->scaleHeight));
-	view.setSize(size);
-	view.setCenter(view.getSize() * 0.5f);
-
 	// background.setTexture(ResourceManager::getInstance().getTexture("background"));
 
 	// create gui 
@@ -52,37 +49,23 @@ void GameStateEnd::update(const float deltaTime)
 		}
 	}
 
-	scrollUpdateAccumulator += deltaTime;
+	sf::Vector2f center = view.getCenter();
 
-	while (scrollUpdateAccumulator > scrollUpdateSpan)
+	float currentPos = lines.at(lines.size() - 1).getGlobalBounds().top - center.y + settings->height * 0.5f;
+
+	if (!(currentPos < targetEndPosY))
 	{
-
-		sf::Vector2f center = view.getCenter();
-
-		float currentPos = lines.at(lines.size() - 1).getGlobalBounds().top - center.y + settings->height * 0.5f;
-
-		/*std::cout << "currentPos: " << currentPos << std::endl;
-		std::cout << "targetEndPosY: " << targetEndPosY << std::endl;*/
-
-		if (!(currentPos < targetEndPosY))
-		{
-			/*std::cout << "center.y: " << center.y << std::endl;*/
-			++scrollCtr;
-			center.y += scrollSpeed;
-			view.setCenter(center);
-		}
-		else
-		{
-			if (!endedScrolling)
-			{
-				endedScrolling = true;
-				std::cout << "center.y: " << center.y << std::endl;
-				std::cout << "scrollCtr: " << scrollCtr << std::endl;
-			}
-		}
-
-		scrollUpdateAccumulator -= deltaTime;
+		center.y += scrollSpeed * deltaTime / scrollUpdateSpan;
+		view.setCenter(center);
 	}
+	else
+	{
+		if (!endedScrolling)
+		{
+			endedScrolling = true;
+		}
+	}
+
 
 	if (totalAccumulator > totalDuration && !triggeredQuit)
 	{
@@ -104,7 +87,9 @@ void GameStateEnd::handleInput()
 		{
 			game.window.close();
 		}
-		else if (event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed)
+		else if ((event.type == sf::Event::KeyPressed && 
+			(event.key.code == sf::Keyboard::Delete || event.key.code == sf::Keyboard::Escape || event.key.code == sf::Keyboard::Return || event.key.code == sf::Keyboard::Space))
+			|| event.type == sf::Event::MouseButtonPressed)
 		{
 			if (!triggeredQuit)
 			{
@@ -122,12 +107,6 @@ void GameStateEnd::loadGui()
 {
 	view.setSize(static_cast<float>(settings->width), static_cast<float>(settings->height));
 	view.setCenter(static_cast<float>(settings->width) * 0.5f, static_cast<float>(settings->height) * 0.5f);
-
-	gui.removeAllWidgets();
-	gui.setWindow(game.window);
-
-	// set global font that all widgets can use by default
-	gui.setFont("res/fonts/DejaVuSans.ttf");
 
 	std::string endCaption;
 	std::vector<std::string> linesTexts;
@@ -342,17 +321,19 @@ void GameStateEnd::loadGui()
 	linesTexts.push_back("Alexander Benesch & Florian Hilbinger");
 	linesTexts.push_back("GADEL, 2015");
 
+	float scale = settings->heightScaleFactor;
+
 	float offsetY = settings->height * 1.f;
 	float centerX = settings->width * 0.5f;
 	float centerY = settings->height * 0.5f;
 	float captionSize = 50.f;
 	float textSize = 25.f;
-	float lineSpace = 10.f * settings->heightScaleFactor;
+	float lineSpace = 10.f * scale;
 
 	font.loadFromFile("res/fonts/DejaVuSans.ttf");
 
 	endCaptionText.setString(endCaption);
-	endCaptionText.setCharacterSize(static_cast<unsigned int>(captionSize * settings->heightScaleFactor)); //50.f * settings->heightScaleFactor
+	endCaptionText.setCharacterSize(static_cast<unsigned int>(captionSize * scale)); //50.f * settings->heightScaleFactor
 	endCaptionText.setFont(font);
 	endCaptionText.setColor(sf::Color::White);
 
@@ -365,13 +346,11 @@ void GameStateEnd::loadGui()
 	offsetY += lineSpace;
 	offsetY += lineSpace;
 
-	std::cout << "text: " << endCaptionText.getString().toAnsiString() << std::endl;
-
 	for (std::string lineText : linesTexts)
 	{
 		sf::Text line;
 		line.setString(lineText);
-		line.setCharacterSize(static_cast<unsigned int>(textSize * settings->heightScaleFactor)); //50.f * settings->heightScaleFactor
+		line.setCharacterSize(static_cast<unsigned int>(textSize * scale)); //50.f * settings->heightScaleFactor
 		line.setFont(font);
 		line.setColor(sf::Color::White);
 
@@ -385,16 +364,10 @@ void GameStateEnd::loadGui()
 	}
 
 	endPosY = lines.at(lines.size() - 1).getGlobalBounds().top;
-
 	targetEndPosY = centerY + lines.at(lines.size() - 1).getGlobalBounds().height * 0.5f + 2*lineSpace;
 
 	float nbrScrolls = (totalDuration - staticEndScreenDuration) / scrollUpdateSpan;
 	float scrollSum = endPosY - targetEndPosY;
-	
-	std::cout << "nbrScrolls: " << nbrScrolls << std::endl;
-	std::cout << "scrollSum: " << scrollSum << std::endl;
 
-	scrollSpeed = scrollSum / nbrScrolls * 0.33f;
-
-	std::cout << "scrollSpeed: " << scrollSpeed << std::endl;
+	scrollSpeed = scrollSum / nbrScrolls;
 }

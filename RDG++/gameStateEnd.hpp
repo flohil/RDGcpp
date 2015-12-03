@@ -21,7 +21,6 @@ private:
 	float quitAccumulator = 0.f;
 
 	float scrollUpdateSpan = 0.05f;
-	float scrollUpdateAccumulator = 0;
 	float totalAccumulator = 0;
 	float totalDuration;
 
@@ -34,7 +33,7 @@ private:
 	float targetEndPosY;
 	float victoryDuration = 140.f; // in seconds
 	float defeatDuration = 121.f; // in seconds
-	float staticEndScreenDuration = 0.f; // in seconds
+	float staticEndScreenDuration = 10.f; // in seconds
 	float scrollSpeed = 0.f;
 
 	bool endedScrolling = false;

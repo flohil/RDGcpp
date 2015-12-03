@@ -497,7 +497,7 @@ void GameStateGame::handleInput()
 					game.window.close();
 				}
 			}
-			else if (event.key.code == sf::Keyboard::U) // debug
+			else if (event.key.code == sf::Keyboard::P) // debug
 			{
 				usePotionActive = !usePotionActive;
 			}
