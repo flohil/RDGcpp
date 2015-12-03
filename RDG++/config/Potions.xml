@@ -31,21 +31,6 @@
 		<Sound>potion.ogg</Sound>
 	</Potion>
 	<Potion>
-		<Name>Antidote</Name>
-		<Item_Class>strong</Item_Class>
-		<Class_Multiplier>1</Class_Multiplier>
-		<Stats_Low_Multiplier>0.8</Stats_Low_Multiplier>
-		<Stats_High_Multiplier>1.2</Stats_High_Multiplier>
-		<Description>reverses poison effect</Description>
-		<Target>self</Target>
-		<Effect>hp</Effect>
-		<Mode>x</Mode>
-		<x>1</x>
-		<n>1</n>
-		<Image>potions/antidote.png</Image>
-		<Sound>potion.ogg</Sound>
-	</Potion>
-	<Potion>
 		<Name>Potion of Strength</Name>
 		<Item_Class>medium</Item_Class>
 		<Class_Multiplier>1</Class_Multiplier>

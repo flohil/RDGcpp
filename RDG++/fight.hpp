@@ -32,7 +32,10 @@ public:
 	~Fight();
 
 	void fightRound(Attacks::Enum, unsigned int stage);
-	void addPotionToBeUsed(std::shared_ptr<Potion> potion) { selectedPotion = potion; };
+	void addPotionToBeUsed(std::shared_ptr<Potion> potion) { 
+		std::cout << (potion->getMode() == Mode::INCREMENTAL_INCREASE) << std::endl;
+		selectedPotion = potion; 
+	};
 	unsigned int getActiveRound() const { return activeRound; };
 	void setActiveRound(unsigned int activeRound_) { activeRound = activeRound_; };
 	Attacks::Enum getPlayerAttackType() { return playerAttackType; }

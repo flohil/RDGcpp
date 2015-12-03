@@ -88,6 +88,9 @@ void Map::init(std::shared_ptr<Player> player_)
 	loadRooms();
 	fillWithRooms();
 
+	placeInOverlay(Point{ 1, 1 }, std::shared_ptr<RenderableObject>(game.getPrototypeStorage()->potionFactory->create("Instant Cure")));
+	placeInOverlay(Point{ 1, 1 }, std::shared_ptr<RenderableObject>(game.getPrototypeStorage()->potionFactory->create("Potion of Regeneration")));
+
 #if 0
 	placeInOverlay(Point{ 1, 1 }, std::shared_ptr<RenderableObject>(game.getPrototypeStorage()->weaponFactory->create("Bow")));
 	placeInOverlay(Point{ 2, 1 }, std::shared_ptr<RenderableObject>(game.getPrototypeStorage()->weaponFactory->create("Axt")));

@@ -510,8 +510,8 @@ void EquipmentSet::setGeometry(sf::Vector2f armorOffsets_, sf::Vector2f potionOf
 	potionDims = potionDims_;
 	itemSize = itemSize_;
 
-	std::cout << "armorDims: " << armorDims.x << " x " << armorDims.y << std::endl;
-	std::cout << "potionDims: " << potionDims.x << " x " << potionDims.y << std::endl;
+	//std::cout << "armorDims: " << armorDims.x << " x " << armorDims.y << std::endl;
+	//std::cout << "potionDims: " << potionDims.x << " x " << potionDims.y << std::endl;
 
 	primaryWeaponPos = sf::Vector2f(armorOffsets.x + 12.f, armorOffsets.y + 110.f);
 	secondaryWeaponPos = sf::Vector2f(armorOffsets.x + 196.f, armorOffsets.y + 110.f);
@@ -647,37 +647,37 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 	std::list<std::shared_ptr<RenderableObject>> retObjs;
 	EquipHotspots::Enum hotspot = EquipHotspots::UNKNOWN;
 
-	std::cout << "pos: x =  " << pos.x << ", y = " << pos.y << std::endl;
-	std::cout << "armorBounds: left =  " << armorOffsets.x << ", right = " << (armorOffsets.x + armorDims.x) << ", top = " << armorOffsets.y << ", bottom = " << (armorOffsets.y + armorDims.y) << std::endl;
-	std::cout << "potionBounds: left =  " << potionOffsets.x << ", right = " << (potionOffsets.x + potionDims.x) << ", top = " << potionOffsets.y << ", bottom = " << (potionOffsets.y + potionDims.y) << std::endl;
+	//std::cout << "pos: x =  " << pos.x << ", y = " << pos.y << std::endl;
+	//std::cout << "armorBounds: left =  " << armorOffsets.x << ", right = " << (armorOffsets.x + armorDims.x) << ", top = " << armorOffsets.y << ", bottom = " << (armorOffsets.y + armorDims.y) << std::endl;
+	//std::cout << "potionBounds: left =  " << potionOffsets.x << ", right = " << (potionOffsets.x + potionDims.x) << ", top = " << potionOffsets.y << ", bottom = " << (potionOffsets.y + potionDims.y) << std::endl;
 
 	if (pos.x >= armorOffsets.x && pos.x <= (armorOffsets.x + armorDims.x) && pos.y >= armorOffsets.y && pos.y <= (armorOffsets.y + armorDims.y)) //inside armor
 	{
 		if (pos.x >= armorOffsets.x + (armorDims.x * 0.5f)){
 			hotspot = EquipHotspots::RIGHT;
-			std::cout << "right" << std::endl;
+			//std::cout << "right" << std::endl;
 		}
 		else
 		{
 			hotspot = EquipHotspots::LEFT;
-			std::cout << "left" << std::endl;
+			//std::cout << "left" << std::endl;
 		}
 	}
 	if (pos.x >= potionOffsets.x && pos.x <= (potionOffsets.x + potionDims.x) && pos.y >= potionOffsets.y && pos.y <= (potionOffsets.y + potionDims.y)) //inside potions
 	{
 		if (pos.x >= potionOffsets.x && pos.x < potionOffsets.x + (potionDims.x * 0.33f)){
 			hotspot = EquipHotspots::POTION3;
-			std::cout << "potion1" << std::endl;
+			//std::cout << "potion1" << std::endl;
 		}
 		else if (pos.x >= potionOffsets.x + (potionDims.x * 0.33f) && pos.x < potionOffsets.x + (potionDims.x * 0.66f))
 		{
 			hotspot = EquipHotspots::POTION2;
-			std::cout << "potion2" << std::endl;
+			//std::cout << "potion2" << std::endl;
 		}
 		else if (pos.x >= potionOffsets.x + (potionDims.x * 0.66f) && pos.x < potionOffsets.x + potionDims.x)
 		{
 			hotspot = EquipHotspots::POTION1;
-			std::cout << "potion3" << std::endl;
+			//std::cout << "potion3" << std::endl;
 		}
 	}
 
@@ -694,7 +694,7 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 
 	if (item->getItemType() == ItemType::POTION && hotspot != EquipHotspots::POTION1 && hotspot != EquipHotspots::POTION2 && hotspot != EquipHotspots::POTION3) // potion dragged on armament
 	{
-		std::cout << "dragged into armor" << std::endl;
+		//std::cout << "dragged into armor" << std::endl;
 		if (usePotion) // drink a potion
 		{
 			std::shared_ptr<Potion> potion = std::dynamic_pointer_cast<Potion>(item);
@@ -716,7 +716,7 @@ std::list<std::shared_ptr<RenderableObject>> EquipmentSet::setItemAtPixels(sf::V
 
 	if ((item->getItemType() == ItemType::ARMAMENT || item->getItemType() == ItemType::WEAPON) && hotspot != EquipHotspots::LEFT && hotspot != EquipHotspots::RIGHT)
 	{
-		std::cout << "dragged into potions" << std::endl;
+		//std::cout << "dragged into potions" << std::endl;
 		retObjs.push_back(obj);
 		return retObjs;
 	}
@@ -985,14 +985,14 @@ std::shared_ptr<Monster> Player::handleInput(sf::Event event, std::shared_ptr<Re
 	if (event.key.code == sf::Keyboard::E)
 	{
 
-		std::cout << "facing dir: " << facingDir << std::endl;
+		//std::cout << "facing dir: " << facingDir << std::endl;
 
 		Point facingPoint = playerPosition.getDirPoint(facingDir);
 		std::shared_ptr<RenderableObject> object = map->getOverlayObject(facingPoint);
 
 		if (object != nullptr)
 		{
-			std::cout << "in front of player: " << object->getName() << std::endl;
+			//std::cout << "in front of player: " << object->getName() << std::endl;
 
 			if (draggedItem == nullptr)
 			{
