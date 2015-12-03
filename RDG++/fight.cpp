@@ -876,20 +876,23 @@ void Fight::updateAttributes(std::shared_ptr<Creature> defender, float attribute
 
 void Fight::usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Creature> opponent, std::shared_ptr<Potion> potion)
 {
+	std::cout << "usePotion() called" << std::endl;
 	// if player uses antidote / removes the first poison in the list
 	if (potion->getMode() == Mode::CURE)
 	{
-		/*for (Potion _potion : potionUser->activePotions)
+		std::cout << "potionMode == CURE" << std::endl;
+		for (std::shared_ptr<Potion> _potion : potionUser->activePotions)
 		{
-			if (_potion.getEffect == Attribute::HP && _potion.getMode() == Mode::INCREMENTAL_DECREASE)
+			if (_potion->getEffect() == Attribute::HP && _potion->getMode() == Mode::INCREMENTAL_DECREASE)
 			{
 				potionUser->removeActivePotions(_potion);
 			}
 			break;
-		}*/
+		}
 	}
 	else
 	{
+		std::cout << "potionMode != CURE" << std::endl;
 		//store potions to the creature that they affect
 		if (potion->getTarget() == Target::SELF)
 		{
@@ -912,14 +915,15 @@ void Fight::usePotion(std::shared_ptr<Creature> potionUser, std::shared_ptr<Crea
 
 void Fight::potionEffects(std::shared_ptr<Creature> creature)
 {
+	std::cout << "potionEffects() called" << std::endl;
 	// apply all non temporary potion effects
 	if (creature != nullptr)
 	{
 		for (std::shared_ptr<Potion> potion : creature->activePotions)
 		{
-			std::cout << "Active Potion: " << potion << std::endl;
+			std::cout << "Active Potion: " << potion->getName() << std::endl;
 			potion->setDuration(potion->getDuration() - 1);
-			switch (potion->getMode())
+			switch (potion->getMode())				// kommt nur in default!!
 			{
 			case Mode::TEMPORARY_INCREASE:
 				std::cout << "potion mode: TEMPORARY_INCREASE" << std::endl;
@@ -953,6 +957,8 @@ void Fight::potionEffects(std::shared_ptr<Creature> creature)
 
 void Fight::revertEffect(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion)
 {
+	std::cout << "revertEffect() called" << std::endl;
+
 	if (potion->getMode() == Mode::TEMPORARY_INCREASE)
 	{
 		potionDecrease(creature, potion);
@@ -965,6 +971,8 @@ void Fight::revertEffect(std::shared_ptr<Creature> creature, std::shared_ptr<Pot
 
 void Fight::potionDecrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion)
 {
+	std::cout << "potionDecrease() called" << std::endl;
+	
 	// constants
 	float const finishedStagesDivisor = 50.f;
 
@@ -1014,6 +1022,8 @@ void Fight::potionDecrease(std::shared_ptr<Creature> creature, std::shared_ptr<P
 
 void Fight::potionIncrease(std::shared_ptr<Creature> creature, std::shared_ptr<Potion> potion)
 {
+	std::cout << "potionIncrease() called" << std::endl;
+
 	// constants
 	float const finishedStagesDivisor = 50.f;
 
