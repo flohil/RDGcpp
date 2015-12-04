@@ -1010,8 +1010,13 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 	// scale mouse position
 	sf::Vector2i pos;
 
+	/*std::cout << std::endl;
+	std::cout << "noScale? " << noScale << std::endl;
+	std::cout << "mouseEvent raw: pos = " << pos_.x << ", " << pos_.y << ", type: " << eventType << std::endl;*/
+
 	if (noScale)
 	{
+		//std::cout << "mouseEvent unscaled: pos = " << pos.x << ", " << pos.y << ", type: " << eventType << std::endl;
 		pos = pos_;
 	}
 	else
@@ -1020,7 +1025,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		pos.y = static_cast<int>(pos_.y * settings->heightDownScaleFactor);
 	}
 
-	//std::cout << "mouseEvent: pos = " << pos.x << ", " << pos.y << ", type: " << eventType << std::endl;
+	//std::cout << "mouseEvent scaled: pos = " << pos.x << ", " << pos.y << ", type: " << eventType << std::endl;
 
 	if (eventType == MouseEvent::DRAGSTART)
 	{
@@ -1039,6 +1044,7 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 
 	if (pos.x < rightHorSplitAbs && pos.y < bottomVerSplitAbs && pos.y >= topVerSplitAbs) // inside map
 	{
+
 		sf::Vector2i relPos;
 		sf::Vector2f mapViewCenter = mapView.getCenter();
 		sf::Vector2f mapCenter = sf::Vector2f(rightHorSplitAbs * 0.5f, (bottomVerSplitAbs - topVerSplitAbs) * 0.5f);
@@ -1046,18 +1052,18 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 		relPos.x = pos.x/* + static_cast<int>(mapCenter.x - mapViewCenter.x)*/;
 		relPos.y = pos.y - topVerSplitAbs /*+ static_cast<int>(mapCenter.y - mapViewCenter.y)*/;
 
-		//std::cout << "mapViewCenter: x = " << mapViewCenter.x << ", y = " << mapViewCenter.y << std::endl;
-		//std::cout << "mapCenter: x = " << mapCenter.x << ", y = " << mapCenter.y << std::endl;
-
-		//std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
-
-		relPos.x = relPos.x - static_cast<int>(mapCenter.x - mapViewCenter.x);
-		relPos.y = relPos.y - static_cast<int>(mapCenter.y - mapViewCenter.y);
-
-		//std::cout << "after relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
-
 		if (!inFight)
 		{
+			/*std::cout << "mapViewCenter: x = " << mapViewCenter.x << ", y = " << mapViewCenter.y << std::endl;
+			std::cout << "mapCenter: x = " << mapCenter.x << ", y = " << mapCenter.y << std::endl;
+*/
+			//std::cout << "before relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;
+
+			relPos.x = relPos.x - static_cast<int>(mapCenter.x - mapViewCenter.x);
+			relPos.y = relPos.y - static_cast<int>(mapCenter.y - mapViewCenter.y);
+
+			/*std::cout << "after relPos.x = " << relPos.x << ", relPos.y = " << relPos.y << std::endl;*/
+
 			if (eventType == MouseEvent::DRAGSTART)
 			{
 				draggedItem = nullptr;
@@ -1110,9 +1116,13 @@ void GameStateGame::handleMouseEvent(sf::Vector2i pos_, MouseEvent::Enum eventTy
 			float right = (left + enemySprite.getGlobalBounds().width);
 			float bottom = (top + enemySprite.getGlobalBounds().height);
 
+			/*std::cout << "clicked in fight - relPos: x = " << relPos.x << ", y = " << relPos.y << std::endl;
+			std::cout << "clicked in fight - enemySprite: left = " << left << ", top = " << top << ", right = " << right << ", bottom = " << bottom << std::endl;*/
+
 			// show monster details 
 			if (relPos.x >= left && relPos.y >= top && relPos.x < right && relPos.y < bottom)
 			{
+				// std::cout << "showing enemy details for " << fight->getEnemy()->getName() << std::endl;
 				ResourceManager::getInstance().getSound(fight->getEnemy()->getSoundName()).play();
 				updateDetails(DetailsBag(fight->getEnemy(), false));
 				showingEnemyDetails = true;
