@@ -1,0 +1,23 @@
+1) SFML 2.3.2 in Visual Studio einrichten: http://www.sfml-dev.org/tutorials/2.3/start-vc.php
+	- dynamisch mit dlls verwenden!!!
+	- nicht vergessen, wie ganz unten im Tutorial beschrieben, die dlls in Projekt - Debugverzeichnis zu kopieren
+	- folgende dlls bei Linker->Input->Additional Dependencies einstellen: 
+	
+	sfml-graphics-d.lib
+	sfml-window-d.lib
+	sfml-system-d.lib
+	sfgui-d.lib
+	opengl32.lib
+
+2) SFGUI installieren: hier runterladen als zip: https://github.com/TankOs/SFGUI
+   danach Anleitung folgen: http://sfgui.sfml-dev.de/p/docs/guide/installing
+
+	- dynamisch nicht statisch 
+	- bei Generator nicht Visual Studio 2013 auswählen sondern Nmake Makefiles
+	- cmake-gui.exe aus der Visual Studio 2013 Developer Command Prompt heraus öffnen, damit Systemvariablen korrekt gesetzt werden
+
+3) In visual studio mit git repo verknüpfen: http://michaelcrump.net/setting-up-github-to-work-with-visual-studio-2013-step-by-step/
+	- https://github.com/flohil/RDGcpp.git
+
+
+	
